@@ -1,0 +1,29 @@
+DELETCRA
+Copyright (c) 2026 DELETCRA contributors
+
+Original code authored for this repository is licensed under the MIT License.
+
+ELECTRA attribution
+------------------
+This project builds on the ELECTRA architecture and replaced-token detection
+research by Kevin Clark, Minh-Thang Luong, Quoc V. Le, and Christopher D. Manning:
+"ELECTRA: Pre-training Text Encoders as Discriminators Rather Than Generators"
+https://arxiv.org/abs/2003.10555
+
+The original Google Research ELECTRA implementation was released under the
+Apache License, Version 2.0, not MIT:
+https://github.com/google-research/electra
+Copyright 2020 The Google Research Authors (as credited in upstream model code).
+The upstream license text is included in LICENSES/Apache-2.0.txt.
+
+This repository uses the Hugging Face Transformers ELECTRA implementation as
+an external dependency. Transformers is licensed under Apache License 2.0:
+https://github.com/huggingface/transformers
+
+No upstream implementation source or pretrained model weights are vendored in
+this repository. Our additions configure causal self-attention and implement
+causal corruption, learning objectives, and experiments around that dependency.
+The MIT license for these additions does not replace any upstream license.
+Dependencies and any separately downloaded model weights or datasets retain
+their respective licenses. This NOTICE is an attribution document and does not
+modify those licenses.
