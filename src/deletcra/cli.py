@@ -42,6 +42,8 @@ def parser() -> argparse.ArgumentParser:
     budget.add_argument("--train-tokens", type=int)
     run.add_argument("--max-training-seconds", type=float)
     run.add_argument("--share-embeddings", action="store_true")
+    run.add_argument("--dropout", type=float)
+    run.add_argument("--eval-every-steps", type=int, default=0)
     run.add_argument("--batch-size", type=int, default=16)
     run.add_argument("--learning-rate", type=float)
     run.add_argument("--replacement-probability", type=float, default=0.15)
@@ -104,6 +106,7 @@ def _run(args: argparse.Namespace) -> dict:
         max_positions=max(model_settings.max_positions, sequence_length),
         pad_token_id=pad_id,
         bos_token_id=bos_id,
+        dropout=args.dropout if args.dropout is not None else model_settings.dropout,
     )
     if args.train_tokens is not None:
         if args.train_tokens < 1 or args.batch_size < 1:
@@ -128,6 +131,7 @@ def _run(args: argparse.Namespace) -> dict:
         probe_steps=args.probe_steps,
         max_training_seconds=args.max_training_seconds,
         share_embeddings=args.share_embeddings,
+        eval_every_steps=args.eval_every_steps,
     )
     modes = ["clm", "rtd", "joint"] if args.mode == "all" else [args.mode]
     rows = []

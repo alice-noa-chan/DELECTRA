@@ -34,6 +34,7 @@ class TrainConfig:
     probe_learning_rate: float = 0.01
     max_training_seconds: float | None = None
     share_embeddings: bool = False
+    eval_every_steps: int = 0
 
     def __post_init__(self) -> None:
         for name in ("steps", "batch_size", "cpu_threads", "eval_batches"):
@@ -61,6 +62,12 @@ class TrainConfig:
             raise ValueError("max_training_seconds must be finite and positive")
         if not isinstance(self.share_embeddings, bool):
             raise ValueError("share_embeddings must be boolean")
+        if (
+            not isinstance(self.eval_every_steps, int)
+            or isinstance(self.eval_every_steps, bool)
+            or self.eval_every_steps < 0
+        ):
+            raise ValueError("eval_every_steps must be a nonnegative integer")
 
 
 def _autocast(settings: TrainConfig):
@@ -280,6 +287,13 @@ def run_experiment(
         settings,
         special_token_ids=special_token_ids,
     )
+    validation_history = [{"step": 0, "metrics": initial}]
+    best_validation = (
+        initial if settings.eval_every_steps and objective.mode != "rtd" else None
+    )
+    best_step = 0 if best_validation is not None else None
+    if best_validation is not None:
+        model.save(directory / "best_model")
     model.train()
     if generator is not None:
         generator.train()
@@ -339,6 +353,31 @@ def run_experiment(
             _synchronize(settings.device)
             if time.perf_counter() - started >= settings.max_training_seconds:
                 break
+        if settings.eval_every_steps and step % settings.eval_every_steps == 0:
+            _synchronize(settings.device)
+            evaluation_started = time.perf_counter()
+            snapshot = evaluate(
+                model,
+                generator,
+                validation,
+                objective,
+                settings,
+                special_token_ids=special_token_ids,
+            )
+            validation_history.append({"step": step, "metrics": snapshot})
+            if (
+                best_validation is not None
+                and snapshot["lm_loss"] < best_validation["lm_loss"]
+            ):
+                best_validation, best_step = snapshot, step
+                model.save(directory / "best_model")
+            model.train()
+            if generator is not None:
+                generator.train()
+            _synchronize(settings.device)
+            excluded = time.perf_counter() - evaluation_started
+            started += excluded
+            measured_started += excluded
     completed_steps = step
     _synchronize(settings.device)
     ended = time.perf_counter()
@@ -354,6 +393,10 @@ def run_experiment(
         settings,
         special_token_ids=special_token_ids,
     )
+    validation_history.append({"step": completed_steps, "metrics": final})
+    if best_validation is not None and final["lm_loss"] < best_validation["lm_loss"]:
+        best_validation, best_step = final, completed_steps
+        model.save(directory / "best_model")
     probe_metrics = None
     if settings.probe_steps:
         probe_metrics, probe = frozen_probe(model, train, validation, settings)
@@ -384,6 +427,9 @@ def run_experiment(
         ),
         "initial_validation": initial,
         "final_validation": final,
+        "validation_history": validation_history,
+        "best_validation": best_validation,
+        "best_validation_step": best_step,
         "frozen_probe": probe_metrics,
         "history": history,
         "training_tokens": training_tokens,
@@ -400,6 +446,8 @@ def run_experiment(
         "measurement_note": (
             "Throughput includes this objective's generator/discriminator passes and "
             "optimizer step, excludes warmup, validation, probe training, and saving. "
+            "Optional best_model is selected on validation, not a test result; "
+            "probe and model checkpoints refer to the final training state. "
             "RTD/joint use a changing generator, so initial/final RTD corruption is "
             "not identical. Equal input tokens do not imply equal compute."
         ),

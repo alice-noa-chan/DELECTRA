@@ -156,6 +156,7 @@ def test_run_rejects_context_overflow_before_creating_outputs(tmp_path):
         {"precision": "bf16", "device": "cpu"},
         {"max_training_seconds": 0},
         {"max_training_seconds": float("nan")},
+        {"eval_every_steps": -1},
     ],
 )
 def test_invalid_training_settings(settings):
@@ -178,3 +179,27 @@ def test_time_budget_stops_after_a_complete_optimizer_step_and_saves(tmp_path):
     assert report["training_tokens"] == 20
     assert report["warmup_steps"] == 0
     assert (tmp_path / "timed" / "model" / "model.pt").exists()
+
+
+def test_periodic_validation_preserves_training_rng_and_selects_a_reloadable_best(
+    tmp_path,
+):
+    data = synthetic_sequences(16, 6, 8, seed=1)
+    settings = TrainConfig(steps=6, batch_size=4, probe_steps=0, learning_rate=0.01)
+    arguments = (
+        data,
+        data,
+        ModelConfig(vocab_size=8, dropout=0.1),
+        ObjectiveConfig(mode="clm"),
+    )
+    baseline = run_experiment(*arguments, settings, tmp_path / "baseline")
+    periodic = run_experiment(
+        *arguments, replace(settings, eval_every_steps=2), tmp_path / "periodic"
+    )
+    assert baseline["history"] == periodic["history"]
+    assert baseline["final_validation"] == periodic["final_validation"]
+    assert periodic["best_validation"]["lm_loss"] == min(
+        item["metrics"]["lm_loss"] for item in periodic["validation_history"]
+    )
+    restored = CausalElectra.load(tmp_path / "periodic" / "best_model")
+    assert torch.isfinite(restored(data).lm_logits).all()
