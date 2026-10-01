@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-01",
+  "type": "conditional planning scenario; not an invoice or quality guarantee",
+  "measurement": "runpod-3090-20261001.json",
+  "measured_joint_targets_per_second": 139815.9245806753,
+  "gpu_hourly_usd": 0.22,
+  "container_disk_gb": 30,
+  "observed_container_hourly_usd": 0.004,
+  "proposed_volume_gb": 50,
+  "running_volume_gb_monthly_usd": 0.1,
+  "planning_month_hours": 730,
+  "planning_volume_hourly_usd": 0.00684931506849315,
+  "setup_pilots_checkpoint_evaluation_hours_allowance": 3,
+  "stages": [
+    {
+      "stage": "TinyStories",
+      "processed_positions_or_targets": 3000000000,
+      "budget_status": "provisional",
+      "hours": 5.960217592041821,
+      "gpu_container_usd": 1.335088740617368
+    },
+    {
+      "stage": "Base",
+      "processed_positions_or_targets": 16400000000,
+      "budget_status": "accepted input scale; conservatively projected as targets",
+      "hours": 32.582522836495286,
+      "gpu_container_usd": 7.298485115374945
+    },
+    {
+      "stage": "IT",
+      "processed_positions_or_targets": 300000000,
+      "budget_status": "provisional; includes prompt and padded positions",
+      "hours": 0.5960217592041821,
+      "gpu_container_usd": 0.13350887406173678
+    }
+  ],
+  "scenarios": [
+    {
+      "training_speed_fraction": 1,
+      "active_hours": 42.13876218774129,
+      "compute_container_volume_usd": 9.727704388874196,
+      "usd_with_10_percent_contingency": 10.700474827761617
+    },
+    {
+      "training_speed_fraction": 0.8,
+      "active_hours": 51.923452734676616,
+      "compute_container_volume_usd": 11.986493499791374,
+      "usd_with_10_percent_contingency": 13.185142849770513
+    },
+    {
+      "training_speed_fraction": 0.7,
+      "active_hours": 58.91251741105899,
+      "compute_container_volume_usd": 13.599914293303646,
+      "usd_with_10_percent_contingency": 14.959905722634012
+    }
+  ],
+  "assumptions": [
+    "IT derives from Base; no second pretraining run",
+    "TinyStories full split count and sufficient convergence remain unmeasured",
+    "IT joint-rate extrapolation is unmeasured",
+    "Fresh-corpus preparation uses local CPU before allocation; cloud preprocessing remains unpriced",
+    "No additional idle-volume days",
+    "Current GPU offer and production loader speed must be checked before allocation",
+    "Additional research, failed runs, and quality-driven training extensions are not included"
+  ],
+  "full_training_allocated_during_review": false,
+  "storage_source": "https://docs.runpod.io/pods/pricing",
+  "offer_review": {
+    "provider": "Runpod Community Cloud",
+    "date": "2026-10-01",
+    "available_gpu_listing": "RTX 3090",
+    "listed_gpu_hourly_usd": 0.22,
+    "source": "https://console.runpod.io/deploy",
+    "pod_deployed": false
+  }
+}

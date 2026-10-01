@@ -96,3 +96,73 @@ fresh-corpus filtering, full-corpus loading overhead, quality pilots, validation
 checkpoints, failures, TinyStories completion or IT. Confirm production-loader
 speed and the current offer before allocating full training. No finished model
 or quality improvement was demonstrated by this short benchmark.
+
+## Whole-lineup credit scenario, October 1, 2026
+
+The earlier **$7.30** figure covers only Base optimizer work and its temporary
+container at the measured rate. It is not the total for three evaluated models.
+The user has requested a whole-lineup credit review before any full allocation.
+No new GPU has been allocated during this review.
+
+Only Base's 3.3B distinct corpus / 16.4B repeated input budget is accepted.
+For planning, propose **3.0B processed targets for TinyStories** and **0.3B
+processed input positions for IT**. These two numbers are provisional compute
+allowances, not measured corpus sizes, accepted epoch counts, reference training
+budgets, or evidence that release quality will be achieved. Count the complete
+pinned TinyStories split before setting epochs; increase the allowance if full
+coverage or validated convergence requires it. IT derives from Base without
+another independent pretraining run. IT compute counts prompts and padding,
+even where assistant-only loss masking excludes them from the loss.
+
+Use the measured batch-256 rate of 139,815.9245806753 targets/s, GPU $0.22/hour,
+and 30GB container $0.004/hour. Reusing joint throughput for IT is an unmeasured
+planning assumption. The Community Cloud deployment listing was rechecked on
+October 1 and still showed an available RTX 3090 at $0.22/hour; no Pod was
+deployed. Availability and rates can change before allocation. IT's objective,
+packing, and loader differ from the benchmark. Assume three
+additional GPU hours for installation, transfers, quality pilots, checkpointing,
+validation, independent tests, reference scoring, and sample generation. This
+fixed allowance has not been measured and does not cover unlimited research.
+
+| Stage | Provisional compute budget | Hours at measured rate | GPU + container |
+| --- | ---: | ---: | ---: |
+| Full TinyStories training | 3.0B targets | 5.96 | $1.34 |
+| Base pretraining | 16.4B targets, conservatively matching accepted input scale | 32.58 | $7.30 |
+| IT from Base | 0.3B processed positions | 0.60 | $0.13 |
+| Setup, pilots, saving, and evaluation allowance | Fixed time allowance | 3.00 | $0.67 |
+| Total compute and container | | 42.14 | $9.44 |
+
+Add a proposed **50GB persistent Pod volume**, separate from the container:
+$0.10/GB/month while running. Using 730 hours/month for this planning conversion
+adds about $0.29 over 42.14 hours, giving **$9.73** before a reserve. The provider's
+deployment quote remains authoritative. A stopped Pod volume costs
+$0.20/GB/month; export results and remove paid storage promptly after completion.
+This estimate assumes no extra idle-volume days and excludes existing Modal
+storage. [Runpod's official storage and billing rates](https://docs.runpod.io/pods/pricing).
+
+| Sustained training speed relative to benchmark | Active hours including 3h allowance | Compute + both disks | With 10% contingency |
+| --- | ---: | ---: | ---: |
+| 100% | 42.14 | $9.73 | $10.70 |
+| 80% | 51.92 | $11.99 | $13.19 |
+| 70% | 58.91 | $13.60 | $14.96 |
+
+The slowdown applies to training only; the three-hour allowance stays fixed.
+These scenarios support a **conditional $13-15 planning range**, not a guaranteed
+all-in price or a claim that all three candidates will pass quality tests.
+Every additional 1B joint targets costs about 1.99 hours / $0.46 including both
+disks at benchmark speed, or 2.84 hours / $0.66 at 70% speed, before contingency.
+
+Prepare the fresh 3.3B-token corpus and instruction subset on the local CPU before
+renting a GPU. This uses zero Runpod credits for preparation, but still takes
+local compute, download time, and disk space; those have not been measured.
+Cloud preprocessing is **unpriced**, so a cloud-prepared whole-project total is
+not established. Raw September Common Crawl needs extraction, filtering,
+deduplication, and tokenization; it is not a ready training cache. Runpod does
+not charge data ingress/egress according to its pricing documentation.
+
+The full loader, exact resume, learning schedule, and instruction trainer remain
+implementation work. Recheck actual throughput and the available GPU offer
+before spending. More epochs, failed runs, longer contexts, larger models,
+separate-generator controls beyond the pilot allowance, and additional tuning
+are outside this scenario. Arithmetic and assumptions are preserved in
+[the credit scenario](results/lineup-credit-scenario-20261001.json).
