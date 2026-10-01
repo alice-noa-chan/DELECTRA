@@ -1,4 +1,4 @@
-"""Portable A5000 measurement of the unchanged integrated 15M training step."""
+"""Portable budget-GPU measurement of the integrated 15M training step."""
 
 import argparse
 import gc
@@ -28,12 +28,19 @@ MEASURED = 100
 BASE_TARGETS = 16_400_000_000
 
 
-def validate_device(name: str, memory: int, capability: tuple[int, int]) -> None:
-    """Reject another GPU instead of attaching an A5000 price to its speed."""
-    if name.removeprefix("NVIDIA ") != "RTX A5000":
-        raise ValueError(f"expected RTX A5000, received {name}")
+def validate_device(
+    name: str,
+    memory: int,
+    capability: tuple[int, int],
+    expected: str = "RTX A5000",
+) -> None:
+    """Reject another GPU instead of attaching the requested device's price."""
+    if expected not in ("RTX A5000", "RTX 3090"):
+        raise ValueError("unsupported budget GPU")
+    if name.removeprefix("NVIDIA ") != expected:
+        raise ValueError(f"expected {expected}, received {name}")
     if memory < 22 * 2**30 or capability != (8, 6):
-        raise ValueError("expected a 24GB Ampere RTX A5000")
+        raise ValueError("expected a 24GB Ampere GPU")
 
 
 def summarize(rows: list[dict], hourly_price: float) -> list[dict]:
@@ -68,7 +75,7 @@ def summarize(rows: list[dict], hourly_price: float) -> list[dict]:
                 "finite_gradients": "passed",
             }
             if any(row.get(key) != value for key, value in expected.items()):
-                raise ValueError("trial differs from the fixed A5000 protocol")
+                raise ValueError("trial differs from the fixed budget GPU protocol")
             seconds = row["training_seconds"]
             if not math.isfinite(seconds) or seconds <= 0:
                 raise ValueError("training time must be finite and positive")
@@ -117,6 +124,7 @@ def main() -> None:
     parser.add_argument("--data-dir", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--hourly-price", type=float, required=True)
+    parser.add_argument("--gpu", choices=("RTX A5000", "RTX 3090"), default="RTX A5000")
     args = parser.parse_args()
     if not math.isfinite(args.hourly_price) or args.hourly_price <= 0:
         parser.error("hourly price must be finite and positive")
@@ -137,14 +145,17 @@ def main() -> None:
     started = time.perf_counter()
 
     def timeout(_signal, _frame):
-        raise TimeoutError("A5000 benchmark exceeded its 900-second process budget")
+        raise TimeoutError("GPU benchmark exceeded its 900-second process budget")
 
     try:
         if not torch.cuda.is_available():
-            raise ValueError("A5000 benchmark requires CUDA")
+            raise ValueError("budget GPU benchmark requires CUDA")
         device = torch.cuda.get_device_properties(0)
         validate_device(
-            device.name, device.total_memory, torch.cuda.get_device_capability()
+            device.name,
+            device.total_memory,
+            torch.cuda.get_device_capability(),
+            args.gpu,
         )
         if not torch.cuda.is_bf16_supported(including_emulation=False):
             raise ValueError("native BF16 is required")
@@ -189,7 +200,7 @@ def main() -> None:
             for batch in order:
                 gc.collect()
                 torch.cuda.empty_cache()
-                print(f"A5000 repetition={repetition} batch={batch}", flush=True)
+                print(f"{args.gpu} repetition={repetition} batch={batch}", flush=True)
                 row = measure_case(
                     train,
                     tuple(metadata["special_token_ids"]),

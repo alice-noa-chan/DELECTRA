@@ -3,6 +3,10 @@
 The current Runpod console offers one RTX A5000 at $0.16/GPU-hour on October 1,
 2026. This is a live offer, not a guaranteed future rate. The public pricing
 page previously listed $0.27/hour. Container storage and startup add costs.
+Both Community and Secure A5000 stock subsequently ran out before allocation.
+The available 24GB RTX 3090 offers $0.22/GPU-hour plus $0.004/container-hour;
+it is the fallback for this short measurement. Its result must be labeled 3090,
+and cannot be presented as A5000 speed. No A5000 measurement has occurred.
 
 This experiment measures the unchanged 15,041,505-parameter ELECTRA backbone
 with integrated learned replacements and RTD + causal LM. It uses native BF16,
@@ -21,10 +25,10 @@ on failure. It does not allocate, extend, or stop the provider's Pod itself.
 After committing the code, run in the repository root on one rented A5000:
 
 ```sh
-python -m deletcra.budget_benchmark \
+python -m deletcra.budget_benchmark --gpu 'RTX 3090' \
   --data-dir data/tinystories-gpu-profile-256-10m-100k \
-  --output results/runpod-a5000-20261001.json \
-  --hourly-price 0.16
+  --output results/runpod-3090-20261001.json \
+  --hourly-price 0.22
 ```
 
 Pin PyTorch 2.8.0, Transformers 4.57.6, and Liger 0.8.4 to match previous runs.
