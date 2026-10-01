@@ -1,0 +1,80 @@
+{
+  "root": "D:\\models\\DELETCRA\\runs\\modal-checkpoints\\modal-l40s-wikitext2-20261001-ablations",
+  "torch": "2.14.1+cpu",
+  "checkpoints": [
+    {
+      "checkpoint": "embeddings\\separate\\rtd\\generator\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "embeddings\\separate\\rtd\\model\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "embeddings\\shared\\rtd\\generator\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "embeddings\\shared\\rtd\\model\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "regularization\\dropout0\\clm\\best_model\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "regularization\\dropout0\\clm\\model\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "regularization\\dropout01\\clm\\best_model\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "regularization\\dropout01\\clm\\model\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    }
+  ],
+  "shared_embedding_pairs_verified": [
+    "embeddings\\shared\\rtd\\generator"
+  ],
+  "sha256": {
+    "embeddings\\separate\\rtd\\generator\\config.json": "f793ceedade99627d1ec89481f2fcfa7fd3e1c0f9d9800397e738ccf11cf2543",
+    "embeddings\\separate\\rtd\\generator\\model.pt": "1e2fcbadc01650cc835d41880f8f0d8e9182350e4f6eaaebef4bbed07e53a2e7",
+    "embeddings\\separate\\rtd\\model\\config.json": "0de7b2c5ca4fbdebda9f778677c17b1614b97523b7c47cd7f0382ffb4a785c42",
+    "embeddings\\separate\\rtd\\model\\model.pt": "af7de2449c2adf086016abe35b579dab609d464a4df80755411b074c78e52587",
+    "embeddings\\separate\\rtd\\probe.pt": "d308ddd3a0da192764523090d0798c8970fb4ad8bd66d767f67d409b5f88e6cb",
+    "embeddings\\shared\\rtd\\generator\\config.json": "f793ceedade99627d1ec89481f2fcfa7fd3e1c0f9d9800397e738ccf11cf2543",
+    "embeddings\\shared\\rtd\\generator\\model.pt": "694bd82ea90613042efd8622dad50794e51c8107b43806366e64d516a72996a8",
+    "embeddings\\shared\\rtd\\model\\config.json": "0de7b2c5ca4fbdebda9f778677c17b1614b97523b7c47cd7f0382ffb4a785c42",
+    "embeddings\\shared\\rtd\\model\\model.pt": "656cfd454bd2031d671a8cc1ab3d94415098efe5d1a78becc939d92fec0e05ce",
+    "embeddings\\shared\\rtd\\probe.pt": "77d846cc13e9aa4a01f97ed3e94c3db6aa62070a6c25079bdd45d0536685e299",
+    "regularization\\dropout0\\clm\\best_model\\config.json": "0de7b2c5ca4fbdebda9f778677c17b1614b97523b7c47cd7f0382ffb4a785c42",
+    "regularization\\dropout0\\clm\\best_model\\model.pt": "a57dee4f4a618a69a65404628307a35abda8e45fd69c8a78bc0be8b924bd186c",
+    "regularization\\dropout0\\clm\\model\\config.json": "0de7b2c5ca4fbdebda9f778677c17b1614b97523b7c47cd7f0382ffb4a785c42",
+    "regularization\\dropout0\\clm\\model\\model.pt": "3f2eaf2bfff2e578e4746183eed0a553c0c51bcd578ea7d68be863bfdf1ff031",
+    "regularization\\dropout0\\clm\\probe.pt": "812b0cc3a5b7e1d3d98c5d6bf55acf8a1fd38dd0e281fd01af46fa3698d67c14",
+    "regularization\\dropout01\\clm\\best_model\\config.json": "4401c5636a42221e4291b881854f8976027afe334771d6959a133274e9bfbbfe",
+    "regularization\\dropout01\\clm\\best_model\\model.pt": "be608263336d5a65ac932105aee2c16a5dbef1d6d0d9a8571a82dbf456d30548",
+    "regularization\\dropout01\\clm\\model\\config.json": "4401c5636a42221e4291b881854f8976027afe334771d6959a133274e9bfbbfe",
+    "regularization\\dropout01\\clm\\model\\model.pt": "1c43adb665fb004132a428c3ae65b707b5db3cd7e575c7ff3eba8fca2a6fb744",
+    "regularization\\dropout01\\clm\\probe.pt": "832805bffa70d6e0d3afc2f42deb4b7df23f8a46700e50ace5e7bfe14f8d6145"
+  },
+  "note": "Local CPU strict loading, finite outputs and bit-exact future isolation; not a generation quality benchmark."
+}
