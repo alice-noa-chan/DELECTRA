@@ -40,7 +40,7 @@ app = modal.App("deletcra-integration-optimizations", image=image)
     max_containers=1,
     scaledown_window=2,
 )
-def profile(run_id: str, source_commit: str) -> dict:
+def profile(run_id: str, source_commit: str, follow_up: bool = False) -> dict:
     import torch
 
     from deletcra.data import load_prepared
@@ -64,7 +64,9 @@ def profile(run_id: str, source_commit: str) -> dict:
         or metadata["tokenizer_revision"] != REFERENCE_REVISION
     ):
         raise ValueError("cached data differs from the pinned protocol")
-    result = benchmark_optimizations(train, tuple(metadata["special_token_ids"]))
+    result = benchmark_optimizations(
+        train, tuple(metadata["special_token_ids"]), follow_up=follow_up
+    )
     seconds = time.perf_counter() - started
     result.update(
         run_id=run_id,
@@ -82,7 +84,7 @@ def profile(run_id: str, source_commit: str) -> dict:
 
 
 @app.local_entrypoint()
-def main(run_id: str) -> None:
+def main(run_id: str, follow_up: bool = False) -> None:
     validate_run_id(run_id)
     destination = ROOT / "results" / f"{run_id}.json"
     if destination.exists():
@@ -94,7 +96,7 @@ def main(run_id: str) -> None:
     source_commit = subprocess.check_output(
         ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
     ).strip()
-    result = profile.remote(run_id, source_commit)
+    result = profile.remote(run_id, source_commit, follow_up)
     destination.write_text(
         json.dumps(result, indent=2, allow_nan=False) + "\n", encoding="utf-8"
     )

@@ -12,6 +12,7 @@ saved experiment IDs, and historical artifact paths also retain that spelling.
 
 See [MODEL_REVIEW.md](MODEL_REVIEW.md) for the critical model review and
 [INTEGRATION.md](INTEGRATION.md) for self replacement and its limits.
+Verified GPU optimization measurements are in [OPTIMIZATION.md](OPTIMIZATION.md).
 
 Use Python 3.10 or newer.
 

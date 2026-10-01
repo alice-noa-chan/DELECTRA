@@ -1,0 +1,26 @@
+{
+  "hash_format": "SHA-256 of UTF-8 file content with LF newlines, no BOM",
+  "artifacts": [
+    {
+      "path": "results/modal-integration-20261001-profile.json",
+      "sha256": "54149a2f2985bd8b43af2cb17a0e83c02ca9f4dd7b4314f7a05777defd0d24c4",
+      "source_commit": "46f29b80e253ef5eee44b33836411f623d7fb2e9",
+      "volume": "deletcra-experiments",
+      "volume_path": "/runs/modal-integration-20261001-profile/result.json",
+      "downloaded_volume_bytes_match": true,
+      "summary_recomputed": true,
+      "app_id": "ap-yzn4IXhkm4fqhX3eTRc85s",
+      "verified_app_state": "stopped",
+      "verified_running_tasks": 0,
+      "stopped_at": "2026-10-01 17:54:06+09:00"
+    }
+  ],
+  "empty_console_failure_app": {
+    "app_id": "ap-sOkLauojVLPnTnjodEYuIv",
+    "reason": "Windows cp949 console could not print the Modal success marker; no function worker started",
+    "verified_app_state": "stopped",
+    "verified_running_tasks": 0,
+    "stopped_at": "2026-10-01 17:45:06+09:00"
+  },
+  "limitations": "Benchmarks create no release weights. Function-duration GPU estimates are not invoices; host, image build, startup and storage are excluded. Algorithm and batch changes have unverified convergence effects."
+}

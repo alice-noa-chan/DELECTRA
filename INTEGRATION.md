@@ -29,7 +29,8 @@ CLM pass, making proposal reuse a different tradeoff.
 
 Implementation checks cover two backbone passes, correct loss weighting,
 detached sampling, future isolation, RTD/LM gradients and single-model export.
-This document does not claim measured CUDA speed or completed model training.
+See [OPTIMIZATION.md](OPTIMIZATION.md) for verified CUDA loss/gradient checks,
+throughput and memory measurements. Completed model training is still pending.
 
 ## Optional training execution optimizations
 

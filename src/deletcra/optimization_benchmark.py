@@ -27,6 +27,12 @@ CASES = (
     ("self-fused", "self", "liger", True, True, 64),
     ("self-large-batch", "self", "liger", True, True, 256),
 )
+FOLLOW_UP_CASES = (
+    ("follow-control", "self", "liger", True, True, 256),
+    ("follow-combined", "self", "liger", False, False, 256),
+    ("follow-batch512", "self", "liger", False, False, 512),
+)
+FOLLOW_UP_MEASURED = 100
 
 
 def check_liger_equivalence() -> dict:
@@ -72,7 +78,7 @@ def check_liger_equivalence() -> dict:
                 "cosine_similarity": cosine,
             }
         results[precision] = {
-            "loss_absolute_difference": float((reference - actual).abs()),
+            "loss_absolute_difference": float((reference - actual).detach().abs()),
             "gradients": errors,
         }
     return results
@@ -120,19 +126,23 @@ def check_sequential_equivalence() -> dict:
         differences.append(float((pa.grad - pb.grad).abs().max()))
     return {
         "same_replacements": True,
-        "loss_absolute_difference": float((outputs[0].loss - outputs[1].loss).abs()),
+        "loss_absolute_difference": float(
+            (outputs[0].loss - outputs[1].loss).detach().abs()
+        ),
         "gradient_max_absolute_difference": max(differences),
     }
 
 
-def summarize_cases(rows: list[dict]) -> list[dict]:
+def summarize_cases(rows: list[dict], *, follow_up: bool = False) -> list[dict]:
     """Require complete repetitions before claiming a throughput or memory result."""
     summary = []
-    for name, generator, loss, sequential, fused, batch in CASES:
+    protocol = FOLLOW_UP_CASES if follow_up else CASES
+    measured = FOLLOW_UP_MEASURED if follow_up else MEASURED
+    for name, generator, loss, sequential, fused, batch in protocol:
         cases = [row for row in rows if row["case"] == name]
         if len(cases) != REPETITIONS or any(
             row["status"] != "completed"
-            or row["measured_steps"] != MEASURED
+            or row["measured_steps"] != measured
             or row["warmup_steps"] != WARMUP
             or row["batch_size"] != batch
             or row["generator_mode"] != generator
@@ -166,7 +176,9 @@ def summarize_cases(rows: list[dict]) -> list[dict]:
     return summary
 
 
-def benchmark_optimizations(train: Tensor, special_ids: tuple[int, ...]) -> dict:
+def benchmark_optimizations(
+    train: Tensor, special_ids: tuple[int, ...], *, follow_up: bool = False
+) -> dict:
     if not torch.cuda.is_available():
         raise ValueError("optimization benchmark requires CUDA")
     if train.ndim != 2 or train.shape[1] != 256 or train.eq(0).any():
@@ -178,11 +190,13 @@ def benchmark_optimizations(train: Tensor, special_ids: tuple[int, ...]) -> dict
         "sequential_execution": check_sequential_equivalence(),
     }
     rows = []
+    protocol = FOLLOW_UP_CASES if follow_up else CASES
+    measured = FOLLOW_UP_MEASURED if follow_up else MEASURED
     # Rotate execution order across repetitions to reduce first/last-case bias.
     for repetition in range(REPETITIONS):
-        order = CASES[repetition:] + CASES[:repetition]
+        order = protocol[repetition:] + protocol[:repetition]
         for name, generator, loss, sequential, fused, batch in order:
-            if time.perf_counter() - started > 450:
+            if time.perf_counter() - started > (300 if follow_up else 450):
                 raise TimeoutError("optimization benchmark exceeded its work budget")
             gc.collect()
             torch.cuda.empty_cache()
@@ -194,7 +208,7 @@ def benchmark_optimizations(train: Tensor, special_ids: tuple[int, ...]) -> dict
                 "joint",
                 batch,
                 warmup_steps=WARMUP,
-                measured_steps=MEASURED,
+                measured_steps=measured,
                 generator_mode=generator,
                 lm_loss_backend=loss,
                 sequential_backward=sequential,
@@ -206,7 +220,8 @@ def benchmark_optimizations(train: Tensor, special_ids: tuple[int, ...]) -> dict
         "status": "completed",
         "checks": checks,
         "cases": rows,
-        "summary": summarize_cases(rows),
+        "summary": summarize_cases(rows, follow_up=follow_up),
+        "profile": "batch-follow-up" if follow_up else "initial",
         "environment": {
             "gpu": torch.cuda.get_device_name(),
             "torch": torch.__version__,
