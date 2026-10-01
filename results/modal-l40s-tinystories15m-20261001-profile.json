@@ -1,0 +1,864 @@
+{
+  "run_id": "modal-l40s-tinystories15m-20261001-profile",
+  "reports": {
+    "clm": {
+      "model_config": {
+        "vocab_size": 32000,
+        "embedding_size": 288,
+        "hidden_size": 288,
+        "num_layers": 6,
+        "num_heads": 6,
+        "intermediate_size": 1024,
+        "max_positions": 256,
+        "dropout": 0.1,
+        "pad_token_id": 0,
+        "bos_token_id": 1
+      },
+      "objective_config": {
+        "mode": "clm",
+        "replacement_probability": 0.15,
+        "temperature": 1.0,
+        "generator_weight": 1.0,
+        "rtd_weight": 5.0,
+        "lm_weight": 1.0
+      },
+      "train_config": {
+        "steps": 300,
+        "batch_size": 16,
+        "learning_rate": 0.0003,
+        "weight_decay": 0.01,
+        "max_grad_norm": 1.0,
+        "seed": 7,
+        "device": "cuda",
+        "precision": "bf16",
+        "cpu_threads": 2,
+        "eval_batches": 32,
+        "probe_steps": 0,
+        "probe_learning_rate": 0.01,
+        "max_training_seconds": null,
+        "share_embeddings": false,
+        "eval_every_steps": 0
+      },
+      "dataset": {
+        "dataset": "roneneldan/TinyStories",
+        "dataset_revision": "f54c09fd23315a6f9c86f9dc80f725de7d8f9c64",
+        "tokenizer": "nickypro/tinyllama-15M",
+        "tokenizer_revision": "a97e01fa7d54c088df9dc1b53d581a863ce08cd6",
+        "vocab_size": 32000,
+        "bos_token_id": 1,
+        "pad_token_id": 0,
+        "special_token_ids": [
+          1,
+          2,
+          0
+        ],
+        "sequence_length": 256,
+        "train_content_tokens": 9999825,
+        "validation_content_tokens": 99960,
+        "license_note": "TinyStories data is CDLA-Sharing-1.0; reference model card labels MIT. These are separate from project licenses.",
+        "protocol": "BOS-prefixed packed blocks; BOS separates stories, no appended EOS. Official HF train/validation; reference pretraining overlap is unknown. Different from upstream's private shard evaluation."
+      },
+      "special_token_ids": [
+        1,
+        2,
+        0
+      ],
+      "environment": {
+        "python": "3.11.12",
+        "torch": "2.8.0+cu128",
+        "transformers": "4.57.6",
+        "device": "NVIDIA L40S"
+      },
+      "model_parameters": 15041505,
+      "generator_parameters": 0,
+      "unique_optimized_parameters": 15041505,
+      "initial_validation": {
+        "next_token_targets": 99960,
+        "lm_loss": 10.450463937253367,
+        "perplexity": 34560.404849801846
+      },
+      "final_validation": {
+        "next_token_targets": 99960,
+        "lm_loss": 3.7346009234992827,
+        "perplexity": 41.87131237158185
+      },
+      "validation_history": [
+        {
+          "step": 0,
+          "metrics": {
+            "next_token_targets": 99960,
+            "lm_loss": 10.450463937253367,
+            "perplexity": 34560.404849801846
+          }
+        },
+        {
+          "step": 300,
+          "metrics": {
+            "next_token_targets": 99960,
+            "lm_loss": 3.7346009234992827,
+            "perplexity": 41.87131237158185
+          }
+        }
+      ],
+      "best_validation": null,
+      "best_validation_step": null,
+      "frozen_probe": null,
+      "history": [
+        {
+          "step": 1,
+          "loss": 10.4382963180542,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 10.4382963180542
+        },
+        {
+          "step": 10,
+          "loss": 9.074456214904785,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 9.074456214904785
+        },
+        {
+          "step": 20,
+          "loss": 7.877458572387695,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 7.877458572387695
+        },
+        {
+          "step": 30,
+          "loss": 6.903431415557861,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 6.903431415557861
+        },
+        {
+          "step": 40,
+          "loss": 6.333869457244873,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 6.333869457244873
+        },
+        {
+          "step": 50,
+          "loss": 5.937628269195557,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 5.937628269195557
+        },
+        {
+          "step": 60,
+          "loss": 5.6190505027771,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 5.6190505027771
+        },
+        {
+          "step": 70,
+          "loss": 5.495537281036377,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 5.495537281036377
+        },
+        {
+          "step": 80,
+          "loss": 5.227321624755859,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 5.227321624755859
+        },
+        {
+          "step": 90,
+          "loss": 5.0649614334106445,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 5.0649614334106445
+        },
+        {
+          "step": 100,
+          "loss": 4.93663215637207,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 4.93663215637207
+        },
+        {
+          "step": 110,
+          "loss": 4.872061729431152,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 4.872061729431152
+        },
+        {
+          "step": 120,
+          "loss": 4.6218671798706055,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 4.6218671798706055
+        },
+        {
+          "step": 130,
+          "loss": 4.599989891052246,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 4.599989891052246
+        },
+        {
+          "step": 140,
+          "loss": 4.54520320892334,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 4.54520320892334
+        },
+        {
+          "step": 150,
+          "loss": 4.43761682510376,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 4.43761682510376
+        },
+        {
+          "step": 160,
+          "loss": 4.434951305389404,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 4.434951305389404
+        },
+        {
+          "step": 170,
+          "loss": 4.359445095062256,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 4.359445095062256
+        },
+        {
+          "step": 180,
+          "loss": 4.297602653503418,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 4.297602653503418
+        },
+        {
+          "step": 190,
+          "loss": 4.4262495040893555,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 4.4262495040893555
+        },
+        {
+          "step": 200,
+          "loss": 4.183577537536621,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 4.183577537536621
+        },
+        {
+          "step": 210,
+          "loss": 4.406987190246582,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 4.406987190246582
+        },
+        {
+          "step": 220,
+          "loss": 4.191014766693115,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 4.191014766693115
+        },
+        {
+          "step": 230,
+          "loss": 4.237242221832275,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 4.237242221832275
+        },
+        {
+          "step": 240,
+          "loss": 4.169631004333496,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 4.169631004333496
+        },
+        {
+          "step": 250,
+          "loss": 4.042221546173096,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 4.042221546173096
+        },
+        {
+          "step": 260,
+          "loss": 4.075896739959717,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 4.075896739959717
+        },
+        {
+          "step": 270,
+          "loss": 4.118040561676025,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 4.118040561676025
+        },
+        {
+          "step": 280,
+          "loss": 3.953523874282837,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 3.953523874282837
+        },
+        {
+          "step": 290,
+          "loss": 3.942411422729492,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 3.942411422729492
+        },
+        {
+          "step": 300,
+          "loss": 3.9322311878204346,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 3.9322311878204346
+        }
+      ],
+      "training_tokens": 1224000,
+      "completed_steps": 300,
+      "stop_reason": "step_budget",
+      "training_seconds": 8.267802936,
+      "warmup_steps": 5,
+      "input_tokens_per_second": 160749.488716124,
+      "peak_cuda_allocated_bytes": 2111285760,
+      "estimated_hours_per_10m_tokens": 0.017280165554263142,
+      "measurement_note": "Throughput includes this objective's generator/discriminator passes and optimizer step, excludes warmup, validation, probe training, and saving. Optional best_model is selected on validation, not a test result; probe and model checkpoints refer to the final training state. RTD/joint use a changing generator, so initial/final RTD corruption is not identical. Equal input tokens do not imply equal compute."
+    },
+    "joint": {
+      "model_config": {
+        "vocab_size": 32000,
+        "embedding_size": 288,
+        "hidden_size": 288,
+        "num_layers": 6,
+        "num_heads": 6,
+        "intermediate_size": 1024,
+        "max_positions": 256,
+        "dropout": 0.1,
+        "pad_token_id": 0,
+        "bos_token_id": 1
+      },
+      "objective_config": {
+        "mode": "joint",
+        "replacement_probability": 0.15,
+        "temperature": 1.0,
+        "generator_weight": 1.0,
+        "rtd_weight": 5.0,
+        "lm_weight": 1.0
+      },
+      "train_config": {
+        "steps": 300,
+        "batch_size": 16,
+        "learning_rate": 0.0003,
+        "weight_decay": 0.01,
+        "max_grad_norm": 1.0,
+        "seed": 7,
+        "device": "cuda",
+        "precision": "bf16",
+        "cpu_threads": 2,
+        "eval_batches": 32,
+        "probe_steps": 0,
+        "probe_learning_rate": 0.01,
+        "max_training_seconds": null,
+        "share_embeddings": true,
+        "eval_every_steps": 0
+      },
+      "dataset": {
+        "dataset": "roneneldan/TinyStories",
+        "dataset_revision": "f54c09fd23315a6f9c86f9dc80f725de7d8f9c64",
+        "tokenizer": "nickypro/tinyllama-15M",
+        "tokenizer_revision": "a97e01fa7d54c088df9dc1b53d581a863ce08cd6",
+        "vocab_size": 32000,
+        "bos_token_id": 1,
+        "pad_token_id": 0,
+        "special_token_ids": [
+          1,
+          2,
+          0
+        ],
+        "sequence_length": 256,
+        "train_content_tokens": 9999825,
+        "validation_content_tokens": 99960,
+        "license_note": "TinyStories data is CDLA-Sharing-1.0; reference model card labels MIT. These are separate from project licenses.",
+        "protocol": "BOS-prefixed packed blocks; BOS separates stories, no appended EOS. Official HF train/validation; reference pretraining overlap is unknown. Different from upstream's private shard evaluation."
+      },
+      "special_token_ids": [
+        1,
+        2,
+        0
+      ],
+      "environment": {
+        "python": "3.11.12",
+        "torch": "2.8.0+cu128",
+        "transformers": "4.57.6",
+        "device": "NVIDIA L40S"
+      },
+      "model_parameters": 15041505,
+      "generator_parameters": 9487625,
+      "unique_optimized_parameters": 15239402,
+      "initial_validation": {
+        "next_token_targets": 99960,
+        "lm_loss": 10.450463937253367,
+        "perplexity": 34560.404849801846,
+        "generator_loss": 10.45936123205691,
+        "rtd_loss": 0.7093755395173912,
+        "rtd_accuracy": 0.263274780930943,
+        "rtd_majority_baseline": 0.8487820564354048,
+        "rtd_replacement_rate": 0.15121794356459523,
+        "rtd_precision": 0.15169593859470834,
+        "rtd_recall": 0.8431685273790537,
+        "rtd_f1": 0.25713098724275246,
+        "rtd_balanced_accuracy": 0.5015650839206313,
+        "rtd_confusion": {
+          "tp": 12688,
+          "tn": 13511,
+          "fp": 70953,
+          "fn": 2360
+        },
+        "rtd_auroc": 0.5146520856691057,
+        "rtd_average_precision": 0.15957432249480313
+      },
+      "final_validation": {
+        "next_token_targets": 99960,
+        "lm_loss": 3.855872923014115,
+        "perplexity": 47.26986188713978,
+        "generator_loss": 3.8871221250417283,
+        "rtd_loss": 0.37995237247651964,
+        "rtd_accuracy": 0.8714727872015435,
+        "rtd_majority_baseline": 0.8706286678993488,
+        "rtd_replacement_rate": 0.1293713321006512,
+        "rtd_precision": 0.61731843575419,
+        "rtd_recall": 0.017166381854901352,
+        "rtd_f1": 0.033403869407496976,
+        "rtd_balanced_accuracy": 0.5077925447906516,
+        "rtd_confusion": {
+          "tp": 221,
+          "tn": 86501,
+          "fp": 137,
+          "fn": 12653
+        },
+        "rtd_auroc": 0.5631752195327371,
+        "rtd_average_precision": 0.16692883780995466
+      },
+      "validation_history": [
+        {
+          "step": 0,
+          "metrics": {
+            "next_token_targets": 99960,
+            "lm_loss": 10.450463937253367,
+            "perplexity": 34560.404849801846,
+            "generator_loss": 10.45936123205691,
+            "rtd_loss": 0.7093755395173912,
+            "rtd_accuracy": 0.263274780930943,
+            "rtd_majority_baseline": 0.8487820564354048,
+            "rtd_replacement_rate": 0.15121794356459523,
+            "rtd_precision": 0.15169593859470834,
+            "rtd_recall": 0.8431685273790537,
+            "rtd_f1": 0.25713098724275246,
+            "rtd_balanced_accuracy": 0.5015650839206313,
+            "rtd_confusion": {
+              "tp": 12688,
+              "tn": 13511,
+              "fp": 70953,
+              "fn": 2360
+            },
+            "rtd_auroc": 0.5146520856691057,
+            "rtd_average_precision": 0.15957432249480313
+          }
+        },
+        {
+          "step": 300,
+          "metrics": {
+            "next_token_targets": 99960,
+            "lm_loss": 3.855872923014115,
+            "perplexity": 47.26986188713978,
+            "generator_loss": 3.8871221250417283,
+            "rtd_loss": 0.37995237247651964,
+            "rtd_accuracy": 0.8714727872015435,
+            "rtd_majority_baseline": 0.8706286678993488,
+            "rtd_replacement_rate": 0.1293713321006512,
+            "rtd_precision": 0.61731843575419,
+            "rtd_recall": 0.017166381854901352,
+            "rtd_f1": 0.033403869407496976,
+            "rtd_balanced_accuracy": 0.5077925447906516,
+            "rtd_confusion": {
+              "tp": 221,
+              "tn": 86501,
+              "fp": 137,
+              "fn": 12653
+            },
+            "rtd_auroc": 0.5631752195327371,
+            "rtd_average_precision": 0.16692883780995466
+          }
+        }
+      ],
+      "best_validation": null,
+      "best_validation_step": null,
+      "frozen_probe": null,
+      "history": [
+        {
+          "step": 1,
+          "loss": 24.432775497436523,
+          "generator_loss": 10.453263282775879,
+          "rtd_loss": 0.7083933353424072,
+          "lm_loss": 10.437545776367188
+        },
+        {
+          "step": 10,
+          "loss": 20.6080379486084,
+          "generator_loss": 9.313733100891113,
+          "rtd_loss": 0.4227931797504425,
+          "lm_loss": 9.180338859558105
+        },
+        {
+          "step": 20,
+          "loss": 18.075136184692383,
+          "generator_loss": 7.957981109619141,
+          "rtd_loss": 0.4296656548976898,
+          "lm_loss": 7.968826770782471
+        },
+        {
+          "step": 30,
+          "loss": 15.873871803283691,
+          "generator_loss": 6.938480377197266,
+          "rtd_loss": 0.39801353216171265,
+          "lm_loss": 6.945323944091797
+        },
+        {
+          "step": 40,
+          "loss": 14.882944107055664,
+          "generator_loss": 6.441708564758301,
+          "rtd_loss": 0.39320024847984314,
+          "lm_loss": 6.475233554840088
+        },
+        {
+          "step": 50,
+          "loss": 14.317047119140625,
+          "generator_loss": 6.11685037612915,
+          "rtd_loss": 0.4126704931259155,
+          "lm_loss": 6.136845111846924
+        },
+        {
+          "step": 60,
+          "loss": 13.878313064575195,
+          "generator_loss": 5.897596836090088,
+          "rtd_loss": 0.4088817834854126,
+          "lm_loss": 5.936306953430176
+        },
+        {
+          "step": 70,
+          "loss": 13.712457656860352,
+          "generator_loss": 5.77987813949585,
+          "rtd_loss": 0.420574426651001,
+          "lm_loss": 5.82970666885376
+        },
+        {
+          "step": 80,
+          "loss": 13.014256477355957,
+          "generator_loss": 5.508484840393066,
+          "rtd_loss": 0.3892917037010193,
+          "lm_loss": 5.55931282043457
+        },
+        {
+          "step": 90,
+          "loss": 12.827392578125,
+          "generator_loss": 5.390151023864746,
+          "rtd_loss": 0.4051075577735901,
+          "lm_loss": 5.4117045402526855
+        },
+        {
+          "step": 100,
+          "loss": 12.45070743560791,
+          "generator_loss": 5.212211608886719,
+          "rtd_loss": 0.4036603271961212,
+          "lm_loss": 5.220193862915039
+        },
+        {
+          "step": 110,
+          "loss": 12.271650314331055,
+          "generator_loss": 5.126971244812012,
+          "rtd_loss": 0.40275418758392334,
+          "lm_loss": 5.130908012390137
+        },
+        {
+          "step": 120,
+          "loss": 11.728355407714844,
+          "generator_loss": 4.847513198852539,
+          "rtd_loss": 0.4053702652454376,
+          "lm_loss": 4.853990077972412
+        },
+        {
+          "step": 130,
+          "loss": 11.58163070678711,
+          "generator_loss": 4.818275451660156,
+          "rtd_loss": 0.3909158706665039,
+          "lm_loss": 4.808775424957275
+        },
+        {
+          "step": 140,
+          "loss": 11.487066268920898,
+          "generator_loss": 4.751279830932617,
+          "rtd_loss": 0.39857232570648193,
+          "lm_loss": 4.742924213409424
+        },
+        {
+          "step": 150,
+          "loss": 11.192352294921875,
+          "generator_loss": 4.61484432220459,
+          "rtd_loss": 0.39512988924980164,
+          "lm_loss": 4.601858139038086
+        },
+        {
+          "step": 160,
+          "loss": 11.02260971069336,
+          "generator_loss": 4.575131893157959,
+          "rtd_loss": 0.37518227100372314,
+          "lm_loss": 4.571566104888916
+        },
+        {
+          "step": 170,
+          "loss": 10.89284610748291,
+          "generator_loss": 4.494435787200928,
+          "rtd_loss": 0.3815388083457947,
+          "lm_loss": 4.490715980529785
+        },
+        {
+          "step": 180,
+          "loss": 10.831085205078125,
+          "generator_loss": 4.417461395263672,
+          "rtd_loss": 0.3991841971874237,
+          "lm_loss": 4.417702674865723
+        },
+        {
+          "step": 190,
+          "loss": 11.039641380310059,
+          "generator_loss": 4.565810680389404,
+          "rtd_loss": 0.3837870955467224,
+          "lm_loss": 4.554895401000977
+        },
+        {
+          "step": 200,
+          "loss": 10.567789077758789,
+          "generator_loss": 4.324263572692871,
+          "rtd_loss": 0.38672488927841187,
+          "lm_loss": 4.309901714324951
+        },
+        {
+          "step": 210,
+          "loss": 10.990519523620605,
+          "generator_loss": 4.528347969055176,
+          "rtd_loss": 0.38773420453071594,
+          "lm_loss": 4.523500442504883
+        },
+        {
+          "step": 220,
+          "loss": 10.543403625488281,
+          "generator_loss": 4.323181629180908,
+          "rtd_loss": 0.3826158046722412,
+          "lm_loss": 4.307143211364746
+        },
+        {
+          "step": 230,
+          "loss": 10.719661712646484,
+          "generator_loss": 4.369915962219238,
+          "rtd_loss": 0.3980998694896698,
+          "lm_loss": 4.359245777130127
+        },
+        {
+          "step": 240,
+          "loss": 10.490299224853516,
+          "generator_loss": 4.280825138092041,
+          "rtd_loss": 0.3882972002029419,
+          "lm_loss": 4.2679877281188965
+        },
+        {
+          "step": 250,
+          "loss": 10.278238296508789,
+          "generator_loss": 4.184314727783203,
+          "rtd_loss": 0.38732630014419556,
+          "lm_loss": 4.15729284286499
+        },
+        {
+          "step": 260,
+          "loss": 10.34417724609375,
+          "generator_loss": 4.2105302810668945,
+          "rtd_loss": 0.388120174407959,
+          "lm_loss": 4.1930460929870605
+        },
+        {
+          "step": 270,
+          "loss": 10.3705472946167,
+          "generator_loss": 4.257630825042725,
+          "rtd_loss": 0.37460821866989136,
+          "lm_loss": 4.239875316619873
+        },
+        {
+          "step": 280,
+          "loss": 9.982080459594727,
+          "generator_loss": 4.066553115844727,
+          "rtd_loss": 0.3715499937534332,
+          "lm_loss": 4.057776927947998
+        },
+        {
+          "step": 290,
+          "loss": 10.061881065368652,
+          "generator_loss": 4.1187744140625,
+          "rtd_loss": 0.3739369809627533,
+          "lm_loss": 4.073421478271484
+        },
+        {
+          "step": 300,
+          "loss": 10.049463272094727,
+          "generator_loss": 4.0690765380859375,
+          "rtd_loss": 0.38826531171798706,
+          "lm_loss": 4.039060115814209
+        }
+      ],
+      "training_tokens": 1224000,
+      "completed_steps": 300,
+      "stop_reason": "step_budget",
+      "training_seconds": 17.452377456,
+      "warmup_steps": 5,
+      "input_tokens_per_second": 72590.91984620658,
+      "peak_cuda_allocated_bytes": 3871606784,
+      "estimated_hours_per_10m_tokens": 0.038266187887725706,
+      "measurement_note": "Throughput includes this objective's generator/discriminator passes and optimizer step, excludes warmup, validation, probe training, and saving. Optional best_model is selected on validation, not a test result; probe and model checkpoints refer to the final training state. RTD/joint use a changing generator, so initial/final RTD corruption is not identical. Equal input tokens do not imply equal compute."
+    }
+  },
+  "commands": {
+    "clm": [
+      "/usr/local/bin/python",
+      "-m",
+      "deletcra",
+      "run",
+      "--preset",
+      "story15m",
+      "--mode",
+      "clm",
+      "--data-dir",
+      "/vol/data/tinystories-ref-256-10m-100k",
+      "--output-dir",
+      "/vol/runs/modal-l40s-tinystories15m-20261001-profile/clm",
+      "--steps",
+      "300",
+      "--batch-size",
+      "16",
+      "--eval-batches",
+      "32",
+      "--probe-steps",
+      "0",
+      "--device",
+      "cuda",
+      "--precision",
+      "bf16",
+      "--cpu-threads",
+      "2",
+      "--seed",
+      "7",
+      "--quiet"
+    ],
+    "joint": [
+      "/usr/local/bin/python",
+      "-m",
+      "deletcra",
+      "run",
+      "--preset",
+      "story15m",
+      "--mode",
+      "joint",
+      "--data-dir",
+      "/vol/data/tinystories-ref-256-10m-100k",
+      "--output-dir",
+      "/vol/runs/modal-l40s-tinystories15m-20261001-profile/joint",
+      "--steps",
+      "300",
+      "--batch-size",
+      "16",
+      "--eval-batches",
+      "32",
+      "--probe-steps",
+      "0",
+      "--device",
+      "cuda",
+      "--precision",
+      "bf16",
+      "--cpu-threads",
+      "2",
+      "--seed",
+      "7",
+      "--quiet",
+      "--share-embeddings"
+    ]
+  },
+  "cuda_checks": {
+    "gpu": "NVIDIA L40S",
+    "cuda": "12.8",
+    "torch": "2.8.0+cu128",
+    "bf16_supported": true,
+    "future_prefix_max_difference": 0.0,
+    "joint_loss": 10.3806734085083,
+    "gradient_check": "passed"
+  },
+  "remote_gpu_function_seconds": 53.858951743,
+  "estimated_gpu_charge_usd": 0.029191551844705996,
+  "extrapolation": {
+    "clm": {
+      "100000000": {
+        "training_hours": 0.1728016555426314,
+        "training_gpu_estimate_usd": 0.33717059029478236
+      },
+      "1000000000": {
+        "training_hours": 1.7280165554263143,
+        "training_gpu_estimate_usd": 3.371705902947824
+      },
+      "3000000000": {
+        "training_hours": 5.184049666278943,
+        "training_gpu_estimate_usd": 10.115117708843472
+      }
+    },
+    "joint": {
+      "100000000": {
+        "training_hours": 0.382661878877257,
+        "training_gpu_estimate_usd": 0.7466498580653038
+      },
+      "1000000000": {
+        "training_hours": 3.8266187887725707,
+        "training_gpu_estimate_usd": 7.466498580653039
+      },
+      "3000000000": {
+        "training_hours": 11.47985636631771,
+        "training_gpu_estimate_usd": 22.399495741959115
+      }
+    }
+  },
+  "note": "300-step throughput/memory pilot, not target-level training. Extrapolated longer-run time and GPU cost exclude data preparation, validation, checkpoints, startup/scaledown, CPU, memory, storage and egress. Short pilots can overestimate sustained throughput. 100M/1B/3B are proposed input budgets, not known reference budgets or guarantees of beating TinyLlama.",
+  "source_commit": "3a16a00",
+  "validation_tokens_sha256": "1ebbe107d26b2272a471fbda05201a5209bb318651067990c719444ca3fda283",
+  "validation_tokens_hash_format": "C-order little-endian signed int64",
+  "provenance": {
+    "app_url": "https://modal.com/apps/gaon12/main/ap-kRTMiMqhpFsTCNXqbYPoxK",
+    "app_state": "stopped",
+    "tasks": 0,
+    "stopped_at": "2026-10-01 14:56:10+09:00",
+    "gpu_rate_usd_per_second": 0.000542,
+    "rate_source": "https://modal.com/pricing",
+    "checkpoint_verification": "modal-l40s-tinystories15m-20261001-profile-checkpoints.json"
+  },
+  "validation_protocol_verification": {
+    "exact_local_remote_tensor_equality": true,
+    "tensor_shape": [
+      392,
+      256
+    ],
+    "remote_validation_file_sha256": "da70c0a1a011689d05576de3b4c4e131e06cf35802813f7ed477d896b1bf7a11",
+    "note": "Serialized .pt hashes differ across torch versions; decoded token tensors are bit-identical."
+  },
+  "saved_joint_shared_embeddings_exactly_equal": true
+}

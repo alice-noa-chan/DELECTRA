@@ -1,0 +1,63 @@
+{
+  "reference_model": "nickypro/tinyllama-15M",
+  "reference_revision": "a97e01fa7d54c088df9dc1b53d581a863ce08cd6",
+  "model_parameters": 15191712,
+  "dataset": {
+    "dataset": "roneneldan/TinyStories",
+    "dataset_revision": "f54c09fd23315a6f9c86f9dc80f725de7d8f9c64",
+    "tokenizer": "nickypro/tinyllama-15M",
+    "tokenizer_revision": "a97e01fa7d54c088df9dc1b53d581a863ce08cd6",
+    "vocab_size": 32000,
+    "bos_token_id": 1,
+    "pad_token_id": 0,
+    "special_token_ids": [
+      1,
+      2,
+      0
+    ],
+    "sequence_length": 256,
+    "train_content_tokens": 99960,
+    "validation_content_tokens": 99960,
+    "license_note": "TinyStories data is CDLA-Sharing-1.0; reference model card labels MIT. These are separate from project licenses.",
+    "protocol": "BOS-prefixed packed blocks; BOS separates stories, no appended EOS. Official HF train/validation; reference pretraining overlap is unknown. Different from upstream's private shard evaluation."
+  },
+  "validation_sha256": "d40142e1eaf482867d5c10c2bc10eb348147a03ca8c4d9a9ea0aea61ad8360f4",
+  "metrics": {
+    "next_token_targets": 99960,
+    "nll": 1.3717497915637737,
+    "perplexity": 3.9422427670037163
+  },
+  "evaluation_seconds": 25.258762599900365,
+  "environment": {
+    "device": "cpu",
+    "torch": "2.14.1+cpu",
+    "transformers": "4.57.6",
+    "python": "3.11.9"
+  },
+  "generation": {
+    "max_new_tokens": 96,
+    "do_sample": false,
+    "samples": [
+      {
+        "prompt": "Once upon a time, a little girl found a key",
+        "generated_text": "Once upon a time, a little girl found a key. She was so excited and wanted to keep it. She put the key in her pocket and went to the park.\nAt the park, she saw a big tree. She wanted to climb it. She put the key in the tree and started to climb. She was so happy.\nBut then, the key got stuck in the tree. She tried to get it out, but she couldn't. She was so sad.\nThe little girl was so"
+      },
+      {
+        "prompt": "Tom wanted to help his friend, but",
+        "generated_text": "Tom wanted to help his friend, but he was too small to reach the top of the stairs. He saw a ladder near the stairs and thought it would be a good idea. He grabbed the ladder and started to climb.\nBut the ladder was old and weak. It broke and Tom fell down. He hurt his leg and cried. He was scared and sad. He wanted to go back to his home.\nHis mom heard him and ran to him. She"
+      },
+      {
+        "prompt": "The little dog was afraid of the rain. One day,",
+        "generated_text": "The little dog was afraid of the rain. One day, the rain was very heavy and the dog was scared. He ran to his bed and hid under the covers. He felt safe and warm.\nSuddenly, he heard a loud noise. He looked up and saw a big, scary monster! The monster was coming closer and closer. The little dog was so scared that he started to shake.\nThe monster was so big and scary that the little dog couldn't move."
+      },
+      {
+        "prompt": "Lily and her brother went to the park. They saw",
+        "generated_text": "Lily and her brother went to the park. They saw a big slide and ran to it. Lily wanted to go first, but her brother said no. He said it was too high and too fast. Lily was sad and angry. She wanted to go on the slide.\nShe saw a boy with a red hat and a blue shirt. He was playing with a ball. Lily ran to him and said, \"Give me your ball. I want to go on the slide.\" The boy said, \""
+      }
+    ]
+  },
+  "note": "Common BOS-prefixed packed-block protocol, context 256; measure candidate with identical validation tokens. This is not upstream's private shard loss or independent held-out evidence for the reference (training overlap unknown). Prior WikiText/ELECTRA-tokenizer perplexities are incomparable. No candidate has yet been trained on this TinyStories protocol.",
+  "source_commit": "25c3590",
+  "validation_tokens_sha256": "1ebbe107d26b2272a471fbda05201a5209bb318651067990c719444ca3fda283",
+  "validation_tokens_hash_format": "C-order little-endian signed int64"
+}

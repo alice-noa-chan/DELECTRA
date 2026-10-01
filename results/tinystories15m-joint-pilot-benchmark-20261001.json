@@ -1,0 +1,67 @@
+{
+  "reference_model": "nickypro/tinyllama-15M",
+  "reference_revision": "a97e01fa7d54c088df9dc1b53d581a863ce08cd6",
+  "evaluated_model": "candidate",
+  "candidate_checkpoint": "runs\\modal-checkpoints\\modal-l40s-tinystories15m-20261001-profile\\joint\\joint\\model",
+  "model_parameters": 15041505,
+  "dataset": {
+    "dataset": "roneneldan/TinyStories",
+    "dataset_revision": "f54c09fd23315a6f9c86f9dc80f725de7d8f9c64",
+    "tokenizer": "nickypro/tinyllama-15M",
+    "tokenizer_revision": "a97e01fa7d54c088df9dc1b53d581a863ce08cd6",
+    "vocab_size": 32000,
+    "bos_token_id": 1,
+    "pad_token_id": 0,
+    "special_token_ids": [
+      1,
+      2,
+      0
+    ],
+    "sequence_length": 256,
+    "train_content_tokens": 99960,
+    "validation_content_tokens": 99960,
+    "license_note": "TinyStories data is CDLA-Sharing-1.0; reference model card labels MIT. These are separate from project licenses.",
+    "protocol": "BOS-prefixed packed blocks; BOS separates stories, no appended EOS. Official HF train/validation; reference pretraining overlap is unknown. Different from upstream's private shard evaluation."
+  },
+  "validation_sha256": "d40142e1eaf482867d5c10c2bc10eb348147a03ca8c4d9a9ea0aea61ad8360f4",
+  "metrics": {
+    "next_token_targets": 99960,
+    "nll": 3.8558176512620888,
+    "perplexity": 47.26724927125783
+  },
+  "evaluation_seconds": 28.876878599869087,
+  "environment": {
+    "device": "cpu",
+    "torch": "2.14.1+cpu",
+    "transformers": "4.57.6",
+    "python": "3.11.9"
+  },
+  "generation": {
+    "max_new_tokens": 96,
+    "do_sample": false,
+    "samples": [
+      {
+        "prompt": "Once upon a time, a little girl found a key",
+        "generated_text": "Once upon a time, a little girl found a key. He was a big, there was a little girl named Lily.\n\n\n\n\n\nThe boy named Lily was a big, \"I's mommy was a big, \"I's mommy said, \"I's mommy said, \"I's mommy's mommy said, \"I's mommy said, \"I's mommy said, \"I's mommy said, \"I's"
+      },
+      {
+        "prompt": "Tom wanted to help his friend, but",
+        "generated_text": "Tom wanted to help his friend, but he was a time, he was a time, he was a time, he was a big, he was a little girl named Lily.\n\n\n\n\nThe boy named Lily was a big, \"I's mommy was a big, \"I's mommy was a big, \"I's mommy was a big, \"I's mommy said, \"I's mommy said, \"I's mommy."
+      },
+      {
+        "prompt": "The little dog was afraid of the rain. One day,",
+        "generated_text": "The little dog was afraid of the rain. One day, and the park.\n\n\nThe little girl was a big, \"I's mommy was a big, \"I's mommy said, \"I's mommy said, \"I's mommy's mommy's mommy said, \"I's mommy's mommy said, \"I's mommy's mommy's mommy's mommy said, \"I's mommy's"
+      },
+      {
+        "prompt": "Lily and her brother went to the park. They saw",
+        "generated_text": "Lily and her brother went to the park. They saw a big, \"I's mommy. They were very happy. They were very happy. They were very happy. They were happy. They were very happy. They were happy. They were very happy. They were very happy. They were very happy. They were very happy. They were very happy. They were very happy. They were very happy. They were very happy. They were very happy. They were very happy. They were very happy. They were very"
+      }
+    ],
+    "note": "Candidate generation masks BOS/PAD; reference uses native HF generation. Qualitative samples are not a controlled generation-quality score."
+  },
+  "note": "Common BOS-prefixed packed-block protocol, context 256; measure candidate with identical validation tokens. This is not upstream's private shard loss or independent held-out evidence for the reference (training overlap unknown). Prior WikiText/ELECTRA-tokenizer perplexities are incomparable. Candidate results refer only to the explicitly provided checkpoint.",
+  "source_commit": "58ceae2",
+  "validation_tokens_sha256": "1ebbe107d26b2272a471fbda05201a5209bb318651067990c719444ca3fda283",
+  "validation_tokens_hash_format": "C-order little-endian signed int64",
+  "candidate_weights_sha256": "075882f9fb4533316803536701c8a75e57a093b364b638a4553fe0f747cfc86c"
+}

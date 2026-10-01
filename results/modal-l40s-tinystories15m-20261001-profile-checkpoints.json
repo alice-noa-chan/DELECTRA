@@ -1,0 +1,34 @@
+{
+  "root": "D:\\models\\DELETCRA\\runs\\modal-checkpoints\\modal-l40s-tinystories15m-20261001-profile",
+  "torch": "2.14.1+cpu",
+  "checkpoints": [
+    {
+      "checkpoint": "clm\\clm\\model\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "joint\\joint\\generator\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "joint\\joint\\model\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    }
+  ],
+  "shared_embedding_pairs_verified": [],
+  "sha256": {
+    "clm\\clm\\model\\config.json": "370ea42174ba1b63c06bf6240d4ffa6d4fe7fef577855ef6377130dada95f40c",
+    "clm\\clm\\model\\model.pt": "30ce29c39226f8b1dc14db89af4224b92e66c8764264f2e010a41c7ffe46b03b",
+    "joint\\joint\\generator\\config.json": "b1d36438f5abb62c6ccd63ec7fbe528b9be220414c934cbb0036c8572fa670ed",
+    "joint\\joint\\generator\\model.pt": "a9b14f1469541ca8bd6df0430455b96aae452aadeb953bc84d462f394010a0c6",
+    "joint\\joint\\model\\config.json": "370ea42174ba1b63c06bf6240d4ffa6d4fe7fef577855ef6377130dada95f40c",
+    "joint\\joint\\model\\model.pt": "075882f9fb4533316803536701c8a75e57a093b364b638a4553fe0f747cfc86c"
+  },
+  "note": "Local CPU strict loading, finite outputs and bit-exact future isolation; not a generation quality benchmark."
+}
