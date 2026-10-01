@@ -56,6 +56,9 @@ def parser() -> argparse.ArgumentParser:
     run.add_argument(
         "--generator-mode", choices=["separate", "self"], default="separate"
     )
+    run.add_argument("--lm-loss-backend", choices=["torch", "liger"], default="torch")
+    run.add_argument("--sequential-backward", action="store_true")
+    run.add_argument("--fused-optimizer", action="store_true")
     run.add_argument("--dropout", type=float)
     run.add_argument(
         "--attention-backend", choices=["eager", "sdpa", "flash"], default="eager"
@@ -154,6 +157,8 @@ def _run(args: argparse.Namespace) -> dict:
         max_training_seconds=args.max_training_seconds,
         share_embeddings=args.share_embeddings,
         eval_every_steps=args.eval_every_steps,
+        sequential_backward=args.sequential_backward,
+        fused_optimizer=args.fused_optimizer,
     )
     modes = ["clm", "rtd", "joint"] if args.mode == "all" else [args.mode]
     rows = []
@@ -161,6 +166,7 @@ def _run(args: argparse.Namespace) -> dict:
         objective = ObjectiveConfig(
             mode=mode,
             generator_mode=args.generator_mode,
+            lm_loss_backend=args.lm_loss_backend,
             replacement_probability=args.replacement_probability,
             temperature=args.temperature,
             rtd_weight=args.rtd_weight,

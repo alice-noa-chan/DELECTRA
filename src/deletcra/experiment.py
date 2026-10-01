@@ -43,6 +43,8 @@ class TrainConfig:
     max_training_seconds: float | None = None
     share_embeddings: bool = False
     eval_every_steps: int = 0
+    sequential_backward: bool = False
+    fused_optimizer: bool = False
 
     def __post_init__(self) -> None:
         for name in ("steps", "batch_size", "cpu_threads", "eval_batches"):
@@ -70,6 +72,12 @@ class TrainConfig:
             raise ValueError("max_training_seconds must be finite and positive")
         if not isinstance(self.share_embeddings, bool):
             raise ValueError("share_embeddings must be boolean")
+        if not isinstance(self.sequential_backward, bool) or not isinstance(
+            self.fused_optimizer, bool
+        ):
+            raise ValueError("optimizer execution flags must be boolean")
+        if self.fused_optimizer and self.device != "cuda":
+            raise ValueError("fused optimizer requires CUDA")
         if (
             not isinstance(self.eval_every_steps, int)
             or isinstance(self.eval_every_steps, bool)
@@ -240,6 +248,10 @@ def run_experiment(
         raise ValueError("sharing requires an RTD generator")
     if settings.share_embeddings and objective.generator_mode == "self":
         raise ValueError("self replacement already uses one model; no sharing flag")
+    if settings.sequential_backward and objective.generator_mode != "self":
+        raise ValueError("sequential backward requires self replacement")
+    if objective.lm_loss_backend == "liger" and settings.device != "cuda":
+        raise ValueError("liger fused loss requires CUDA")
     for tokens in (train, validation):
         if tokens.device.type != "cpu":
             raise ValueError(
@@ -270,7 +282,10 @@ def run_experiment(
     # Shared embeddings occur in both modules; update each parameter exactly once.
     parameters = list({id(parameter): parameter for parameter in parameters}.values())
     optimizer = torch.optim.AdamW(
-        parameters, lr=settings.learning_rate, weight_decay=settings.weight_decay
+        parameters,
+        lr=settings.learning_rate,
+        weight_decay=settings.weight_decay,
+        fused=True if settings.fused_optimizer else None,
     )
     directory.mkdir(parents=True)
     initial = evaluate(
@@ -320,6 +335,7 @@ def run_experiment(
                 objective,
                 rng=noise_rng,
                 special_token_ids=special_token_ids,
+                backward_clean=settings.sequential_backward,
             )
         if not torch.isfinite(output.loss):
             raise RuntimeError(f"nonfinite training loss at step {step}")

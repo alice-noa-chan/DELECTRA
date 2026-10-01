@@ -19,6 +19,7 @@ deletcra = "deletcra.cli:main"
 dev = ["pytest>=8,<10", "ruff>=0.12,<1"]
 data = ["datasets>=3,<5"]
 cloud = ["modal>=1.6,<2"]
+kernels = ["liger-kernel==0.8.4; sys_platform == 'linux'"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

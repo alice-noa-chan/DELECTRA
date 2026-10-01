@@ -4,9 +4,10 @@ import math
 from dataclasses import dataclass
 
 import torch
-from torch import Tensor
+from torch import Tensor, nn
 from torch.nn import functional as F
 
+from deletcra.losses import fused_causal_lm_loss
 from deletcra.model import CausalElectra, validate_batch
 
 
@@ -14,6 +15,7 @@ from deletcra.model import CausalElectra, validate_batch
 class ObjectiveConfig:
     mode: str = "joint"
     generator_mode: str = "separate"
+    lm_loss_backend: str = "torch"
     replacement_probability: float = 0.15
     temperature: float = 1.0
     generator_weight: float = 1.0
@@ -25,6 +27,8 @@ class ObjectiveConfig:
             raise ValueError("mode must be rtd, clm, or joint")
         if self.generator_mode not in {"separate", "self"}:
             raise ValueError("generator_mode must be separate or self")
+        if self.lm_loss_backend not in {"torch", "liger"}:
+            raise ValueError("lm_loss_backend must be torch or liger")
         if self.generator_mode == "self" and self.mode != "joint":
             raise ValueError("self replacement requires joint RTD and CLM")
         if self.generator_mode == "self" and self.generator_weight != 1.0:
@@ -75,7 +79,7 @@ class Corruption:
 def corrupt_tokens(
     input_ids: Tensor,
     attention_mask: Tensor,
-    generator_logits: Tensor,
+    generator_logits: Tensor | None,
     *,
     pad_token_id: int = 0,
     bos_token_id: int = 1,
@@ -84,6 +88,8 @@ def corrupt_tokens(
     temperature: float = 1.0,
     rng: torch.Generator | None = None,
     selected: Tensor | None = None,
+    generator_features: Tensor | None = None,
+    generator_head: nn.Linear | None = None,
 ) -> Corruption:
     """Sample x'_t from the generator's x_<t distribution, never from logits[t].
 
@@ -93,13 +99,27 @@ def corrupt_tokens(
     A sampled token identical to the original always has a negative RTD label.
     """
     validate_batch(input_ids, attention_mask)
-    if generator_logits.ndim != 3 or generator_logits.shape[:2] != input_ids.shape:
-        raise ValueError("generator logits must match the input batch and sequence")
+    if generator_logits is not None:
+        if generator_features is not None or generator_head is not None:
+            raise ValueError("provide logits or features/head, not both")
+        if generator_logits.ndim != 3 or generator_logits.shape[:2] != input_ids.shape:
+            raise ValueError("generator logits must match the input batch and sequence")
+        vocab_size = generator_logits.shape[-1]
+    else:
+        if generator_features is None or generator_head is None:
+            raise ValueError("replacement sampling requires logits or features/head")
+        if (
+            generator_features.ndim != 3
+            or generator_features.shape[:2] != input_ids.shape
+        ):
+            raise ValueError(
+                "generator features must match the input batch and sequence"
+            )
+        vocab_size = generator_head.out_features
     if not math.isfinite(probability) or not 0 <= probability <= 1:
         raise ValueError("probability must be finite and in [0, 1]")
     if not math.isfinite(temperature) or temperature <= 0:
         raise ValueError("temperature must be finite and positive")
-    vocab_size = generator_logits.shape[-1]
     specials = sorted({pad_token_id, bos_token_id, *special_token_ids})
     if any(token < 0 or token >= vocab_size for token in specials):
         raise ValueError("special token IDs must be inside the vocabulary")
@@ -121,9 +141,13 @@ def corrupt_tokens(
     if selected.any():
         # Logits at t have already seen x_t, so using them to replace x_t would
         # leak the answer. Logits at t-1 only saw the original prefix x_<t.
-        shifted = torch.zeros_like(generator_logits)
-        shifted[:, 1:] = generator_logits[:, :-1]
-        sample_logits = shifted[selected].float().clone()
+        # Target t selects source t-1 directly. Avoid a full [B,L,V] shifted copy.
+        # Fused-loss callers materialize logits only at selected proposal sites.
+        sites = selected[:, 1:]
+        if generator_logits is not None:
+            sample_logits = generator_logits[:, :-1][sites].float()
+        else:
+            sample_logits = generator_head(generator_features[:, :-1][sites]).float()
         sample_logits[:, specials] = -torch.inf
         probs = F.softmax(sample_logits / temperature, dim=-1)
         samples = torch.multinomial(probs, 1, generator=rng).squeeze(-1)
@@ -169,15 +193,25 @@ def pretraining_step(
     *,
     rng: torch.Generator | None = None,
     special_token_ids: tuple[int, ...] = (),
+    backward_clean: bool = False,
 ) -> PretrainingOutput:
-    """Compute one objective's losses without updating model parameters.
+    """Compute losses without updating parameters; optionally backpropagate clean CLM.
 
     RTD/joint first train the generator on clean next-token targets, sample a
     corrupted batch without gradients, and classify that batch with the main
-    model. CLM/joint also run the main model on a separate clean batch. The
-    training loop owns backward, gradient clipping, and the optimizer update.
+    model. CLM/joint also run the main model on a separate clean batch.
+    By default the training loop owns backward. In self mode, backward_clean=True
+    frees the clean graph before RTD; the caller then backpropagates the returned
+    loss (whose clean term is detached), clips accumulated gradients and updates
+    once. This execution option changes graph lifetime, not objective weights.
     """
     validate_batch(input_ids, attention_mask)
+    if backward_clean and (
+        settings.generator_mode != "self" or not torch.is_grad_enabled()
+    ):
+        raise ValueError(
+            "sequential clean backward requires self training with gradients"
+        )
     if not input_ids[:, 0].eq(model.config.bos_token_id).all():
         raise ValueError("training sequences must begin with BOS")
     zero = torch.zeros((), device=input_ids.device)
@@ -190,8 +224,20 @@ def pretraining_step(
         # One clean pass learns next tokens AND supplies replacement proposals.
         # Sampling at t uses clean logits[t-1], detached inside corrupt_tokens.
         # A second pass is essential: RTD must see the actually corrupted prefix.
-        clean = model(input_ids, attention_mask)
-        lm_loss = causal_lm_loss(clean.lm_logits, input_ids, attention_mask)
+        clean = model(
+            input_ids,
+            attention_mask,
+            compute_lm=settings.lm_loss_backend == "torch",
+            compute_rtd=False,
+        )
+        features = None
+        if settings.lm_loss_backend == "liger":
+            features = model.lm_projection(clean.hidden_states)
+            lm_loss = fused_causal_lm_loss(
+                model.lm_head, features, input_ids, attention_mask
+            )
+        else:
+            lm_loss = causal_lm_loss(clean.lm_logits, input_ids, attention_mask)
         corruption = corrupt_tokens(
             input_ids,
             attention_mask,
@@ -202,7 +248,17 @@ def pretraining_step(
             probability=settings.replacement_probability,
             temperature=settings.temperature,
             rng=rng,
+            generator_features=features,
+            generator_head=model.lm_head if features is not None else None,
         )
+        if backward_clean:
+            if not torch.isfinite(lm_loss):
+                raise RuntimeError("nonfinite clean CLM loss")
+            (settings.lm_weight * lm_loss).backward()
+            # The caller backpropagates returned loss to accumulate RTD gradients,
+            # then clips/updates ONCE. Detaching prevents a second CLM backward.
+            lm_loss = lm_loss.detach()
+        del clean, features
         rtd_logits = model(
             corruption.input_ids, attention_mask, compute_lm=False
         ).rtd_logits
@@ -218,11 +274,24 @@ def pretraining_step(
         for key in ("vocab_size", "pad_token_id", "bos_token_id"):
             if getattr(generator.config, key) != getattr(model.config, key):
                 raise ValueError("generator and discriminator must share token IDs")
-        generator_logits = generator(input_ids, attention_mask).lm_logits
+        generated = generator(
+            input_ids,
+            attention_mask,
+            compute_lm=settings.lm_loss_backend == "torch",
+            compute_rtd=False,
+        )
+        generator_logits = generated.lm_logits
+        features = None
         # The generator learns through this CLM loss. RTD loss cannot train it
         # through discrete sampling; shared embeddings are the separate path
         # by which both objectives can update the same embedding parameters.
-        generator_loss = causal_lm_loss(generator_logits, input_ids, attention_mask)
+        if settings.lm_loss_backend == "liger":
+            features = generator.lm_projection(generated.hidden_states)
+            generator_loss = fused_causal_lm_loss(
+                generator.lm_head, features, input_ids, attention_mask
+            )
+        else:
+            generator_loss = causal_lm_loss(generator_logits, input_ids, attention_mask)
         corruption = corrupt_tokens(
             input_ids,
             attention_mask,
@@ -233,14 +302,28 @@ def pretraining_step(
             probability=settings.replacement_probability,
             temperature=settings.temperature,
             rng=rng,
+            generator_features=features,
+            generator_head=generator.lm_head if features is not None else None,
         )
+        del generated, generator_logits, features
         output = model(corruption.input_ids, attention_mask, compute_lm=False)
         rtd_logits = output.rtd_logits
         discriminator_loss = rtd_loss(rtd_logits, corruption)
     if settings.mode != "rtd":
         # CLM uses a separate CLEAN pass: corrupted prefixes would change its task.
-        logits = model(input_ids, attention_mask).lm_logits
-        lm_loss = causal_lm_loss(logits, input_ids, attention_mask)
+        clean = model(
+            input_ids,
+            attention_mask,
+            compute_lm=settings.lm_loss_backend == "torch",
+            compute_rtd=False,
+        )
+        if settings.lm_loss_backend == "liger":
+            features = model.lm_projection(clean.hidden_states)
+            lm_loss = fused_causal_lm_loss(
+                model.lm_head, features, input_ids, attention_mask
+            )
+        else:
+            lm_loss = causal_lm_loss(clean.lm_logits, input_ids, attention_mask)
     loss = (
         settings.generator_weight * generator_loss
         + settings.rtd_weight * discriminator_loss

@@ -42,7 +42,7 @@ def electra_config(settings: ModelConfig) -> ElectraConfig:
 @dataclass
 class DecoderOutput:
     hidden_states: Tensor
-    rtd_logits: Tensor
+    rtd_logits: Tensor | None
     lm_logits: Tensor | None
 
 
@@ -141,6 +141,7 @@ class CausalElectra(nn.Module):
         attention_mask: Tensor | None = None,
         *,
         compute_lm: bool = True,
+        compute_rtd: bool = True,
     ) -> DecoderOutput:
         if attention_mask is None:
             attention_mask = input_ids.ne(self.config.pad_token_id)
@@ -166,7 +167,7 @@ class CausalElectra(nn.Module):
             ).last_hidden_state
         return DecoderOutput(
             hidden_states=hidden,
-            rtd_logits=self.rtd_head(hidden),
+            rtd_logits=self.rtd_head(hidden) if compute_rtd else None,
             lm_logits=self.lm_head(self.lm_projection(hidden)) if compute_lm else None,
         )
 
