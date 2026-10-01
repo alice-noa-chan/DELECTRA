@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from deletcra.cloud import validate_run_id
-from deletcra.research import research_command
+from deletcra.research import ablation_command
 from modal_app import (
     DATA_DIRECTORY,
     GPU,
@@ -18,29 +18,6 @@ from modal_app import (
 )
 
 MATRIX_ID = "modal-l40s-wikitext2-20261001-research"
-
-
-def ablation_command(
-    kind: str, setting: str, output: str, time_budget: float
-) -> list[str]:
-    if kind == "embeddings" and setting in {"separate", "shared"}:
-        command = research_command(7, "joint", DATA_DIRECTORY, output)
-        command[command.index("--mode") + 1] = "rtd"
-        if setting == "shared":
-            command.append("--share-embeddings")
-        return command
-    if kind == "regularization" and setting in {"dropout0", "dropout01"}:
-        command = research_command(
-            7, "clm_time", DATA_DIRECTORY, output, time_budget=time_budget
-        )
-        return [
-            *command,
-            "--dropout",
-            "0.1" if setting == "dropout01" else "0",
-            "--eval-every-steps",
-            "500",
-        ]
-    raise ValueError("only predeclared embedding/dropout controls are supported")
 
 
 @app.function(
@@ -82,7 +59,9 @@ def run_ablation(run_id: str, kind: str) -> dict:
     commands = {
         setting: [
             sys.executable,
-            *ablation_command(kind, setting, str(directory / setting), time_budget),
+            *ablation_command(
+                kind, setting, DATA_DIRECTORY, str(directory / setting), time_budget
+            ),
         ]
         for setting in settings_list
     }

@@ -56,3 +56,27 @@ def research_command(
         "--quiet",
         *(["--max-training-seconds", str(time_budget)] if stage == "clm_time" else []),
     ]
+
+
+def ablation_command(
+    kind: str, setting: str, data_directory: str, output: str, time_budget: float
+) -> list[str]:
+    """Build exploratory controls without importing optional cloud dependencies."""
+    if kind == "embeddings" and setting in {"separate", "shared"}:
+        command = research_command(7, "joint", data_directory, output)
+        command[command.index("--mode") + 1] = "rtd"
+        if setting == "shared":
+            command.append("--share-embeddings")
+        return command
+    if kind == "regularization" and setting in {"dropout0", "dropout01"}:
+        command = research_command(
+            7, "clm_time", data_directory, output, time_budget=time_budget
+        )
+        return [
+            *command,
+            "--dropout",
+            "0.1" if setting == "dropout01" else "0",
+            "--eval-every-steps",
+            "500",
+        ]
+    raise ValueError("only predeclared embedding/dropout controls are supported")
