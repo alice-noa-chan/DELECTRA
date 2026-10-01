@@ -10,6 +10,7 @@ class PilotConfig:
     batch_size: int = 32
     probe_steps: int = 20
     seed: int = 7
+    train_tokens: int | None = None
 
     def __post_init__(self) -> None:
         for name, maximum in (("steps", 500), ("batch_size", 128)):
@@ -24,8 +25,19 @@ class PilotConfig:
             raise ValueError("probe_steps must be an integer in [0, 100]")
         if not isinstance(self.seed, int) or not 0 <= self.seed < 2**63:
             raise ValueError("seed must be a nonnegative 63-bit integer")
+        if self.train_tokens is not None and (
+            not isinstance(self.train_tokens, int)
+            or isinstance(self.train_tokens, bool)
+            or not 1 <= self.train_tokens <= 10_000_000
+        ):
+            raise ValueError("train_tokens must be an integer in [1, 10000000]")
 
     def command(self, data_directory: str, output_directory: str) -> list[str]:
+        budget = (
+            ["--steps", str(self.steps)]
+            if self.train_tokens is None
+            else ["--train-tokens", str(self.train_tokens)]
+        )
         return [
             "-m",
             "deletcra",
@@ -38,8 +50,7 @@ class PilotConfig:
             "all",
             "--preset",
             "small",
-            "--steps",
-            str(self.steps),
+            *budget,
             "--batch-size",
             str(self.batch_size),
             "--probe-steps",

@@ -191,11 +191,17 @@ def main(
     steps: int = 100,
     batch_size: int = 32,
     probe_steps: int = 20,
+    train_tokens: int | None = None,
 ) -> None:
     from dataclasses import asdict
 
     validate_run_id(run_id)
-    config = PilotConfig(steps=steps, batch_size=batch_size, probe_steps=probe_steps)
+    config = PilotConfig(
+        steps=steps,
+        batch_size=batch_size,
+        probe_steps=probe_steps,
+        train_tokens=train_tokens,
+    )
     destination = ROOT / "results" / f"{run_id}.json"
     if destination.exists():
         raise FileExistsError(f"refusing to overwrite local results: {destination}")
