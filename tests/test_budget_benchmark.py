@@ -70,6 +70,7 @@ def test_invalid_prices_are_rejected(price):
 def test_device_guard_does_not_accept_a_different_or_small_gpu():
     validate_device("NVIDIA RTX A5000", 24 * 2**30, (8, 6))
     validate_device("NVIDIA RTX 3090", 24 * 2**30, (8, 6), "RTX 3090")
+    validate_device("NVIDIA GeForce RTX 3090", 24 * 2**30, (8, 6), "RTX 3090")
     with pytest.raises(ValueError):
         validate_device("NVIDIA RTX A5000", 24 * 2**30, (8, 6), "RTX 3090")
     for name, memory, capability in (

@@ -37,7 +37,8 @@ def validate_device(
     """Reject another GPU instead of attaching the requested device's price."""
     if expected not in ("RTX A5000", "RTX 3090"):
         raise ValueError("unsupported budget GPU")
-    if name.removeprefix("NVIDIA ") != expected:
+    canonical = name.removeprefix("NVIDIA ").removeprefix("GeForce ")
+    if canonical != expected:
         raise ValueError(f"expected {expected}, received {name}")
     if memory < 22 * 2**30 or capability != (8, 6):
         raise ValueError("expected a 24GB Ampere GPU")
