@@ -40,6 +40,7 @@ the authorized history cleanup and experiment source-hash correspondence.
 | `model.py` | Make ELECTRA causal, expose RTD/LM heads, share embeddings, save/load |
 | `attention.py` | Reuse ELECTRA Q/K/V weights with SDPA or forced CUDA FlashAttention |
 | `attention_benchmark.py` | Measure real-objective GPU throughput and physical batch memory |
+| `gpu_comparison.py` | Compare repeated fixed-batch training costs on exact GPU types |
 | `objectives.py` | Predict next tokens, sample replacements, and compute losses |
 | `data.py` | Pack separate dataset splits into BOS-prefixed token blocks |
 | `experiment.py` | Train, validate, measure throughput, and save checkpoints |
@@ -131,6 +132,8 @@ counts remain unchanged.
 
 See [ATTENTION.md](ATTENTION.md) for real L40S kernel verification, batch-size
 measurements, memory limits, and the distinction between throughput and quality.
+See [GPU_COMPARISON.md](GPU_COMPARISON.md) for measured L40S, A100 80GB,
+RTX PRO 6000 and H100 speed and input-token costs at the same physical batch.
 
 ## Data preparation
 
@@ -213,8 +216,9 @@ evidence of superiority on real language.
 
 ## Modal GPU experiments
 
-Authenticated Modal runs prepare data on CPU before allocating one L40S 48GB.
-The measured results are L40S results, not RTX 5090 benchmarks. Source and license
+Historical Modal training pilots prepare data on CPU before allocating one L40S
+48GB. The separate GPU comparison profiles four exact GPU types; RTX 5090 has
+not been benchmarked. Source and license
 files are uploaded; local Git metadata, environments, and credentials are not.
 Data and checkpoints persist in the `deletcra-experiments` Volume.
 

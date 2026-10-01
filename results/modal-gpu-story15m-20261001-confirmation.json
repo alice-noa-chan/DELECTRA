@@ -1,0 +1,49 @@
+{
+  "measurements": [
+    {
+      "requested_gpu": "RTX-PRO-6000",
+      "actual_gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "mode": "joint",
+      "input_tokens_per_second": 207784.7606786213,
+      "repetition_throughputs": [
+        208061.1349790248,
+        207907.2538217175,
+        207387.0950470639
+      ],
+      "throughput_sample_std_percent": 0.16999154770772978,
+      "peak_cuda_allocated_bytes": 12249236480,
+      "gpu_usd_per_million_tokens": 0.004052270230261561,
+      "requested_compute_usd_per_million_tokens": 0.004263835312592081,
+      "base_16_4b_training_hours": 21.924396864703613,
+      "base_16_4b_gpu_usd": 66.45723177628959,
+      "gpu_usd_per_second": 0.000842
+    },
+    {
+      "requested_gpu": "H100!",
+      "actual_gpu": "NVIDIA H100 80GB HBM3",
+      "mode": "joint",
+      "input_tokens_per_second": 233509.0566345512,
+      "repetition_throughputs": [
+        241641.5952940963,
+        224927.18708886567,
+        234564.27072593034
+      ],
+      "throughput_sample_std_percent": 3.589821668635037,
+      "peak_cuda_allocated_bytes": 12299207680,
+      "gpu_usd_per_million_tokens": 0.004697890590671344,
+      "requested_compute_usd_per_million_tokens": 0.004886148813429696,
+      "base_16_4b_training_hours": 19.50911721032362,
+      "base_16_4b_gpu_usd": 77.04540568701005,
+      "gpu_usd_per_second": 0.001097
+    }
+  ],
+  "base_gpu_cost_ranking": [
+    "RTX-PRO-6000",
+    "H100!"
+  ],
+  "failed_requests": [],
+  "pricing_source": "https://modal.com/pricing",
+  "note": "Identical physical batch/context/objective; ranking is throughput economics, not quality. Training projections exclude preparation, validation, saving, startup/scaledown, storage and egress. Requested CPU/host-memory cost is not actual metered resource use. No full training or publication occurs in this benchmark.",
+  "run_id": "modal-gpu-story15m-20261001-confirmation",
+  "source_commit": "c9b451fea7d04c4ee0eba2f7414f82fd6c1ce777"
+}

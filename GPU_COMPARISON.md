@@ -81,6 +81,91 @@ retries, a 600-second timeout and a 450-second internal budget check between cas
 Local JSON saves each completed worker independently before writing the aggregate
 cost ranking. The source commit and pinned dataset metadata accompany each result.
 
-Formatting/linting and 128 CPU tests passed before the cloud run, including tests
+Formatting/linting and 128 CPU tests passed before the first cloud run, including tests
 that reject partial or changed-batch comparisons, incorrect GPU identity, and
 ranking by raw speed instead of cost. Cloud evidence verifies CUDA execution.
+
+## Four-GPU measurements: 2026-10-01
+
+All four requests completed all six cases on their validated physical devices.
+Every case passed finite-gradient checks and native Flash forward/backward
+profiling. All four eager/Flash checks passed, with exactly zero causal prefix
+difference. The shared runtime was PyTorch 2.8.0+cu128, CUDA 12.8, and
+Transformers 4.57.6. Reported memory is peak PyTorch allocated training memory.
+
+| GPU | Joint input tokens/s | Repetition sample SD | Joint peak GiB | 16.4B training hours | 16.4B GPU USD |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| L40S | 108,198 | 0.05% | 11.41 | 42.10 | 82.15 |
+| A100 SXM4 80GB | 130,619 | 1.30% | 11.41 | 34.88 | 87.14 |
+| RTX PRO 6000 Blackwell Server Edition | 181,839 | 3.20% | 11.41 | 25.05 | 75.94 |
+| H100 80GB HBM3 | 232,518 | 1.45% | 11.45 | 19.59 | 77.37 |
+
+H100 was 2.15 times as fast as L40S for joint training. A100's 1.21-times speedup
+did not offset its price: the projected GPU cost increased about 6.1%. RTX and
+H100 both reduced projected GPU cost relative to L40S. RTX's approximately 1.9%
+cost advantage over H100 was small compared with the observed repeat variation,
+so it warranted longer confirmation rather than a definitive cheapest-GPU claim.
+
+CLM-only control throughputs were 241,452, 287,445, 420,429 and 530,045 tokens/s
+for L40S, A100, RTX and H100, respectively. Their projected GPU costs were
+USD 36.81, 39.60, 32.84 and 33.94 for 16.4B tokens. These are different objectives
+with less compute per input token and do not replace the joint Base estimate.
+
+The four measured function durations total an estimated USD 0.3385 in GPU
+charges under the exclusions above. Preserve the complete measurements in the
+[four-GPU aggregate](results/modal-gpu-story15m-20261001-comparison.json).
+The source commit is `7f4cf651c464cda621ec609159dc5d5528361337`; the
+[Modal app](https://modal.com/apps/gaon12/main/ap-pj7RC9g6DV3lULP5IBi8aY)
+was verified stopped with zero tasks at 2026-10-01 16:48:25 +09:00.
+
+## Longer joint confirmation
+
+The separate confirmation compares RTX PRO 6000 and exact H100 only. Each GPU
+runs three fresh joint cases with twenty warmup steps and **1,000 measured steps**
+per case: 48,960,000 measured input targets per GPU. All other settings and
+correctness checks remain the same. The shorter and longer phases are kept in
+separate reports and are not pooled into one ranking.
+
+```powershell
+.venv/Scripts/python -m modal run gpu_app.py::confirm_main --run-id gpu-cost-confirm-unique-run
+```
+
+The confirmation implementation passed formatting/linting and all 129 CPU
+tests, including rejection of short cases supplied as long confirmation cases.
+
+| GPU | Joint input tokens/s | Repetition sample SD | 16.4B training hours | 16.4B GPU USD | 16.4B requested compute USD |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| RTX PRO 6000 Blackwell Server Edition | 207,785 | 0.17% | 21.92 | 66.46 | 69.93 |
+| H100 80GB HBM3 | 233,509 | 3.59% | 19.51 | 77.05 | 80.13 |
+
+RTX reduced projected GPU cost by **13.7%** relative to H100 in this phase;
+H100 reduced optimizer time by **11.0%**, or about 2.42 hours at 16.4B inputs.
+RTX's cost advantage held even when comparing its slowest repetition with H100's
+fastest. This supports **RTX PRO 6000 for cost** and **H100 for elapsed time**
+for this model and batch, rather than choosing the GPU by its hourly price alone.
+Requested CPU/host-memory estimates retain the same ranking.
+
+RTX throughput was 14.3% higher than in the first phase, while H100 was similar.
+These phases use different cloud allocations and measurement lengths; the
+experiment cannot isolate the cause of that change. Within-phase repetition SD
+does not capture all allocation-to-allocation variation. For budgeting, preserve
+the observed RTX range: approximately **22-25 training hours and USD 66-76
+GPU-only**. A longer recent-corpus pilot must confirm throughput after replacing
+the in-memory cache with the production loader. This is not a convergence or
+final model-quality result.
+
+All six long cases passed finite-gradient and native Flash forward/backward
+checks. Both GPUs again had exactly zero causal prefix difference. Peak allocated
+joint memory remained about 11.41GiB on RTX and 11.45GiB on H100. Neither trial
+trained the complete TinyStories corpus or the planned recent-data Base.
+
+The source commit is `c9b451fea7d04c4ee0eba2f7414f82fd6c1ce777`.
+See the [confirmation aggregate](results/modal-gpu-story15m-20261001-confirmation.json)
+and [Modal app](https://modal.com/apps/gaon12/main/ap-p7iG5bTK6zIBafZjMigVok).
+Both apps were verified stopped with zero tasks after confirmation. The
+[provenance manifest](results/gpu-comparison-provenance-20261001.json) records the
+status-check timestamp, source hashes, and SHA-256 hashes of all eight result
+files using UTF-8 with LF line endings for cross-platform Git verification.
+Recomputing both aggregates reproduced them exactly; all 30 cases account
+for 176,256,000 measured input targets. The two phases total approximately
+**USD 0.788 GPU-only estimated function charges**, subject to the exclusions above.

@@ -23,8 +23,10 @@ The user chose the original paper's basic ELECTRA-small scale:
 - About **16.4B cumulative input tokens**, with repeats counted.
 - Retain the current 15M causal ELECTRA architecture, RTD discriminator, and
   generator/main embedding sharing; use RTD+CLM so the main LM head is trained.
-- Start with L40S, BF16, forced FlashAttention, physical batch 64 and context 256.
-  Batch/LR choices require a longer pilot and validation before the full run.
+- Keep BF16, forced FlashAttention, physical batch 64 and context 256. The initial
+  L40S profile is complete; the repeated GPU comparison now favors RTX PRO 6000
+  for cost and H100 for elapsed time. Confirm the chosen GPU with the production
+  corpus loader. Batch/LR choices require validation before the full run.
 
 The [original ELECTRA paper](https://cs.stanford.edu/~kevclark/resources/electra.pdf)
 uses 3.3B Wikipedia/BooksCorpus tokens for its basic experiments. Basic small
@@ -132,13 +134,23 @@ and IT training are still implementation work, not completed capabilities.
 
 ## Conditional compute estimate
 
-At the measured context-256 Flash batch-64 joint throughput of 113,733 input
-tokens/s, 16.4B input tokens would take about **40.1 GPU training hours**. At the
-recorded L40S rate this is roughly **$78 GPU-only**. This extrapolates a twenty-step
-measurement; it excludes data preparation, startup, saving, validation, IT and
-the separate full TinyStories run. Larger context changes require new profiling.
-Do not present this as a measured multi-day run or total invoice.
-[Measured attention evidence](ATTENTION.md).
+The repeated fixed-batch comparison measured joint throughput at context 256 and
+Flash batch 64. Across two allocations, RTX PRO 6000 projects approximately
+**22-25 optimizer hours and $66-76 GPU-only** for 16.4B input targets. Exact H100
+projects about **19.5 hours and $77**, while the first-phase L40S and A100 80GB
+project **42.1 hours/$82** and **34.9 hours/$87** respectively. RTX is the current
+cost candidate; H100 is the time candidate. The longer confirmation's requested
+CPU/host-memory estimate adds about $3.47 on RTX and $3.09 on H100.
+
+These are conditional throughput projections, not a completed long training run
+or total invoice. They exclude production data preparation, startup, saving,
+validation, IT, storage, egress and the separate full TinyStories run. Production
+shards, larger context, different batch or CPU bottlenecks require new profiling.
+The historical twenty-step L40S estimate of 40.1 hours/$78 remains documented in
+[ATTENTION.md](ATTENTION.md); the longer comparison supersedes it for planning.
+See [GPU_COMPARISON.md](GPU_COMPARISON.md) for protocols, raw results, pricing,
+between-allocation variation and correctness checks. No full training is launched
+by this cost experiment.
 
 ## Archived pilot
 

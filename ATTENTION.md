@@ -170,3 +170,7 @@ not matched the reference: the current common-protocol pilot PPL is about 42/47
 for CLM/joint versus 3.94 for the reference. Measure a properly scheduled learning
 curve before concluding that parameters are the limiting factor. See
 [TARGET.md](TARGET.md) for remaining longer-training work and comparison limits.
+
+[GPU_COMPARISON.md](GPU_COMPARISON.md) extends these short L40S measurements
+with repeated fixed-batch runs on L40S, A100 80GB, RTX PRO 6000 and H100.
+Use those longer measurements for the current conditional compute estimate.

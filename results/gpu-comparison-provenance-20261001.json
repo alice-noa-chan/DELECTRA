@@ -1,0 +1,96 @@
+{
+  "checked_at": "2026-10-01T16:58:46.108977+09:00",
+  "status": "verified",
+  "phases": [
+    {
+      "name": "comparison",
+      "source_commit": "7f4cf651c464cda621ec609159dc5d5528361337",
+      "app_url": "https://modal.com/apps/gaon12/main/ap-pj7RC9g6DV3lULP5IBi8aY",
+      "app_state": {
+        "app_id": "ap-pj7RC9g6DV3lULP5IBi8aY",
+        "description": "deletcra-gpu-comparison",
+        "state": "stopped",
+        "tasks": "0",
+        "created_at": "2026-10-01 16:44:05+09:00",
+        "stopped_at": "2026-10-01 16:46:59+09:00"
+      },
+      "measured_input_tokens": 78336000,
+      "gpu_only_function_estimate_usd": 0.338500418959513,
+      "files": [
+        {
+          "path": "results/modal-gpu-story15m-20261001-comparison.json",
+          "sha256": "57c64d3f6738797dd598cd9a51f236677036f3b25aae69712caee7fd3242cd6f",
+          "bytes": 6007
+        },
+        {
+          "path": "results/modal-gpu-story15m-20261001-comparison-a100-80gb.json",
+          "sha256": "13dacccd56653c021eb43886f4c7a89b420875783eb889fcf71945a5daa2a130",
+          "bytes": 8134
+        },
+        {
+          "path": "results/modal-gpu-story15m-20261001-comparison-h100.json",
+          "sha256": "ba954543068999dfb490eee4b58fa839dddcf3dc4055cbe2b4e8b3ce231dc2c7",
+          "bytes": 8124
+        },
+        {
+          "path": "results/modal-gpu-story15m-20261001-comparison-l40s.json",
+          "sha256": "6204e536e7152ad7177d2a6aebfcd6eabddd6e3438e6e9b060078c50fdf7b242",
+          "bytes": 8114
+        },
+        {
+          "path": "results/modal-gpu-story15m-20261001-comparison-rtx-pro-6000.json",
+          "sha256": "a5b5733772aa410fc716f1cdf3a5c9425a26b62ecdf7f0d45f89ddea396182ff",
+          "bytes": 8156
+        }
+      ]
+    },
+    {
+      "name": "confirmation",
+      "source_commit": "c9b451fea7d04c4ee0eba2f7414f82fd6c1ce777",
+      "app_url": "https://modal.com/apps/gaon12/main/ap-p7iG5bTK6zIBafZjMigVok",
+      "app_state": {
+        "app_id": "ap-p7iG5bTK6zIBafZjMigVok",
+        "description": "deletcra-gpu-comparison",
+        "state": "stopped",
+        "tasks": "0",
+        "created_at": "2026-10-01 16:52:02+09:00",
+        "stopped_at": "2026-10-01 16:56:36+09:00"
+      },
+      "measured_input_tokens": 97920000,
+      "gpu_only_function_estimate_usd": 0.44911773917682096,
+      "files": [
+        {
+          "path": "results/modal-gpu-story15m-20261001-confirmation.json",
+          "sha256": "2ff92f1a41f5b32f0a5d63886af0dbe752d80b3a8a8b9104889ff2745c40a27a",
+          "bytes": 1974
+        },
+        {
+          "path": "results/modal-gpu-story15m-20261001-confirmation-h100.json",
+          "sha256": "0514d36c40228b119c93645fc71188df8027e27da32ab0141278e1810cce1f21",
+          "bytes": 5037
+        },
+        {
+          "path": "results/modal-gpu-story15m-20261001-confirmation-rtx-pro-6000.json",
+          "sha256": "71dd14c27bf4ce9aa05577c73cb1aed0b7871aae1d16cbdcbfac88152d995386",
+          "bytes": 5057
+        }
+      ]
+    }
+  ],
+  "pricing_source": "https://modal.com/pricing",
+  "pricing_checked_on": "2026-10-01",
+  "note": "GPU function cost estimates exclude application startup and post-timer persistence; not invoices. No full-corpus training or publication.",
+  "checks": {
+    "complete_cases": 30,
+    "total_measured_input_tokens": 176256000,
+    "same_pinned_dataset_all_workers": true,
+    "exact_hardware_validated": true,
+    "native_flash_forward_backward_verified": true,
+    "finite_gradients_all_cases": true,
+    "future_prefix_difference_all_workers": 0.0,
+    "aggregates_recomputed_exactly": true,
+    "both_apps_stopped_zero_tasks": true
+  },
+  "gpu_only_function_estimate_usd": 0.787618158136334,
+  "file_hash_representation": "UTF-8 JSON with LF line endings; normalize CRLF to LF before verifying SHA-256. This matches Git text normalization across platforms."
+}

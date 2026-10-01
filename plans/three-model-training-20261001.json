@@ -8,9 +8,22 @@
     "preserve_current_pilot_without_upload": true
   },
   "variants": [
-    {"name": "DELECTRA-15M-TinyStories", "corpus": "full_pinned_tinystories_train_split", "status": "not_fully_trained"},
-    {"name": "DELECTRA-15M-Base", "objective": "joint", "status": "not_trained"},
-    {"name": "DELECTRA-15M-IT", "parent": "selected_evaluated_base_checkpoint", "objective": "assistant_response_sft", "status": "not_trained"}
+    {
+      "name": "DELECTRA-15M-TinyStories",
+      "corpus": "full_pinned_tinystories_train_split",
+      "status": "not_fully_trained"
+    },
+    {
+      "name": "DELECTRA-15M-Base",
+      "objective": "joint",
+      "status": "not_trained"
+    },
+    {
+      "name": "DELECTRA-15M-IT",
+      "parent": "selected_evaluated_base_checkpoint",
+      "objective": "assistant_response_sft",
+      "status": "not_trained"
+    }
   ],
   "initial_gpu_configuration": {
     "gpu": "L40S",
@@ -29,7 +42,14 @@
     "capture_to": "2026-09-17T05:59:21",
     "inventory_url": "https://index.commoncrawl.org/collinfo.json",
     "status": "raw_source_available_curation_not_implemented",
-    "required": ["English text extraction", "quality filtering", "document deduplication", "frozen train/validation/test partitions", "source file hashes and capture provenance", "token counting after the pinned tokenizer"]
+    "required": [
+      "English text extraction",
+      "quality filtering",
+      "document deduplication",
+      "frozen train/validation/test partitions",
+      "source file hashes and capture provenance",
+      "token counting after the pinned tokenizer"
+    ]
   },
   "curated_alternatives_not_silently_substituted": [
     {
@@ -75,5 +95,25 @@
   ],
   "hub_namespace": null,
   "published_repositories": [],
-  "note": "This is a saved training/release scope, not evidence that any full-corpus run or publication has happened. Current pilot archive is recorded separately."
+  "note": "This is a saved training/release scope, not evidence that any full-corpus run or publication has happened. Current pilot archive is recorded separately.",
+  "measured_gpu_candidates": {
+    "checked_on": "2026-10-01",
+    "cost_candidate": "RTX-PRO-6000",
+    "elapsed_time_candidate": "H100!",
+    "same_configuration_as_initial_profile": true,
+    "rtx_observed_16_4b_training_hours_range": [
+      21.924396864703613,
+      25.052747907396057
+    ],
+    "rtx_observed_16_4b_gpu_usd_range": [
+      66.45723177628959,
+      75.93988945689892
+    ],
+    "h100_confirmation_16_4b_training_hours": 19.50911721032362,
+    "h100_confirmation_16_4b_gpu_usd": 77.04540568701005,
+    "evidence": "GPU_COMPARISON.md",
+    "provenance": "results/gpu-comparison-provenance-20261001.json",
+    "required_before_full_run": "Confirm throughput with production shards and validate learning schedule and exact checkpoint resume.",
+    "note": "Conditional estimates from bounded TinyStories-cache trials. Fresh-corpus training, full TinyStories training and publication remain unlaunched."
+  }
 }
