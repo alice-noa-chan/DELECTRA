@@ -1,0 +1,79 @@
+{
+  "status": "planned_not_launched",
+  "accepted_by_user": {
+    "base_distinct_corpus_tokens_approx": 3300000000,
+    "base_cumulative_input_tokens_approx": 16400000000,
+    "original_basic_small_nominal_sequence_positions": 16384000000,
+    "publish_only_after_complete_training_and_quality_tests": true,
+    "preserve_current_pilot_without_upload": true
+  },
+  "variants": [
+    {"name": "DELECTRA-15M-TinyStories", "corpus": "full_pinned_tinystories_train_split", "status": "not_fully_trained"},
+    {"name": "DELECTRA-15M-Base", "objective": "joint", "status": "not_trained"},
+    {"name": "DELECTRA-15M-IT", "parent": "selected_evaluated_base_checkpoint", "objective": "assistant_response_sft", "status": "not_trained"}
+  ],
+  "initial_gpu_configuration": {
+    "gpu": "L40S",
+    "precision": "bf16",
+    "attention_backend": "flash",
+    "physical_batch_size": 64,
+    "context": 256,
+    "joint_shares_embeddings": true,
+    "learning_schedule": "requires_token_based_warmup_and_decay_validation"
+  },
+  "source_inventory_checked_on": "2026-10-01",
+  "fresh_pretraining_candidate": {
+    "source": "Common Crawl",
+    "crawl": "CC-MAIN-2026-39",
+    "capture_from": "2026-09-04T13:16:03",
+    "capture_to": "2026-09-17T05:59:21",
+    "inventory_url": "https://index.commoncrawl.org/collinfo.json",
+    "status": "raw_source_available_curation_not_implemented",
+    "required": ["English text extraction", "quality filtering", "document deduplication", "frozen train/validation/test partitions", "source file hashes and capture provenance", "token counting after the pinned tokenizer"]
+  },
+  "curated_alternatives_not_silently_substituted": [
+    {
+      "repo": "HuggingFaceFW/fineweb-edu",
+      "revision": "87f09149ef4734204d70ed1d046ddc9ca3f2b8f9",
+      "last_modified": "2025-07-11T20:16:53.000Z",
+      "newest_crawl": "CC-MAIN-2025-26",
+      "license_label": "odc-by"
+    },
+    {
+      "repo": "HuggingFaceFW/fineweb",
+      "revision": "9bb295ddab0e05d785b879661af7260fed5140fc",
+      "last_modified": "2025-07-11T20:16:53.000Z",
+      "newest_crawl": "CC-MAIN-2025-26",
+      "license_label": "odc-by"
+    }
+  ],
+  "instruction_candidates_to_audit": [
+    {
+      "repo": "HuggingFaceTB/smoltalk2",
+      "revision": "fc6cc2103c066455aade5d7fbb346039ae36ca5e",
+      "last_modified": "2025-10-31T13:49:55.000Z",
+      "subset": "short_English_non_reasoning_SFT_components",
+      "license_note": "Mixed provenance; new datasets Apache 2.0, existing components retain upstream licenses. Recipe not finalized."
+    },
+    {
+      "repo": "HuggingFaceTB/smol-smoltalk",
+      "revision": "f73fe857d519ff6ac5af2ea67c4d3834da7b8bcc",
+      "last_modified": "2025-02-06T10:35:19.000Z",
+      "license_label": "apache-2.0",
+      "status": "older_short_model_reference_not_a_2026_source"
+    }
+  ],
+  "still_required": [
+    "full TinyStories coverage manifest",
+    "disk shards and mmap data loading",
+    "token-based learning-rate schedule",
+    "verified optimizer/RNG/sampler checkpoint resumption",
+    "recent raw-crawl corpus curation",
+    "assistant-only instruction loss and EOS/chat formatting",
+    "pre-registered final quality criteria and independent test evidence",
+    "verified Hub loading and generation export"
+  ],
+  "hub_namespace": null,
+  "published_repositories": [],
+  "note": "This is a saved training/release scope, not evidence that any full-corpus run or publication has happened. Current pilot archive is recorded separately."
+}

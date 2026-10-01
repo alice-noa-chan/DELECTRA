@@ -302,6 +302,10 @@ and budget estimates. The candidate runs are 300-step pilots and have not reache
 reference-level quality. RTD remains part of the main DELECTRA experiment; CLM
 remains its control.
 
+[TRAINING_PLAN.md](TRAINING_PLAN.md) defines the intended full TinyStories,
+recent-data Base, and Base-derived IT releases. Current partial-training pilots
+are archived evidence; publication follows completed training and quality tests.
+
 ## Licenses and attribution
 
 New code in this repository is [MIT-licensed](LICENSE). Original Google Research

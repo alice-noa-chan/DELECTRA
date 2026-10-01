@@ -6,6 +6,13 @@ alone does not achieve this goal. Compare next-token loss with
 stories for sentence flow, consistent characters/events, and repetition.
 RTD remains part of the main DELECTRA experiment, with CLM-only as its control.
 
+The publication plan now includes a fully trained TinyStories variant, a Base
+variant on recent English data, and an instruction-tuned derivative of Base.
+The user selected approximately 3.3B distinct data tokens and 16.4B cumulative
+input tokens for Base. Existing pilots are preserved but must not be uploaded
+as completed models. See [TRAINING_PLAN.md](TRAINING_PLAN.md) for the corrected
+scope, freshness evidence, training sequence, and release requirements.
+
 15M is a reasonable initial scale for this restricted English-story target.
 The [TinyStories paper](https://arxiv.org/abs/2305.07759) reports coherent stories
 from models below 10M parameters. That supports feasibility, not a guarantee for

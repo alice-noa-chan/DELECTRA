@@ -1,0 +1,256 @@
+{
+  "archive": "runs/archives/tinystories15m-20261001-pilot",
+  "manifest_sha256": "6cbcf85db3a27017929f761e363c8e016893fa8d88b186592c727382dbd4373b",
+  "copied_files": 52,
+  "copied_bytes": 164726978,
+  "status": "archived_partial_training_pilot",
+  "published": false,
+  "training_complete": false,
+  "purpose": "Preserve existing evidence; not a release candidate.",
+  "source_commit": "799e421f219a770f55ad77b930f6dbf2c3e44feb",
+  "original_checkpoints": "runs/modal-checkpoints/modal-l40s-tinystories15m-20261001-profile",
+  "modal_volume": "deletcra-experiments",
+  "modal_run": "modal-l40s-tinystories15m-20261001-profile",
+  "main_objective": "joint",
+  "control_objective": "clm",
+  "steps_per_condition": 300,
+  "input_tokens_per_condition": 1224000,
+  "prepared_train_tokens": 9999825,
+  "files": {
+    "controls/clm/config.json": {
+      "sha256": "370ea42174ba1b63c06bf6240d4ffa6d4fe7fef577855ef6377130dada95f40c",
+      "bytes": 701
+    },
+    "controls/clm/model.pt": {
+      "sha256": "30ce29c39226f8b1dc14db89af4224b92e66c8764264f2e010a41c7ffe46b03b",
+      "bytes": 60204219
+    },
+    "generator/config.json": {
+      "sha256": "b1d36438f5abb62c6ccd63ec7fbe528b9be220414c934cbb0036c8572fa670ed",
+      "bytes": 699
+    },
+    "generator/model.pt": {
+      "sha256": "a9b14f1469541ca8bd6df0430455b96aae452aadeb953bc84d462f394010a0c6",
+      "bytes": 37967783
+    },
+    "model/config.json": {
+      "sha256": "370ea42174ba1b63c06bf6240d4ffa6d4fe7fef577855ef6377130dada95f40c",
+      "bytes": 701
+    },
+    "model/model.pt": {
+      "sha256": "075882f9fb4533316803536701c8a75e57a093b364b638a4553fe0f747cfc86c",
+      "bytes": 60204219
+    },
+    "reports/clm.json": {
+      "sha256": "253673ccdf91bf9cd780497a8e5b8271d76c86fec6e51aba4c3b94a37f3dba28",
+      "bytes": 8133
+    },
+    "reports/joint.json": {
+      "sha256": "70cfedb2f77fde8d7fb3bfb3a51a5a29240f9e8f1f15514881b9b451e8005de4",
+      "bytes": 11479
+    },
+    "reports/target-result.json": {
+      "sha256": "751b0ca2d2b43d1e0fdff057d054db50b316d5496eb3acfb82ebbf8533f4b03b",
+      "bytes": 25434
+    },
+    "source/LICENSE": {
+      "sha256": "aa62d81c65f3be29e43cc9493c98dec84d6473a6642010e52fae5c18d3ab03e6",
+      "bytes": 1078
+    },
+    "source/LICENSES/Apache-2.0.txt": {
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358
+    },
+    "source/NOTICE": {
+      "sha256": "4e117868d4c2a2f376b2d0dec27d79fcd888859327339f6088f3daf9f689d126",
+      "bytes": 1431
+    },
+    "source/README.md": {
+      "sha256": "c3348ca29049be8a6d2395d19817740b18f59f96d78a293dbf2c8f653600e9ee",
+      "bytes": 16648
+    },
+    "source/pyproject.toml": {
+      "sha256": "69a637ed4be8203523932ddd479de9660c6c5c1a70fd9abd360403b8c08ba4c5",
+      "bytes": 787
+    },
+    "source/results/attention-provenance-20261001.json": {
+      "sha256": "7dcd78f610de3b52c1ced98147ee5c8b9770dc4e6866a15fb4f936876fcab47e",
+      "bytes": 2069
+    },
+    "source/results/cpu-smoke-2026-10-01.json": {
+      "sha256": "cc392706e61baca414ac306adcb24dcdf25d081e627ef2554b503243618a319f",
+      "bytes": 56042
+    },
+    "source/results/history-rewrite-20261001.json": {
+      "sha256": "ff1466db498bd65f57fdad28a0679161be233d6c414c5d1d8dede08653febfdc",
+      "bytes": 10283
+    },
+    "source/results/modal-l40s-tinystories15m-20261001-attention-capacity.json": {
+      "sha256": "c062591fec7feb27dd95bc11f2c94ad31ff7ba01589f2af136259f5afb35e5b3",
+      "bytes": 21621
+    },
+    "source/results/modal-l40s-tinystories15m-20261001-attention.json": {
+      "sha256": "bd5b49f0920327dc35a21cf0d8daab84a0877d4ef85b3b1c217420dd107ace42",
+      "bytes": 15743
+    },
+    "source/results/modal-l40s-tinystories15m-20261001-profile-checkpoints.json": {
+      "sha256": "e8d3a3c408a837a67d96ad9c87696926fd7a46eede2483725df73e4fde090a98",
+      "bytes": 1533
+    },
+    "source/results/modal-l40s-tinystories15m-20261001-profile.json": {
+      "sha256": "30f403b7e515081407ee3ba595812c2c36821b3abfb657d192d0bf1a29a8237c",
+      "bytes": 27284
+    },
+    "source/results/modal-l40s-wikitext2-20261001-10m.json": {
+      "sha256": "f3678edf45804834f51ed18dfffd9c2e76dc9f9196f9511ddc5376d18356b8dc",
+      "bytes": 171212
+    },
+    "source/results/modal-l40s-wikitext2-20261001-ablations-checkpoints.json": {
+      "sha256": "aeeb42cb8b1e447df8dbad2dc6d9f65c2237da832e63cca762f537826f0add6a",
+      "bytes": 4419
+    },
+    "source/results/modal-l40s-wikitext2-20261001-ablations.json": {
+      "sha256": "784f1d5ed08ca27293da8ce10f8d3109bf6bb7d03bbbee9e6f327b22913aaada",
+      "bytes": 388319
+    },
+    "source/results/modal-l40s-wikitext2-20261001-ablations.png": {
+      "sha256": "450d97689d5e8c87ce6ca89712782e542e1e92e1f5072e2a3a84b87cc0f3e94c",
+      "bytes": 161526
+    },
+    "source/results/modal-l40s-wikitext2-20261001-pilot.json": {
+      "sha256": "a8511e3d0b5f51251c0627d7273758c01fa8c8ce0246559b10f14f9f2e875014",
+      "bytes": 24968
+    },
+    "source/results/modal-l40s-wikitext2-20261001-research-checkpoints.json": {
+      "sha256": "a5ee2c9bfddd84bc9562cce8aaf8cc74e22aa3fe27b647cae301d8e0f057190b",
+      "bytes": 6374
+    },
+    "source/results/modal-l40s-wikitext2-20261001-research-summary.json": {
+      "sha256": "09ea2b8df75abc950a3bf9bbd9d763914e79b88f591e9666e1b12e40d5b508cb",
+      "bytes": 5657
+    },
+    "source/results/modal-l40s-wikitext2-20261001-research.json": {
+      "sha256": "7e8ef6a9154c25432f50aef95fe0809a2e871650e13c0a8fbd7441a84476362b",
+      "bytes": 752690
+    },
+    "source/results/modal-l40s-wikitext2-20261001-research.png": {
+      "sha256": "a3be6320244df66eabb85b8c46f42cf9a11af570ac25f03172d95d2fe1793404",
+      "bytes": 96157
+    },
+    "source/results/tinyllama15m-baseline-20261001.json": {
+      "sha256": "a86159dc07572372470e47841400fa2c81c6f8d443cd028c83d52d518fbe9018",
+      "bytes": 4086
+    },
+    "source/results/tinystories15m-clm-pilot-benchmark-20261001.json": {
+      "sha256": "634d934829171de56435f00a9f1b3a120478643d8073e56de8089c2a39b373cb",
+      "bytes": 4645
+    },
+    "source/results/tinystories15m-joint-pilot-benchmark-20261001.json": {
+      "sha256": "472e9186d29fcdcab7f54f7353b6c1ec8d1047f9d67e5f1a00614d403e32ed4a",
+      "bytes": 4214
+    },
+    "source/src/deletcra/__init__.py": {
+      "sha256": "1e4576550deab002489daac9924f235989a398aacfe694fab7979a05421c7e9e",
+      "bytes": 127
+    },
+    "source/src/deletcra/__main__.py": {
+      "sha256": "379cc4771a04a669abf924dc4ab0e30e7576bc0714ac92774f957b1a50edf15a",
+      "bytes": 56
+    },
+    "source/src/deletcra/attention.py": {
+      "sha256": "af8c7a29078488daa236b10e9da5968e350afebd77793da0bf76bd55fb4298d7",
+      "bytes": 4380
+    },
+    "source/src/deletcra/attention_benchmark.py": {
+      "sha256": "163db3540068c07ffa565468272c9beec44972b43eb25b6adc7a83760cb28bd3",
+      "bytes": 8379
+    },
+    "source/src/deletcra/benchmark.py": {
+      "sha256": "28790bc59e67921a00f0704539ac320660f0beabfcf28fc23f4b71e8455a33be",
+      "bytes": 3219
+    },
+    "source/src/deletcra/cli.py": {
+      "sha256": "a7182da807dc27a915ee76a34e27017eaf0df3450c96b8b0da2992aac1680857",
+      "bytes": 10443
+    },
+    "source/src/deletcra/cloud.py": {
+      "sha256": "bef8739c8ab7acc736604f5279d63aadf5a802c4e35e42b9b06a56612e997b95",
+      "bytes": 2422
+    },
+    "source/src/deletcra/config.py": {
+      "sha256": "b605f25fb3b526802a831d3b1de93279462c418dcb79bcbe20504af05a6bbf02",
+      "bytes": 3662
+    },
+    "source/src/deletcra/data.py": {
+      "sha256": "1e85612189a195533999691c2398ae48386f2689b510d801dc216ad080d05d95",
+      "bytes": 10672
+    },
+    "source/src/deletcra/experiment.py": {
+      "sha256": "dc02885818deab4788ec2a04b999b1679488dbccbb9aa199651d4399ccc252aa",
+      "bytes": 19119
+    },
+    "source/src/deletcra/metrics.py": {
+      "sha256": "1ddb8c0d85c9e556bb9387a2c71a44b4b197ebb5d899d645aac69053de26809e",
+      "bytes": 1540
+    },
+    "source/src/deletcra/model.py": {
+      "sha256": "ceb42d7e4539afaf765ff9aa5e1eced3741ff25c0b06ecf67ee9b497af8f86a4",
+      "bytes": 11241
+    },
+    "source/src/deletcra/objectives.py": {
+      "sha256": "7798d8ef0f71bcc41656386fa83d2840a1da87859a123195e634e4f0a96ab5f2",
+      "bytes": 9395
+    },
+    "source/src/deletcra/research.py": {
+      "sha256": "067208fab12e4f2c51f6bfdb5d7fdb7739a5c5febbd73c7e3423e31645de7988",
+      "bytes": 2492
+    },
+    "source/src/deletcra/target.py": {
+      "sha256": "7aa4fd06c6132b20054524f71ec789167bf9112312dbf52cb41d5cf29f520981",
+      "bytes": 1467
+    },
+    "tokenizer/special_tokens_map.json": {
+      "sha256": "8aa78cce9224631d6ae690cbe16d5bbce9ffc3f3aa4d06c98f9704c0584ac63b",
+      "bytes": 459
+    },
+    "tokenizer/tokenizer.json": {
+      "sha256": "ed7c4e86a6d2b2a24cf7fb6e6d96c445a97bf9a22d682f598869afc2625bfd1f",
+      "bytes": 3619013
+    },
+    "tokenizer/tokenizer_config.json": {
+      "sha256": "6ea55474d7dd602845096402fba85ededb5a7cd64d381924d6e06bd427929746",
+      "bytes": 966
+    },
+    "validation/validation.pt": {
+      "sha256": "d40142e1eaf482867d5c10c2bc10eb348147a03ca8c4d9a9ea0aea61ad8360f4",
+      "bytes": 804414
+    }
+  },
+  "note": "Main and generator are evaluation weights, not optimizer/RNG resume states. Full training data remains in the Modal cache. This archive includes matching validation tokens but no raw training corpus. Use the bundled deletcra loader; these are not AutoModel weights.",
+  "finalization_note": "Initial Windows rename encountered a transient PermissionError; the already verified staging folder was subsequently renamed without altering files.",
+  "verification": {
+    "file_hashes": "passed",
+    "refuses_overwrite": "passed",
+    "checkpoints": [
+      {
+        "checkpoint": "model",
+        "strict_reload": "passed",
+        "finite_outputs": "passed",
+        "future_prefix_max_difference": 0.0
+      },
+      {
+        "checkpoint": "generator",
+        "strict_reload": "passed",
+        "finite_outputs": "passed",
+        "future_prefix_max_difference": 0.0
+      },
+      {
+        "checkpoint": "controls/clm",
+        "strict_reload": "passed",
+        "finite_outputs": "passed",
+        "future_prefix_max_difference": 0.0
+      }
+    ],
+    "shared_generator_embeddings": "passed"
+  }
+}

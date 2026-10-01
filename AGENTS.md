@@ -23,6 +23,9 @@
   validation from independent test evidence.
 - Keep new code under MIT and preserve original ELECTRA's Apache 2.0 attribution,
   NOTICE, and upstream license text. External data/models retain their licenses.
+- Preserve partial-training pilots as research archives. Public TinyStories,
+  Base, and IT models must complete their planned training and quality evaluation
+  before publication; do not label or upload a pilot as a finished model.
 
 ## Change workflow
 
