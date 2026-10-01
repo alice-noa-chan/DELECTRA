@@ -54,6 +54,9 @@ def parser() -> argparse.ArgumentParser:
     run.add_argument("--max-training-seconds", type=float)
     run.add_argument("--share-embeddings", action="store_true")
     run.add_argument("--dropout", type=float)
+    run.add_argument(
+        "--attention-backend", choices=["eager", "sdpa", "flash"], default="eager"
+    )
     run.add_argument("--eval-every-steps", type=int, default=0)
     run.add_argument("--batch-size", type=int, default=16)
     run.add_argument("--learning-rate", type=float)
@@ -120,6 +123,7 @@ def _run(args: argparse.Namespace) -> dict:
         pad_token_id=pad_id,
         bos_token_id=bos_id,
         dropout=args.dropout if args.dropout is not None else model_settings.dropout,
+        attention_backend=args.attention_backend,
     )
     if args.train_tokens is not None:
         if args.train_tokens < 1 or args.batch_size < 1:

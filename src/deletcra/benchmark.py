@@ -27,7 +27,8 @@ def load_story_candidate(directory: Path, metadata: dict) -> CausalElectra:
     for key in ("dataset", "dataset_revision", "tokenizer", "tokenizer_revision"):
         if report["dataset"].get(key) != metadata.get(key):
             raise ValueError(f"candidate data protocol mismatch: {key}")
-    model = CausalElectra.load(directory).eval()
+    # This benchmark evaluates CPU FP32 weights, including flash-trained models.
+    model = CausalElectra.load(directory, attention_backend="sdpa").eval()
     if (
         model.config.vocab_size != metadata["vocab_size"]
         or model.config.pad_token_id != metadata["pad_token_id"]

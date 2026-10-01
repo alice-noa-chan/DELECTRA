@@ -18,7 +18,7 @@ def verify(root: Path) -> dict:
         raise ValueError(f"no model checkpoints found under {root}")
     results = []
     for checkpoint in checkpoints:
-        model = CausalElectra.load(checkpoint.parent).eval()
+        model = CausalElectra.load(checkpoint.parent, attention_backend="sdpa").eval()
         prefix = torch.tensor([[model.config.bos_token_id, 3, 4, 5]])
         changed = prefix.clone()
         changed[:, -1] = 19
@@ -63,7 +63,7 @@ def verify(root: Path) -> dict:
         "shared_embedding_pairs_verified": shared_pairs,
         "sha256": hashes,
         "note": (
-            "Local CPU strict loading, finite outputs and bit-exact future "
+            "Local CPU SDPA strict loading, finite outputs and bit-exact future "
             "isolation; not a generation quality benchmark."
         ),
     }

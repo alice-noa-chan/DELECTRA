@@ -110,6 +110,23 @@ Generator CLM gradients then also train the shared discriminator embeddings.
 The TinyStories joint pilot enables sharing; historical independent-embedding
 experiments retain their original settings.
 
+### Attention execution backends
+
+`--attention-backend eager` remains the default for historical reproducibility.
+`sdpa` reuses ELECTRA's Q/K/V weights through PyTorch scaled-dot-product attention.
+`flash` forces PyTorch's CUDA FlashAttention kernel and raises if it cannot run;
+it does not silently fall back. No external `flash-attn` package is required.
+The installed Transformers ELECTRA has only an eager attention implementation,
+so DELECTRA supplies a small adapter while retaining ELECTRA's other blocks.
+
+Flash mode currently requires unpadded blocks and CUDA FP16/BF16 Q/K/V. SDPA also
+supports right-padded inputs with a combined causal/padding mask. Both preserve
+attention dropout during training and explicitly disable it during evaluation.
+Use `CausalElectra.load(path, attention_backend="sdpa")` to inspect flash-trained
+weights on CPU. Attention weights, head masks, cross-attention, and caching are
+outside this adapter's supported interface. State-dict names and parameter
+counts remain unchanged.
+
 ## Data preparation
 
 The default smoke test uses synthetic cyclic sequences without downloads. Train

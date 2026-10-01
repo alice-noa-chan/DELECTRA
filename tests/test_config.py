@@ -18,6 +18,7 @@ from deletcra.model import CausalElectra
         {"bos_token_id": 0},
         {"vocab_size": 2},
         {"max_positions": 1},
+        {"attention_backend": "unknown"},
     ],
 )
 def test_rejects_invalid_model_settings(settings):

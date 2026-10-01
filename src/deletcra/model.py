@@ -8,6 +8,7 @@ import torch
 from torch import Tensor, nn
 from transformers import ElectraConfig, ElectraForPreTraining
 
+from deletcra.attention import ElectraSDPAAttention, causal_padding_mask
 from deletcra.config import ModelConfig
 
 
@@ -34,6 +35,7 @@ def electra_config(settings: ModelConfig) -> ElectraConfig:
         add_cross_attention=False,
         use_cache=False,
         attn_implementation="eager",
+        deletcra_attention_backend=settings.attention_backend,
     )
 
 
@@ -83,6 +85,9 @@ class CausalElectra(nn.Module):
         if config.bos_token_id is None or config.bos_token_id == config.pad_token_id:
             raise ValueError("set a BOS token distinct from PAD")
         self.config = config
+        self.attention_backend = getattr(config, "deletcra_attention_backend", "eager")
+        if self.attention_backend not in {"eager", "sdpa", "flash"}:
+            raise ValueError("unsupported causal attention backend")
         pretrained = ElectraForPreTraining(config)
         self.electra = pretrained.electra
         self.rtd_head = pretrained.discriminator_predictions
@@ -99,6 +104,11 @@ class CausalElectra(nn.Module):
             nn.init.normal_(layer.weight, std=config.initializer_range)
             nn.init.zeros_(layer.bias)
         self.lm_head.weight = self.electra.embeddings.word_embeddings.weight
+        if self.attention_backend != "eager":
+            for layer in self.electra.encoder.layer:
+                layer.attention.self = ElectraSDPAAttention(
+                    layer.attention.self, self.attention_backend
+                )
 
     def share_generator_embeddings(self, generator: "CausalElectra") -> None:
         """Tie token/position embeddings and retie the generator vocabulary head.
@@ -137,9 +147,23 @@ class CausalElectra(nn.Module):
         validate_batch(input_ids, attention_mask)
         if input_ids.shape[1] > self.config.max_position_embeddings:
             raise ValueError("sequence exceeds max_position_embeddings")
-        hidden = self.electra(
-            input_ids=input_ids, attention_mask=attention_mask, return_dict=True
-        ).last_hidden_state
+        if self.attention_backend == "eager":
+            hidden = self.electra(
+                input_ids=input_ids, attention_mask=attention_mask, return_dict=True
+            ).last_hidden_state
+        else:
+            # Reuse ELECTRA embeddings, optional width projection, and all of
+            # its encoder blocks. Only mask preparation and attention change.
+            # Avoid HF's eager-only additive mask on fully packed flash inputs.
+            hidden = self.electra.embeddings(input_ids=input_ids)
+            if hasattr(self.electra, "embeddings_project"):
+                hidden = self.electra.embeddings_project(hidden)
+            hidden = self.electra.encoder(
+                hidden,
+                attention_mask=causal_padding_mask(attention_mask),
+                use_cache=False,
+                return_dict=True,
+            ).last_hidden_state
         return DecoderOutput(
             hidden_states=hidden,
             rtd_logits=self.rtd_head(hidden),
@@ -177,9 +201,18 @@ class CausalElectra(nn.Module):
         torch.save(self.state_dict(), directory / "model.pt")
 
     @classmethod
-    def load(cls, directory: str | Path) -> "CausalElectra":
+    def load(
+        cls, directory: str | Path, *, attention_backend: str | None = None
+    ) -> "CausalElectra":
+        """Restore weights, optionally choosing a compatible execution backend.
+
+        Use an explicit ``sdpa`` override to inspect flash-trained weights on
+        CPU. This changes the computation kernel, not the saved parameters.
+        """
         directory = Path(directory)
         config = ElectraConfig.from_pretrained(directory, local_files_only=True)
+        if attention_backend is not None:
+            config.deletcra_attention_backend = attention_backend
         model = cls(config)
         model.load_state_dict(
             torch.load(directory / "model.pt", map_location="cpu", weights_only=True)

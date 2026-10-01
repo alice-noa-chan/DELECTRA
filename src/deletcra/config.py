@@ -25,8 +25,11 @@ class ModelConfig:
     dropout: float = 0.0
     pad_token_id: int = 0
     bos_token_id: int = 1
+    attention_backend: str = "eager"
 
     def __post_init__(self) -> None:
+        if self.attention_backend not in {"eager", "sdpa", "flash"}:
+            raise ValueError("attention_backend must be eager, sdpa, or flash")
         for name in (
             "vocab_size",
             "embedding_size",
@@ -77,4 +80,5 @@ def generator_model_config(discriminator: ModelConfig) -> ModelConfig:
         dropout=discriminator.dropout,
         pad_token_id=discriminator.pad_token_id,
         bos_token_id=discriminator.bos_token_id,
+        attention_backend=discriminator.attention_backend,
     )

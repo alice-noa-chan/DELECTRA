@@ -6,6 +6,13 @@ alone does not achieve this goal. Compare next-token loss with
 stories for sentence flow, consistent characters/events, and repetition.
 RTD remains part of the main DELECTRA experiment, with CLM-only as its control.
 
+15M is a reasonable initial scale for this restricted English-story target.
+The [TinyStories paper](https://arxiv.org/abs/2305.07759) reports coherent stories
+from models below 10M parameters. That supports feasibility, not a guarantee for
+this causal ELECTRA architecture or a broad general-purpose language model.
+Train the current scale and examine learning curves before attributing the
+300-step quality gap to insufficient parameter count.
+
 ## Comparison protocol
 
 | Setting | Reference | DELECTRA `story15m` |
