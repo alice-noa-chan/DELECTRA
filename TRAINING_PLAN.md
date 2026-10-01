@@ -28,6 +28,17 @@ The user chose the original paper's basic ELECTRA-small scale:
   for cost and H100 for elapsed time. Confirm the chosen GPU with the production
   corpus loader. Batch/LR choices require validation before the full run.
 
+The later [integrated-model optimization](OPTIMIZATION.md) and
+[budget GPU measurement](BUDGET_GPU.md) provide additional candidates rather
+than changing the accepted token budget or the historical baseline above.
+Runpod RTX 3090 self-replacement joint training at batch 256 measured 139,816
+targets/s: 32.6 hours / $7.17 GPU-only, or $7.30 including its container, for
+16.4B targets. The same small backbone and RTD head are retained. Self replacement
+changes the proposal algorithm, so compare quality against the separate generator
+before selecting the full-training recipe. The actual fresh-corpus loader,
+checkpointing and evaluation still require validation. Full training has not
+been started or authorized by the short benchmark.
+
 The [original ELECTRA paper](https://cs.stanford.edu/~kevclark/resources/electra.pdf)
 uses 3.3B Wikipedia/BooksCorpus tokens for its basic experiments. Basic small
 uses 1M steps, batch 128, and length 128: **16.384B nominal sequence positions**.

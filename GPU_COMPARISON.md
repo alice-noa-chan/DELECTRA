@@ -180,3 +180,10 @@ The measured self batch-256 configuration substantially reduces token cost,
 but changes the proposal distribution and update count. Original separate-model
 costs above are not predictions for the integrated variant on other GPUs.
 Full training and quality equivalence remain unverified.
+
+[BUDGET_GPU.md](BUDGET_GPU.md) adds a completed Community Runpod RTX 3090
+measurement of the integrated configuration, at $0.22/GPU-hour rather than the
+public Secure Cloud offer. Its batch-256 projection is 32.58 hours / $7.17
+GPU-only for 16.4B targets. This is substantially slower and cheaper than the
+measured Modal RTX PRO 6000 integrated configuration. Preserve the distinction
+between different objectives, allocations, prices and production-loader costs.

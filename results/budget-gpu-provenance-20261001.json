@@ -1,0 +1,37 @@
+{
+  "source_commit": "f5612fef95ada57e6f0f41255467d4f2d3b57646",
+  "pod_id": "7w0pei6euy8trd",
+  "provider": "Runpod Community Cloud",
+  "gpu": "NVIDIA GeForce RTX 3090",
+  "container_image": "runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404",
+  "observed_gpu_hourly_usd": 0.22,
+  "observed_container_hourly_usd": 0.004,
+  "container_disk_gb": 30,
+  "persistent_volume_gb": 0,
+  "pod_status": "stopped",
+  "idle_storage_hourly_usd_after_stop": 0,
+  "observed_uptime_before_stop_dialog_seconds": 798,
+  "result_archive_sha256": "99964afefdd2285de2db856b8823da7ffd7bf53b56680890484c197da426f2f6",
+  "files_sha256_utf8_lf": {
+    "runpod-3090-20261001.json": "6c0f26d258abde7a02e3023d2204ab56067295857c0e52ec89462f357d631f43",
+    "runpod-3090-20261001.log": "7c959db5dfef8996c4fbb48d0a3f306f8f9cff6811414bbb94868c08c787ab47",
+    "runpod-3090-20261001-packages.txt": "2cb0874bf4dda31ed8336568b289e70e1468fcef21454b54f637df39592cb455",
+    "runpod-3090-20261001-device.txt": "301776a4b9ee77e13cdc07fea11a083bb67230369c9c9843fa5c84d353d677f1"
+  },
+  "verified_all_summaries": true,
+  "verified_data_matches_original_modal_cache": true,
+  "measured_prediction_targets": 34272000,
+  "checks": [
+    "flash",
+    "liger",
+    "sequential"
+  ],
+  "note": "Nine full repeated trials, not full training or quality evaluation. Rates count prediction targets; both joint passes and the optimizer are included. GPU and container costs exclude preprocessing, startup, evaluation, failures and other models. Pod uptime is an observation, not a final invoice. No A5000 was rented or measured.",
+  "compute_status": "Not running",
+  "container_storage_status": "Not running",
+  "total_hourly_usd_after_stop": 0,
+  "observed_uptime_at_stop_request_seconds": 950,
+  "observed_total_cost_at_stop_request_estimate_usd": 0.059111111111111114,
+  "status_checked_at_utc": "2026-10-01T11:58:38Z",
+  "user_approved_stop": true
+}

@@ -322,6 +322,12 @@ remains its control.
 recent-data Base, and Base-derived IT releases. Current partial-training pilots
 are archived evidence; publication follows completed training and quality tests.
 
+[BUDGET_GPU.md](BUDGET_GPU.md) records the cheaper Runpod RTX 3090 measurement
+with BF16, native Flash Attention and Liger: 139,816 prediction targets/s at
+batch 256, projecting 32.6 Base GPU hours / $7.17 GPU-only at its observed offer.
+These are training-step estimates; complete training and release quality remain
+unverified. The temporary Pod is stopped and its results are preserved locally.
+
 ## Licenses and attribution
 
 New code in this repository is [MIT-licensed](LICENSE). Original Google Research

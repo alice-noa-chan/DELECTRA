@@ -1,0 +1,438 @@
+{
+  "status": "completed",
+  "cases": [
+    {
+      "status": "completed",
+      "backend": "flash",
+      "mode": "joint",
+      "generator_mode": "self",
+      "lm_loss_backend": "liger",
+      "sequential_backward": true,
+      "fused_optimizer": true,
+      "batch_size": 64,
+      "context": 256,
+      "dropout": 0.1,
+      "warmup_steps": 20,
+      "measured_steps": 100,
+      "measured_input_tokens": 1632000,
+      "training_seconds": 14.899774517980404,
+      "input_tokens_per_second": 109531.85889025185,
+      "peak_cuda_allocated_bytes": 2504939008,
+      "peak_cuda_reserved_bytes": 5651824640,
+      "last_training_loss": 6.645848751068115,
+      "finite_gradients": "passed",
+      "attention_dispatcher_ops": {
+        "aten::scaled_dot_product_attention": 12,
+        "aten::_scaled_dot_product_flash_attention": 12,
+        "aten::_flash_attention_forward": 12,
+        "autograd::engine::evaluate_function: ScaledDotProductFlashAttentionBackward0": 12,
+        "ScaledDotProductFlashAttentionBackward0": 12,
+        "aten::_scaled_dot_product_flash_attention_backward": 12,
+        "aten::_flash_attention_backward": 12
+      },
+      "model_parameters": 15041505,
+      "unique_optimized_parameters": 15041505,
+      "repetition": 0
+    },
+    {
+      "status": "completed",
+      "backend": "flash",
+      "mode": "joint",
+      "generator_mode": "self",
+      "lm_loss_backend": "liger",
+      "sequential_backward": true,
+      "fused_optimizer": true,
+      "batch_size": 128,
+      "context": 256,
+      "dropout": 0.1,
+      "warmup_steps": 20,
+      "measured_steps": 100,
+      "measured_input_tokens": 3264000,
+      "training_seconds": 25.629793043015525,
+      "input_tokens_per_second": 127351.78916668956,
+      "peak_cuda_allocated_bytes": 4712687616,
+      "peak_cuda_reserved_bytes": 10869538816,
+      "last_training_loss": 6.5161590576171875,
+      "finite_gradients": "passed",
+      "attention_dispatcher_ops": {
+        "aten::scaled_dot_product_attention": 12,
+        "aten::_scaled_dot_product_flash_attention": 12,
+        "aten::_flash_attention_forward": 12,
+        "autograd::engine::evaluate_function: ScaledDotProductFlashAttentionBackward0": 12,
+        "ScaledDotProductFlashAttentionBackward0": 12,
+        "aten::_scaled_dot_product_flash_attention_backward": 12,
+        "aten::_flash_attention_backward": 12
+      },
+      "model_parameters": 15041505,
+      "unique_optimized_parameters": 15041505,
+      "repetition": 0
+    },
+    {
+      "status": "completed",
+      "backend": "flash",
+      "mode": "joint",
+      "generator_mode": "self",
+      "lm_loss_backend": "liger",
+      "sequential_backward": true,
+      "fused_optimizer": true,
+      "batch_size": 256,
+      "context": 256,
+      "dropout": 0.1,
+      "warmup_steps": 20,
+      "measured_steps": 100,
+      "measured_input_tokens": 6528000,
+      "training_seconds": 46.729480708017945,
+      "input_tokens_per_second": 139697.6790901918,
+      "peak_cuda_allocated_bytes": 9140255232,
+      "peak_cuda_reserved_bytes": 23853006848,
+      "last_training_loss": 6.408633232116699,
+      "finite_gradients": "passed",
+      "attention_dispatcher_ops": {
+        "aten::scaled_dot_product_attention": 12,
+        "aten::_scaled_dot_product_flash_attention": 12,
+        "aten::_flash_attention_forward": 12,
+        "autograd::engine::evaluate_function: ScaledDotProductFlashAttentionBackward0": 12,
+        "ScaledDotProductFlashAttentionBackward0": 12,
+        "aten::_scaled_dot_product_flash_attention_backward": 12,
+        "aten::_flash_attention_backward": 12
+      },
+      "model_parameters": 15041505,
+      "unique_optimized_parameters": 15041505,
+      "repetition": 0
+    },
+    {
+      "status": "completed",
+      "backend": "flash",
+      "mode": "joint",
+      "generator_mode": "self",
+      "lm_loss_backend": "liger",
+      "sequential_backward": true,
+      "fused_optimizer": true,
+      "batch_size": 128,
+      "context": 256,
+      "dropout": 0.1,
+      "warmup_steps": 20,
+      "measured_steps": 100,
+      "measured_input_tokens": 3264000,
+      "training_seconds": 24.728681448032148,
+      "input_tokens_per_second": 131992.48034551967,
+      "peak_cuda_allocated_bytes": 4712687616,
+      "peak_cuda_reserved_bytes": 10869538816,
+      "last_training_loss": 6.5161590576171875,
+      "finite_gradients": "passed",
+      "attention_dispatcher_ops": {
+        "aten::scaled_dot_product_attention": 12,
+        "aten::_scaled_dot_product_flash_attention": 12,
+        "aten::_flash_attention_forward": 12,
+        "autograd::engine::evaluate_function: ScaledDotProductFlashAttentionBackward0": 12,
+        "ScaledDotProductFlashAttentionBackward0": 12,
+        "aten::_scaled_dot_product_flash_attention_backward": 12,
+        "aten::_flash_attention_backward": 12
+      },
+      "model_parameters": 15041505,
+      "unique_optimized_parameters": 15041505,
+      "repetition": 1
+    },
+    {
+      "status": "completed",
+      "backend": "flash",
+      "mode": "joint",
+      "generator_mode": "self",
+      "lm_loss_backend": "liger",
+      "sequential_backward": true,
+      "fused_optimizer": true,
+      "batch_size": 256,
+      "context": 256,
+      "dropout": 0.1,
+      "warmup_steps": 20,
+      "measured_steps": 100,
+      "measured_input_tokens": 6528000,
+      "training_seconds": 46.82600293098949,
+      "input_tokens_per_second": 139409.7209112795,
+      "peak_cuda_allocated_bytes": 9140255232,
+      "peak_cuda_reserved_bytes": 22575841280,
+      "last_training_loss": 6.408633232116699,
+      "finite_gradients": "passed",
+      "attention_dispatcher_ops": {
+        "aten::scaled_dot_product_attention": 12,
+        "aten::_scaled_dot_product_flash_attention": 12,
+        "aten::_flash_attention_forward": 12,
+        "autograd::engine::evaluate_function: ScaledDotProductFlashAttentionBackward0": 12,
+        "ScaledDotProductFlashAttentionBackward0": 12,
+        "aten::_scaled_dot_product_flash_attention_backward": 12,
+        "aten::_flash_attention_backward": 12
+      },
+      "model_parameters": 15041505,
+      "unique_optimized_parameters": 15041505,
+      "repetition": 1
+    },
+    {
+      "status": "completed",
+      "backend": "flash",
+      "mode": "joint",
+      "generator_mode": "self",
+      "lm_loss_backend": "liger",
+      "sequential_backward": true,
+      "fused_optimizer": true,
+      "batch_size": 64,
+      "context": 256,
+      "dropout": 0.1,
+      "warmup_steps": 20,
+      "measured_steps": 100,
+      "measured_input_tokens": 1632000,
+      "training_seconds": 14.781863101990893,
+      "input_tokens_per_second": 110405.5685497584,
+      "peak_cuda_allocated_bytes": 2504939008,
+      "peak_cuda_reserved_bytes": 5649727488,
+      "last_training_loss": 6.645848751068115,
+      "finite_gradients": "passed",
+      "attention_dispatcher_ops": {
+        "aten::scaled_dot_product_attention": 12,
+        "aten::_scaled_dot_product_flash_attention": 12,
+        "aten::_flash_attention_forward": 12,
+        "autograd::engine::evaluate_function: ScaledDotProductFlashAttentionBackward0": 12,
+        "ScaledDotProductFlashAttentionBackward0": 12,
+        "aten::_scaled_dot_product_flash_attention_backward": 12,
+        "aten::_flash_attention_backward": 12
+      },
+      "model_parameters": 15041505,
+      "unique_optimized_parameters": 15041505,
+      "repetition": 1
+    },
+    {
+      "status": "completed",
+      "backend": "flash",
+      "mode": "joint",
+      "generator_mode": "self",
+      "lm_loss_backend": "liger",
+      "sequential_backward": true,
+      "fused_optimizer": true,
+      "batch_size": 256,
+      "context": 256,
+      "dropout": 0.1,
+      "warmup_steps": 20,
+      "measured_steps": 100,
+      "measured_input_tokens": 6528000,
+      "training_seconds": 46.51439794804901,
+      "input_tokens_per_second": 140343.64171048696,
+      "peak_cuda_allocated_bytes": 9140255232,
+      "peak_cuda_reserved_bytes": 23853006848,
+      "last_training_loss": 6.408633232116699,
+      "finite_gradients": "passed",
+      "attention_dispatcher_ops": {
+        "aten::scaled_dot_product_attention": 12,
+        "aten::_scaled_dot_product_flash_attention": 12,
+        "aten::_flash_attention_forward": 12,
+        "autograd::engine::evaluate_function: ScaledDotProductFlashAttentionBackward0": 12,
+        "ScaledDotProductFlashAttentionBackward0": 12,
+        "aten::_scaled_dot_product_flash_attention_backward": 12,
+        "aten::_flash_attention_backward": 12
+      },
+      "model_parameters": 15041505,
+      "unique_optimized_parameters": 15041505,
+      "repetition": 2
+    },
+    {
+      "status": "completed",
+      "backend": "flash",
+      "mode": "joint",
+      "generator_mode": "self",
+      "lm_loss_backend": "liger",
+      "sequential_backward": true,
+      "fused_optimizer": true,
+      "batch_size": 64,
+      "context": 256,
+      "dropout": 0.1,
+      "warmup_steps": 20,
+      "measured_steps": 100,
+      "measured_input_tokens": 1632000,
+      "training_seconds": 14.594924159988295,
+      "input_tokens_per_second": 111819.69718445654,
+      "peak_cuda_allocated_bytes": 2504939008,
+      "peak_cuda_reserved_bytes": 5649727488,
+      "last_training_loss": 6.645848751068115,
+      "finite_gradients": "passed",
+      "attention_dispatcher_ops": {
+        "aten::scaled_dot_product_attention": 12,
+        "aten::_scaled_dot_product_flash_attention": 12,
+        "aten::_flash_attention_forward": 12,
+        "autograd::engine::evaluate_function: ScaledDotProductFlashAttentionBackward0": 12,
+        "ScaledDotProductFlashAttentionBackward0": 12,
+        "aten::_scaled_dot_product_flash_attention_backward": 12,
+        "aten::_flash_attention_backward": 12
+      },
+      "model_parameters": 15041505,
+      "unique_optimized_parameters": 15041505,
+      "repetition": 2
+    },
+    {
+      "status": "completed",
+      "backend": "flash",
+      "mode": "joint",
+      "generator_mode": "self",
+      "lm_loss_backend": "liger",
+      "sequential_backward": true,
+      "fused_optimizer": true,
+      "batch_size": 128,
+      "context": 256,
+      "dropout": 0.1,
+      "warmup_steps": 20,
+      "measured_steps": 100,
+      "measured_input_tokens": 3264000,
+      "training_seconds": 24.852998612972442,
+      "input_tokens_per_second": 131332.24086273034,
+      "peak_cuda_allocated_bytes": 4712687616,
+      "peak_cuda_reserved_bytes": 10869538816,
+      "last_training_loss": 6.5161590576171875,
+      "finite_gradients": "passed",
+      "attention_dispatcher_ops": {
+        "aten::scaled_dot_product_attention": 12,
+        "aten::_scaled_dot_product_flash_attention": 12,
+        "aten::_flash_attention_forward": 12,
+        "autograd::engine::evaluate_function: ScaledDotProductFlashAttentionBackward0": 12,
+        "ScaledDotProductFlashAttentionBackward0": 12,
+        "aten::_scaled_dot_product_flash_attention_backward": 12,
+        "aten::_flash_attention_backward": 12
+      },
+      "model_parameters": 15041505,
+      "unique_optimized_parameters": 15041505,
+      "repetition": 2
+    }
+  ],
+  "hourly_gpu_price_usd": 0.22,
+  "source_commit": "f5612fef95ada57e6f0f41255467d4f2d3b57646",
+  "dataset": {
+    "dataset": "roneneldan/TinyStories",
+    "dataset_revision": "f54c09fd23315a6f9c86f9dc80f725de7d8f9c64",
+    "tokenizer": "nickypro/tinyllama-15M",
+    "tokenizer_revision": "a97e01fa7d54c088df9dc1b53d581a863ce08cd6",
+    "vocab_size": 32000,
+    "bos_token_id": 1,
+    "pad_token_id": 0,
+    "special_token_ids": [
+      1,
+      2,
+      0
+    ],
+    "sequence_length": 256,
+    "train_content_tokens": 9999825,
+    "validation_content_tokens": 99960,
+    "license_note": "TinyStories data is CDLA-Sharing-1.0; reference model card labels MIT. These are separate from project licenses.",
+    "protocol": "BOS-prefixed packed blocks; BOS separates stories, no appended EOS. Official HF train/validation; reference pretraining overlap is unknown. Different from upstream's private shard evaluation."
+  },
+  "dataset_sha256": {
+    "metadata.json": "cfde7d9fa43c07cb8a411a1b154ec8fcdceec74daefaf481751d0658f14fd674",
+    "train.pt": "bb02e07de73864d9aa14f488f9681caa0d00055a8abb7c81e6fc8c88cdd2b8a5",
+    "validation.pt": "da70c0a1a011689d05576de3b4c4e131e06cf35802813f7ed477d896b1bf7a11"
+  },
+  "environment": {
+    "gpu": "NVIDIA GeForce RTX 3090",
+    "memory_bytes": 25296044032,
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "capability": [
+      8,
+      6
+    ]
+  },
+  "checks": {
+    "flash": {
+      "bf16_max_absolute_differences": {
+        "hidden_states": 0.00456470251083374,
+        "lm_logits": 0.0078125,
+        "rtd_logits": 0.00048828125
+      },
+      "future_prefix_max_difference": 0.0
+    },
+    "liger": {
+      "fp32": {
+        "loss_absolute_difference": 4.76837158203125e-07,
+        "gradients": {
+          "weight": {
+            "max_absolute_difference": 2.9802322387695312e-08,
+            "relative_l2_error": 8.031397413788e-08,
+            "cosine_similarity": 0.9999999403953552
+          },
+          "bias": {
+            "max_absolute_difference": 1.4901161193847656e-08,
+            "relative_l2_error": 8.197628886819075e-08,
+            "cosine_similarity": 1.0000001192092896
+          },
+          "features": {
+            "max_absolute_difference": 2.7939677238464355e-09,
+            "relative_l2_error": 6.131087815219871e-08,
+            "cosine_similarity": 1.0
+          }
+        }
+      },
+      "bf16": {
+        "loss_absolute_difference": 0.0038390159606933594,
+        "gradients": {
+          "weight": {
+            "max_absolute_difference": 0.002013683319091797,
+            "relative_l2_error": 0.004187369719147682,
+            "cosine_similarity": 0.999993085861206
+          },
+          "bias": {
+            "max_absolute_difference": 0.00041203200817108154,
+            "relative_l2_error": 0.002188465790823102,
+            "cosine_similarity": 0.9999979734420776
+          },
+          "features": {
+            "max_absolute_difference": 0.0001220703125,
+            "relative_l2_error": 0.0038411018904298544,
+            "cosine_similarity": 0.999994695186615
+          }
+        }
+      }
+    },
+    "sequential": {
+      "same_replacements": true,
+      "loss_absolute_difference": 0.0,
+      "gradient_max_absolute_difference": 0.000133514404296875
+    }
+  },
+  "summary": [
+    {
+      "batch_size": 64,
+      "prediction_targets_per_second": 110577.69174425874,
+      "repetition_throughputs": [
+        109531.85889025185,
+        110405.5685497584,
+        111819.69718445654
+      ],
+      "throughput_sample_std_percent": 1.043993862672782,
+      "peak_cuda_allocated_bytes": 2504939008,
+      "base_16_4b_targets_hours": 41.19778124950852,
+      "base_gpu_only_estimate_usd": 9.063511874891875
+    },
+    {
+      "batch_size": 128,
+      "prediction_targets_per_second": 130192.90270325272,
+      "repetition_throughputs": [
+        127351.78916668956,
+        131992.48034551967,
+        131332.24086273034
+      ],
+      "throughput_sample_std_percent": 1.9278165409879815,
+      "peak_cuda_allocated_bytes": 4712687616,
+      "base_16_4b_targets_hours": 34.9908133313456,
+      "base_gpu_only_estimate_usd": 7.6979789328960315
+    },
+    {
+      "batch_size": 256,
+      "prediction_targets_per_second": 139815.9245806753,
+      "repetition_throughputs": [
+        139697.6790901918,
+        139409.7209112795,
+        140343.64171048696
+      ],
+      "throughput_sample_std_percent": 0.3420613640100256,
+      "peak_cuda_allocated_bytes": 9140255232,
+      "base_16_4b_targets_hours": 32.582522836495286,
+      "base_gpu_only_estimate_usd": 7.168155024028963
+    }
+  ],
+  "benchmark_process_seconds": 341.49753621499985,
+  "note": "Short training-step measurement, not model quality or full training. Rates count 255 prediction targets per 256-token block, including both joint passes and optimizer work. Extrapolation uses 16.4B targets conservatively; it excludes preprocessing, startup, storage, failures, evaluation, TinyStories completion and IT. No trained model is published."
+}
