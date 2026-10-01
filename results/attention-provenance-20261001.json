@@ -7,7 +7,16 @@
       "modal_app_url": "https://modal.com/apps/gaon12/main/ap-0TRGg8GdfKumDZJOndI2iV",
       "app_state": "stopped",
       "remaining_tasks": 0,
-      "status_checked_at": "2026-10-01T16:08:00+09:00"
+      "status_checked_at": "2026-10-01T16:11:25+09:00"
+    },
+    {
+      "result_file": "modal-l40s-tinystories15m-20261001-attention-capacity.json",
+      "sha256": "c062591fec7feb27dd95bc11f2c94ad31ff7ba01589f2af136259f5afb35e5b3",
+      "source_commit": "e62a17f5f837ae955e9ea47f9ef0581ff58e6693",
+      "modal_app_url": "https://modal.com/apps/gaon12/main/ap-I0aWPbc8JenOZQu6aWmUn0",
+      "app_state": "stopped",
+      "remaining_tasks": 0,
+      "status_checked_at": "2026-10-01T16:11:25+09:00"
     }
   ],
   "settings": {

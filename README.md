@@ -38,6 +38,8 @@ the authorized history cleanup and experiment source-hash correspondence.
 | --- | --- |
 | `config.py` | Validate model settings and derive a smaller generator |
 | `model.py` | Make ELECTRA causal, expose RTD/LM heads, share embeddings, save/load |
+| `attention.py` | Reuse ELECTRA Q/K/V weights with SDPA or forced CUDA FlashAttention |
+| `attention_benchmark.py` | Measure real-objective GPU throughput and physical batch memory |
 | `objectives.py` | Predict next tokens, sample replacements, and compute losses |
 | `data.py` | Pack separate dataset splits into BOS-prefixed token blocks |
 | `experiment.py` | Train, validate, measure throughput, and save checkpoints |
@@ -126,6 +128,9 @@ Use `CausalElectra.load(path, attention_backend="sdpa")` to inspect flash-traine
 weights on CPU. Attention weights, head masks, cross-attention, and caching are
 outside this adapter's supported interface. State-dict names and parameter
 counts remain unchanged.
+
+See [ATTENTION.md](ATTENTION.md) for real L40S kernel verification, batch-size
+measurements, memory limits, and the distinction between throughput and quality.
 
 ## Data preparation
 

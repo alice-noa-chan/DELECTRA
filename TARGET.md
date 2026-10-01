@@ -13,6 +13,11 @@ this causal ELECTRA architecture or a broad general-purpose language model.
 Train the current scale and examine learning curves before attributing the
 300-step quality gap to insufficient parameter count.
 
+The tied 32,000 by 288 token table accounts for 9,216,000 parameters; about 5.83M
+remain for the other blocks and heads. The reference uses the same token-table
+dimensions, so this is a comparison of similar total sizes. Parameter count is
+not a substitute for matching data, training budget, and validation protocol.
+
 ## Comparison protocol
 
 | Setting | Reference | DELECTRA `story15m` |
@@ -90,6 +95,11 @@ zero prefix difference after changing a future token. CUDA/BF16 finite-gradient
 checks passed too.
 
 ## Longer-training budgets
+
+These historical estimates use eager attention and batch 16. The new
+[FlashAttention/batch benchmark](ATTENTION.md) measures a separate, faster
+execution configuration; its extrapolation remains conditional on sustained
+throughput and on validating the larger batch's learning schedule.
 
 The table extrapolates short-pilot throughput for the same model, context, batch,
 and GPU. Input budgets are not amounts of unique data, known reference training
