@@ -21,3 +21,39 @@ def story_model_config() -> ModelConfig:
         pad_token_id=0,
         bos_token_id=1,
     )
+
+
+def profile_command(mode: str, data_directory: str, output_directory: str) -> list[str]:
+    if mode not in {"clm", "joint"}:
+        raise ValueError("target profile supports only CLM and joint")
+    return [
+        "-m",
+        "deletcra",
+        "run",
+        "--preset",
+        "story15m",
+        "--mode",
+        mode,
+        "--data-dir",
+        data_directory,
+        "--output-dir",
+        output_directory,
+        "--steps",
+        "300",
+        "--batch-size",
+        "16",
+        "--eval-batches",
+        "32",
+        "--probe-steps",
+        "0",
+        "--device",
+        "cuda",
+        "--precision",
+        "bf16",
+        "--cpu-threads",
+        "2",
+        "--seed",
+        "7",
+        "--quiet",
+        *(["--share-embeddings"] if mode == "joint" else []),
+    ]

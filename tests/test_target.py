@@ -2,7 +2,7 @@ import pytest
 
 from deletcra.data import pack_texts, prepare_tinystories
 from deletcra.model import CausalElectra
-from deletcra.target import story_model_config
+from deletcra.target import profile_command, story_model_config
 
 
 class LlamaLikeTokenizer:
@@ -35,3 +35,11 @@ def test_story_downloads_are_opt_in_and_memory_budgets_bounded(tmp_path):
             tmp_path / "data", max_train_tokens=100000001, allow_download=True
         )
     assert not (tmp_path / "data").exists()
+
+
+def test_target_profile_is_bounded_and_shares_only_the_joint_generator():
+    for mode in ("clm", "joint"):
+        command = profile_command(mode, "/data", "/runs")
+        assert command[command.index("--steps") + 1] == "300"
+        assert command[command.index("--preset") + 1] == "story15m"
+        assert ("--share-embeddings" in command) == (mode == "joint")
