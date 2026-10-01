@@ -35,6 +35,7 @@ image = (
     .add_local_file(ROOT / "LICENSE", "/workspace/LICENSE")
     .add_local_file(ROOT / "NOTICE", "/workspace/NOTICE")
     .add_local_dir(ROOT / "LICENSES", "/workspace/LICENSES")
+    .add_local_file(ROOT / "modal_app.py", "/root/modal_app.py")
 )
 app = modal.App("deletcra-pilot", image=image)
 
