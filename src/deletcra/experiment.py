@@ -13,6 +13,7 @@ import transformers
 from torch import Tensor, nn
 
 from deletcra.config import ModelConfig
+from deletcra.metrics import binary_ranking_metrics
 from deletcra.model import CausalElectra, validate_batch
 from deletcra.objectives import ObjectiveConfig, causal_lm_loss, pretraining_step
 
@@ -86,6 +87,7 @@ def evaluate(
     rng = torch.Generator(device=settings.device).manual_seed(settings.seed + 1000)
     lm_sum = gen_sum = rtd_sum = 0.0
     lm_count = rtd_count = tp = tn = fp = fn = 0
+    ranking_scores, ranking_labels = [], []
     limit = settings.batch_size * settings.eval_batches
     for start in range(0, min(len(validation), limit), settings.batch_size):
         tokens = validation[start : start + settings.batch_size].to(settings.device)
@@ -111,6 +113,8 @@ def evaluate(
             rtd_sum += output.rtd_loss.item() * count
             predicted = output.rtd_logits[valid] >= 0
             labels = output.corruption.labels[valid]
+            ranking_scores.append(output.rtd_logits[valid].float().cpu())
+            ranking_labels.append(labels.cpu())
             tp += int((predicted & labels).sum())
             tn += int((~predicted & ~labels).sum())
             fp += int((predicted & ~labels).sum())
@@ -135,6 +139,9 @@ def evaluate(
             if recall is not None and specificity is not None
             else None,
             rtd_confusion={"tp": tp, "tn": tn, "fp": fp, "fn": fn},
+        )
+        metrics.update(
+            binary_ranking_metrics(torch.cat(ranking_scores), torch.cat(ranking_labels))
         )
     return metrics
 
