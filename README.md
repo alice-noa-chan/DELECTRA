@@ -10,6 +10,9 @@ saved experiment IDs, and historical artifact paths also retain that spelling.
 
 ## Install and develop
 
+See [MODEL_REVIEW.md](MODEL_REVIEW.md) for the critical model review and
+[INTEGRATION.md](INTEGRATION.md) for self replacement and its limits.
+
 Use Python 3.10 or newer.
 
 ```powershell
@@ -41,7 +44,9 @@ the authorized history cleanup and experiment source-hash correspondence.
 | `attention.py` | Reuse ELECTRA Q/K/V weights with SDPA or forced CUDA FlashAttention |
 | `attention_benchmark.py` | Measure real-objective GPU throughput and physical batch memory |
 | `gpu_comparison.py` | Compare repeated fixed-batch training costs on exact GPU types |
+| `optimization_benchmark.py` | Gate fused losses with CUDA checks and measure integrated execution |
 | `objectives.py` | Predict next tokens, sample replacements, and compute losses |
+| `losses.py` | Optional Liger vocabulary loss with original ELECTRA weights |
 | `data.py` | Pack separate dataset splits into BOS-prefixed token blocks |
 | `experiment.py` | Train, validate, measure throughput, and save checkpoints |
 | `metrics.py` | Compute RTD ranking metrics with explicit tie handling |

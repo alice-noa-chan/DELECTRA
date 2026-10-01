@@ -56,32 +56,46 @@ def measure_case(
     *,
     warmup_steps: int = WARMUP_STEPS,
     measured_steps: int = MEASURED_STEPS,
+    generator_mode: str = "separate",
+    lm_loss_backend: str = "torch",
+    sequential_backward: bool = False,
+    fused_optimizer: bool = False,
 ) -> dict:
     """Measure complete optimizer steps, including generator and both joint passes.
 
-    Every case uses the same architecture, seed, dropout, context and optimizer.
-    Only kernel and physical batch change. Larger batches imply fewer updates at
-    equal input tokens; this benchmark does not claim equivalent trained quality.
+    Defaults preserve the historical attention comparison. Explicit execution
+    flags additionally compare integrated proposals and vocabulary-loss kernels.
+    Larger batches imply fewer updates at equal input tokens; this benchmark
+    does not claim equivalent trained quality.
     """
     if warmup_steps < 1 or measured_steps < 1:
         raise ValueError("benchmark warmup and measured steps must be positive")
+    objective = ObjectiveConfig(
+        mode=mode, generator_mode=generator_mode, lm_loss_backend=lm_loss_backend
+    )
+    if sequential_backward and generator_mode != "self":
+        raise ValueError("sequential benchmark requires self replacement")
     torch.manual_seed(7)
     config = replace(story_model_config(), attention_backend=backend)
     main = CausalElectra(config).cuda().train()
     generator = None
-    if mode == "joint":
+    if mode == "joint" and generator_mode == "separate":
         generator = CausalElectra(generator_model_config(config)).cuda().train()
         main.share_generator_embeddings(generator)
     parameters = list(main.parameters())
     if generator is not None:
         parameters += list(generator.parameters())
     parameters = list({id(parameter): parameter for parameter in parameters}.values())
-    optimizer = torch.optim.AdamW(parameters, lr=0.0003, weight_decay=0.01)
-    objective = ObjectiveConfig(mode=mode)
+    optimizer = torch.optim.AdamW(
+        parameters,
+        lr=0.0003,
+        weight_decay=0.01,
+        fused=True if fused_optimizer else None,
+    )
     batch_rng = torch.Generator().manual_seed(9)
     noise_rng = torch.Generator(device="cuda").manual_seed(10)
 
-    def step() -> float:
+    def step() -> Tensor:
         indices = torch.randint(len(train), (batch_size,), generator=batch_rng)
         tokens = train[indices].cuda()
         optimizer.zero_grad(set_to_none=True)
@@ -94,13 +108,16 @@ def measure_case(
                 objective,
                 rng=noise_rng,
                 special_token_ids=special_ids,
+                backward_clean=sequential_backward,
             )
         if not torch.isfinite(output.loss):
             raise RuntimeError("nonfinite benchmark loss")
         output.loss.backward()
         torch.nn.utils.clip_grad_norm_(parameters, 1.0, error_if_nonfinite=True)
         optimizer.step()
-        return output.loss.item()
+        # Read the last scalar after the timed synchronization, avoiding another
+        # host/device round trip on every update. Safety checks remain enabled.
+        return output.loss.detach()
 
     for _ in range(warmup_steps):
         step()
@@ -143,6 +160,10 @@ def measure_case(
         "status": "completed",
         "backend": backend,
         "mode": mode,
+        "generator_mode": generator_mode,
+        "lm_loss_backend": lm_loss_backend,
+        "sequential_backward": sequential_backward,
+        "fused_optimizer": fused_optimizer,
         "batch_size": batch_size,
         "context": train.shape[1],
         "dropout": config.dropout,
@@ -156,7 +177,7 @@ def measure_case(
         / elapsed,
         "peak_cuda_allocated_bytes": peak_allocated,
         "peak_cuda_reserved_bytes": peak_reserved,
-        "last_training_loss": last_loss,
+        "last_training_loss": last_loss.item(),
         "finite_gradients": "passed",
         "attention_dispatcher_ops": attention_ops,
         "model_parameters": sum(p.numel() for p in main.parameters()),
