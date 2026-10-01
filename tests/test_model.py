@@ -81,3 +81,40 @@ def test_generation_rejects_context_overflow_and_padding():
         model.generate(torch.tensor([[1, 3]]), max_new_tokens=3)
     with pytest.raises(ValueError, match="unpadded"):
         model.generate(torch.tensor([[1, 3, 0]]), max_new_tokens=1)
+
+
+@pytest.mark.parametrize("backend", ["eager", "sdpa"])
+def test_last_position_projection_preserves_logits_and_greedy_tokens(backend):
+    torch.manual_seed(12)
+    model = CausalElectra(ModelConfig(attention_backend=backend)).eval()
+    prefix = torch.tensor([[1, 3, 4, 5], [1, 8, 9, 10]])
+    with torch.no_grad():
+        full = model(prefix)
+        last = model(prefix, logits_to_keep=1, compute_rtd=False)
+        torch.testing.assert_close(last.lm_logits, full.lm_logits[:, -1:])
+        assert last.rtd_logits is None
+        torch.testing.assert_close(last.hidden_states, full.hidden_states)
+        expected = prefix.clone()
+        for _ in range(4):
+            logits = model(expected).lm_logits[:, -1].clone()
+            logits[:, [0, 1]] = -torch.inf
+            expected = torch.cat((expected, logits.argmax(-1, keepdim=True)), dim=1)
+    projection_shapes, rtd_calls = [], []
+    projection_hook = model.lm_projection.register_forward_pre_hook(
+        lambda _, inputs: projection_shapes.append(inputs[0].shape)
+    )
+    rtd_hook = model.rtd_head.register_forward_pre_hook(
+        lambda *_: rtd_calls.append(True)
+    )
+    actual = model.generate(prefix, max_new_tokens=4)
+    projection_hook.remove()
+    rtd_hook.remove()
+    assert torch.equal(actual, expected)
+    assert projection_shapes == [torch.Size([2, 1, 32])] * 4
+    assert rtd_calls == []
+
+
+@pytest.mark.parametrize("invalid", [-1, True, 1.5])
+def test_invalid_projection_position_count_is_rejected(invalid):
+    with pytest.raises(ValueError, match="nonnegative integer"):
+        CausalElectra(ModelConfig())(torch.tensor([[1, 3]]), logits_to_keep=invalid)

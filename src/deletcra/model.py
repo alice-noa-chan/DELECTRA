@@ -142,7 +142,20 @@ class CausalElectra(nn.Module):
         *,
         compute_lm: bool = True,
         compute_rtd: bool = True,
+        logits_to_keep: int = 0,
     ) -> DecoderOutput:
+        """Run the backbone and requested heads; zero keeps all LM positions.
+
+        A positive logits_to_keep projects only the final positions into the
+        vocabulary. Hidden states and optional RTD outputs still cover the full
+        input. This reduces decoding work without changing attention or weights.
+        """
+        if (
+            not isinstance(logits_to_keep, int)
+            or isinstance(logits_to_keep, bool)
+            or logits_to_keep < 0
+        ):
+            raise ValueError("logits_to_keep must be a nonnegative integer")
         if attention_mask is None:
             attention_mask = input_ids.ne(self.config.pad_token_id)
         validate_batch(input_ids, attention_mask)
@@ -165,10 +178,13 @@ class CausalElectra(nn.Module):
                 use_cache=False,
                 return_dict=True,
             ).last_hidden_state
+        lm_hidden = hidden[:, -logits_to_keep:] if logits_to_keep else hidden
         return DecoderOutput(
             hidden_states=hidden,
             rtd_logits=self.rtd_head(hidden) if compute_rtd else None,
-            lm_logits=self.lm_head(self.lm_projection(hidden)) if compute_lm else None,
+            lm_logits=self.lm_head(self.lm_projection(lm_hidden))
+            if compute_lm
+            else None,
         )
 
     @torch.no_grad()
@@ -187,7 +203,11 @@ class CausalElectra(nn.Module):
         try:
             tokens = prefix.clone()
             for _ in range(max_new_tokens):
-                logits = self(tokens).lm_logits[:, -1].clone()
+                logits = (
+                    self(tokens, compute_rtd=False, logits_to_keep=1)
+                    .lm_logits[:, -1]
+                    .clone()
+                )
                 special_ids = [self.config.pad_token_id, self.config.bos_token_id]
                 logits[:, special_ids] = -torch.inf
                 tokens = torch.cat((tokens, logits.argmax(-1, keepdim=True)), dim=1)

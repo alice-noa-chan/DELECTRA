@@ -59,7 +59,7 @@ def score_language_model(
         batch = tokens[start : start + batch_size].to(device)
         mask = batch.ne(pad_token_id)
         if isinstance(model, CausalElectra):
-            logits = model(batch, mask).lm_logits
+            logits = model(batch, mask, compute_rtd=False).lm_logits
         else:
             logits = model(input_ids=batch, attention_mask=mask, use_cache=False).logits
         loss = causal_lm_loss(logits, batch, mask)

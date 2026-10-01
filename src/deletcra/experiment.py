@@ -202,7 +202,9 @@ def frozen_probe(
         tokens = train[indices].to(settings.device)
         mask = tokens.ne(model.config.pad_token_id)
         with torch.no_grad(), _autocast(settings):
-            hidden = model(tokens, mask, compute_lm=False).hidden_states
+            hidden = model(
+                tokens, mask, compute_lm=False, compute_rtd=False
+            ).hidden_states
         loss = causal_lm_loss(probe(hidden.float()), tokens, mask)
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
@@ -214,7 +216,9 @@ def frozen_probe(
             tokens = validation[start : start + settings.batch_size].to(settings.device)
             mask = tokens.ne(model.config.pad_token_id)
             with _autocast(settings):
-                hidden = model(tokens, mask, compute_lm=False).hidden_states
+                hidden = model(
+                    tokens, mask, compute_lm=False, compute_rtd=False
+                ).hidden_states
             nll = causal_lm_loss(probe(hidden.float()), tokens, mask)
             targets = int((mask[:, 1:] & mask[:, :-1]).sum())
             nll_sum += nll.item() * targets
