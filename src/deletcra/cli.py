@@ -40,6 +40,7 @@ def parser() -> argparse.ArgumentParser:
     budget = run.add_mutually_exclusive_group()
     budget.add_argument("--steps", type=int)
     budget.add_argument("--train-tokens", type=int)
+    run.add_argument("--max-training-seconds", type=float)
     run.add_argument("--batch-size", type=int, default=16)
     run.add_argument("--learning-rate", type=float)
     run.add_argument("--replacement-probability", type=float, default=0.15)
@@ -124,6 +125,7 @@ def _run(args: argparse.Namespace) -> dict:
         cpu_threads=args.cpu_threads,
         eval_batches=args.eval_batches,
         probe_steps=args.probe_steps,
+        max_training_seconds=args.max_training_seconds,
     )
     modes = ["clm", "rtd", "joint"] if args.mode == "all" else [args.mode]
     rows = []
@@ -161,6 +163,8 @@ def _run(args: argparse.Namespace) -> dict:
                 "final_validation": report["final_validation"],
                 "frozen_probe": report["frozen_probe"],
                 "training_tokens": report["training_tokens"],
+                "completed_steps": report["completed_steps"],
+                "stop_reason": report["stop_reason"],
                 "training_seconds": report["training_seconds"],
                 "input_tokens_per_second": report["input_tokens_per_second"],
                 "estimated_hours_per_10m_tokens": report[
@@ -176,8 +180,9 @@ def _run(args: argparse.Namespace) -> dict:
             row["estimated_hours_per_10m_tokens"] for row in rows
         ),
         "comparison_note": (
-            "Matched initialization, data, input-token budget, and seed. Compute is "
-            "not matched. Probe uses identical fresh linear heads and a frozen "
+            "Matched initialization, data, and seed. Step/token caps and optional "
+            "training wall-time limits are reported per run; neither guarantees "
+            "equal FLOPs. Probe uses identical fresh linear heads and a frozen "
             "backbone. RTD-only has no trained main LM head or main LM perplexity."
         ),
     }

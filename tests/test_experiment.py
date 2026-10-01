@@ -154,8 +154,27 @@ def test_run_rejects_context_overflow_before_creating_outputs(tmp_path):
         {"device": "xpu"},
         {"precision": "fp16"},
         {"precision": "bf16", "device": "cpu"},
+        {"max_training_seconds": 0},
+        {"max_training_seconds": float("nan")},
     ],
 )
 def test_invalid_training_settings(settings):
     with pytest.raises(ValueError):
         TrainConfig(**settings)
+
+
+def test_time_budget_stops_after_a_complete_optimizer_step_and_saves(tmp_path):
+    data = synthetic_sequences(8, 6, 8, seed=1)
+    report = run_experiment(
+        data,
+        data,
+        ModelConfig(vocab_size=8),
+        ObjectiveConfig(mode="clm"),
+        TrainConfig(steps=100, batch_size=4, probe_steps=0, max_training_seconds=1e-9),
+        tmp_path / "timed",
+    )
+    assert report["completed_steps"] == 1
+    assert report["stop_reason"] == "time_budget"
+    assert report["training_tokens"] == 20
+    assert report["warmup_steps"] == 0
+    assert (tmp_path / "timed" / "model" / "model.pt").exists()

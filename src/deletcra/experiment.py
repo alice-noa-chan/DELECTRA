@@ -32,6 +32,7 @@ class TrainConfig:
     eval_batches: int = 8
     probe_steps: int = 50
     probe_learning_rate: float = 0.01
+    max_training_seconds: float | None = None
 
     def __post_init__(self) -> None:
         for name in ("steps", "batch_size", "cpu_threads", "eval_batches"):
@@ -52,6 +53,11 @@ class TrainConfig:
             raise ValueError("precision must be fp32 or bf16")
         if self.precision == "bf16" and self.device != "cuda":
             raise ValueError("bf16 training is supported only on CUDA")
+        if self.max_training_seconds is not None and (
+            not math.isfinite(self.max_training_seconds)
+            or self.max_training_seconds <= 0
+        ):
+            raise ValueError("max_training_seconds must be finite and positive")
 
 
 def _autocast(settings: TrainConfig):
@@ -274,7 +280,8 @@ def run_experiment(
     if settings.device == "cuda":
         torch.cuda.reset_peak_memory_stats()
     history = []
-    warmup_steps = min(5, settings.steps // 5)
+    # A time-limited run can stop before planned warmup finishes; measure all steps.
+    warmup_steps = 0 if settings.max_training_seconds else min(5, settings.steps // 5)
     training_tokens = measured_tokens = 0
     _synchronize(settings.device)
     started = measured_started = time.perf_counter()
@@ -319,6 +326,11 @@ def run_experiment(
             history.append(record)
             if progress is not None:
                 progress(record)
+        if settings.max_training_seconds is not None:
+            _synchronize(settings.device)
+            if time.perf_counter() - started >= settings.max_training_seconds:
+                break
+    completed_steps = step
     _synchronize(settings.device)
     ended = time.perf_counter()
     throughput = measured_tokens / (ended - measured_started)
@@ -363,6 +375,11 @@ def run_experiment(
         "frozen_probe": probe_metrics,
         "history": history,
         "training_tokens": training_tokens,
+        "completed_steps": completed_steps,
+        "stop_reason": "time_budget"
+        if settings.max_training_seconds is not None
+        and ended - started >= settings.max_training_seconds
+        else "step_budget",
         "training_seconds": ended - started,
         "warmup_steps": warmup_steps,
         "input_tokens_per_second": throughput,
