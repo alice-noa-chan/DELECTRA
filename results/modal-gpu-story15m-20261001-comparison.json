@@ -1,0 +1,159 @@
+{
+  "measurements": [
+    {
+      "requested_gpu": "L40S",
+      "actual_gpu": "NVIDIA L40S",
+      "mode": "clm",
+      "input_tokens_per_second": 241451.59665454322,
+      "repetition_throughputs": [
+        243681.75993835504,
+        240746.0348055442,
+        239958.76063446532
+      ],
+      "throughput_sample_std_percent": 0.8125907958228938,
+      "peak_cuda_allocated_bytes": 6669597184,
+      "gpu_usd_per_million_tokens": 0.002244756330087418,
+      "requested_compute_usd_per_million_tokens": 0.0024268218066015195,
+      "base_16_4b_training_hours": 18.867365628041032,
+      "base_16_4b_gpu_usd": 36.81400381343366,
+      "gpu_usd_per_second": 0.000542
+    },
+    {
+      "requested_gpu": "L40S",
+      "actual_gpu": "NVIDIA L40S",
+      "mode": "joint",
+      "input_tokens_per_second": 108197.72113973656,
+      "repetition_throughputs": [
+        108194.38170676229,
+        108258.46512848369,
+        108140.38117431612
+      ],
+      "throughput_sample_std_percent": 0.054634854770687635,
+      "peak_cuda_allocated_bytes": 12249891840,
+      "gpu_usd_per_million_tokens": 0.005009347648829044,
+      "requested_compute_usd_per_million_tokens": 0.005415640864036655,
+      "base_16_4b_training_hours": 42.103988028288406,
+      "base_16_4b_gpu_usd": 82.15330144079634,
+      "gpu_usd_per_second": 0.000542
+    },
+    {
+      "requested_gpu": "A100-80GB",
+      "actual_gpu": "NVIDIA A100-SXM4-80GB",
+      "mode": "clm",
+      "input_tokens_per_second": 287444.68580593937,
+      "repetition_throughputs": [
+        288816.6353394205,
+        285320.0617771886,
+        288221.79357052135
+      ],
+      "throughput_sample_std_percent": 0.6508284224930634,
+      "peak_cuda_allocated_bytes": 6669597184,
+      "gpu_usd_per_million_tokens": 0.002414377562953227,
+      "requested_compute_usd_per_million_tokens": 0.0025673113348083044,
+      "base_16_4b_training_hours": 15.848459827262618,
+      "base_16_4b_gpu_usd": 39.59579203243292,
+      "gpu_usd_per_second": 0.000694
+    },
+    {
+      "requested_gpu": "A100-80GB",
+      "actual_gpu": "NVIDIA A100-SXM4-80GB",
+      "mode": "joint",
+      "input_tokens_per_second": 130619.38420643598,
+      "repetition_throughputs": [
+        128722.69848719308,
+        131205.6443709893,
+        131974.2863280132
+      ],
+      "throughput_sample_std_percent": 1.3009178424057044,
+      "peak_cuda_allocated_bytes": 12249891840,
+      "gpu_usd_per_million_tokens": 0.005313147081624388,
+      "requested_compute_usd_per_million_tokens": 0.005649697435670798,
+      "base_16_4b_training_hours": 34.87656585760485,
+      "base_16_4b_gpu_usd": 87.13561213863996,
+      "gpu_usd_per_second": 0.000694
+    },
+    {
+      "requested_gpu": "RTX-PRO-6000",
+      "actual_gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "mode": "clm",
+      "input_tokens_per_second": 420428.6875299314,
+      "repetition_throughputs": [
+        434641.9684503624,
+        388664.4991903356,
+        442102.9498935606
+      ],
+      "throughput_sample_std_percent": 6.861102685919502,
+      "peak_cuda_allocated_bytes": 6669597184,
+      "gpu_usd_per_million_tokens": 0.0020027177615943624,
+      "requested_compute_usd_per_million_tokens": 0.002107277705536985,
+      "base_16_4b_training_hours": 10.835501217388343,
+      "base_16_4b_gpu_usd": 32.84457129014754,
+      "gpu_usd_per_second": 0.000842
+    },
+    {
+      "requested_gpu": "RTX-PRO-6000",
+      "actual_gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "mode": "joint",
+      "input_tokens_per_second": 181838.55808530556,
+      "repetition_throughputs": [
+        188693.31416542252,
+        178627.46330225753,
+        178561.76951720065
+      ],
+      "throughput_sample_std_percent": 3.2043037956047224,
+      "peak_cuda_allocated_bytes": 12249891840,
+      "gpu_usd_per_million_tokens": 0.0046304810644450575,
+      "requested_compute_usd_per_million_tokens": 0.00487223397132511,
+      "base_16_4b_training_hours": 25.052747907396057,
+      "base_16_4b_gpu_usd": 75.93988945689892,
+      "gpu_usd_per_second": 0.000842
+    },
+    {
+      "requested_gpu": "H100!",
+      "actual_gpu": "NVIDIA H100 80GB HBM3",
+      "mode": "clm",
+      "input_tokens_per_second": 530045.1825404882,
+      "repetition_throughputs": [
+        548317.4058345831,
+        521862.72205877386,
+        520854.7850324714
+      ],
+      "throughput_sample_std_percent": 2.9363419876948846,
+      "peak_cuda_allocated_bytes": 6719273472,
+      "gpu_usd_per_million_tokens": 0.002069634884222732,
+      "requested_compute_usd_per_million_tokens": 0.0021525712101210285,
+      "base_16_4b_training_hours": 8.594655145663122,
+      "base_16_4b_gpu_usd": 33.9420121012528,
+      "gpu_usd_per_second": 0.001097
+    },
+    {
+      "requested_gpu": "H100!",
+      "actual_gpu": "NVIDIA H100 80GB HBM3",
+      "mode": "joint",
+      "input_tokens_per_second": 232517.68186357265,
+      "repetition_throughputs": [
+        230351.60240205028,
+        230868.88580367668,
+        236429.42097987144
+      ],
+      "throughput_sample_std_percent": 1.4489979097585293,
+      "peak_cuda_allocated_bytes": 12295488512,
+      "gpu_usd_per_million_tokens": 0.004717920767176982,
+      "requested_compute_usd_per_million_tokens": 0.004906981657719462,
+      "base_16_4b_training_hours": 19.5922973214075,
+      "base_16_4b_gpu_usd": 77.3739005817025,
+      "gpu_usd_per_second": 0.001097
+    }
+  ],
+  "base_gpu_cost_ranking": [
+    "RTX-PRO-6000",
+    "H100!",
+    "L40S",
+    "A100-80GB"
+  ],
+  "failed_requests": [],
+  "pricing_source": "https://modal.com/pricing",
+  "note": "Identical physical batch/context/objective; ranking is throughput economics, not quality. Training projections exclude preparation, validation, saving, startup/scaledown, storage and egress. Requested CPU/host-memory cost is not actual metered resource use. No full training or publication occurs in this benchmark.",
+  "run_id": "modal-gpu-story15m-20261001-comparison",
+  "source_commit": "7f4cf651c464cda621ec609159dc5d5528361337"
+}

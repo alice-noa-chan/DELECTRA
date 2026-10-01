@@ -41,7 +41,9 @@ def validate_device(requested: str, name: str, memory_bytes: int) -> None:
         raise ValueError(f"GPU differs from exact request {requested}: {name}")
 
 
-def summarize_comparison(reports: list[dict]) -> dict:
+def summarize_comparison(
+    reports: list[dict], *, joint_confirmation: bool = False
+) -> dict:
     """Rank complete repeated measurements by cost, keeping failures visible.
 
     Use total measured tokens divided by total measured optimizer time. Host
@@ -52,13 +54,13 @@ def summarize_comparison(reports: list[dict]) -> dict:
         if report["status"] != "completed":
             continue
         requested = report["requested_gpu"]
-        for mode in ("clm", "joint"):
+        for mode in ("joint",) if joint_confirmation else ("clm", "joint"):
             cases = [x for x in report["cases"] if x["mode"] == mode]
             if len(cases) != REPETITIONS or any(
                 x["status"] != "completed"
                 or x["batch_size"] != BATCH_SIZE
                 or x["context"] != 256
-                or x["measured_steps"] != MEASURED
+                or x["measured_steps"] != (1000 if joint_confirmation else MEASURED)
                 or x["warmup_steps"] != WARMUP
                 or x["backend"] != "flash"
                 for x in cases
@@ -114,10 +116,27 @@ def summarize_comparison(reports: list[dict]) -> dict:
     }
 
 
-def benchmark_gpu(train: Tensor, special_ids: tuple[int, ...], requested: str) -> dict:
+def benchmark_gpu(
+    train: Tensor,
+    special_ids: tuple[int, ...],
+    requested: str,
+    *,
+    joint_confirmation: bool = False,
+) -> dict:
     """Run six fresh-model cases, alternating mode order across repetitions."""
     started = time.perf_counter()
-    report = {"requested_gpu": requested, "status": "failed", "cases": []}
+    report = {
+        "requested_gpu": requested,
+        "status": "failed",
+        "cases": [],
+        "protocol": {
+            "joint_confirmation": joint_confirmation,
+            "measured_steps": 1000 if joint_confirmation else MEASURED,
+            "warmup_steps": WARMUP,
+            "repetitions": REPETITIONS,
+            "batch_size": BATCH_SIZE,
+        },
+    }
     try:
         if not torch.cuda.is_available():
             raise ValueError("CUDA is required for GPU comparison")
@@ -138,6 +157,8 @@ def benchmark_gpu(train: Tensor, special_ids: tuple[int, ...], requested: str) -
         torch.cuda.empty_cache()
         for repetition in range(REPETITIONS):
             modes = ("clm", "joint") if repetition % 2 == 0 else ("joint", "clm")
+            if joint_confirmation:
+                modes = ("joint",)
             for mode in modes:
                 if time.perf_counter() - started > 450:
                     raise TimeoutError("GPU comparison exceeded its execution budget")
@@ -149,7 +170,7 @@ def benchmark_gpu(train: Tensor, special_ids: tuple[int, ...], requested: str) -
                     mode,
                     BATCH_SIZE,
                     warmup_steps=WARMUP,
-                    measured_steps=MEASURED,
+                    measured_steps=1000 if joint_confirmation else MEASURED,
                 )
                 case["repetition"] = repetition + 1
                 report["cases"].append(case)

@@ -24,7 +24,9 @@ RESOURCES = {
 }
 
 
-def profile(requested: str, run_id: str, source_commit: str) -> dict:
+def profile(
+    requested: str, run_id: str, source_commit: str, joint_confirmation: bool
+) -> dict:
     """Persist each GPU's results separately so completed evidence survives failures."""
     from deletcra.data import load_prepared
     from deletcra.gpu_comparison import benchmark_gpu
@@ -42,7 +44,12 @@ def profile(requested: str, run_id: str, source_commit: str) -> dict:
         or metadata["tokenizer_revision"] != REFERENCE_REVISION
     ):
         raise ValueError("cached data differs from the pinned target protocol")
-    result = benchmark_gpu(train, tuple(metadata["special_token_ids"]), requested)
+    result = benchmark_gpu(
+        train,
+        tuple(metadata["special_token_ids"]),
+        requested,
+        joint_confirmation=joint_confirmation,
+    )
     result.update(
         run_id=run_id,
         source_commit=source_commit,
@@ -61,27 +68,48 @@ def profile(requested: str, run_id: str, source_commit: str) -> dict:
 
 
 @app.function(gpu="L40S", **RESOURCES)
-def l40s(run_id: str, source_commit: str) -> dict:
-    return profile("L40S", run_id, source_commit)
+def l40s(run_id: str, source_commit: str, joint_confirmation: bool = False) -> dict:
+    return profile("L40S", run_id, source_commit, joint_confirmation)
 
 
 @app.function(gpu="A100-80GB", **RESOURCES)
-def a100(run_id: str, source_commit: str) -> dict:
-    return profile("A100-80GB", run_id, source_commit)
+def a100(run_id: str, source_commit: str, joint_confirmation: bool = False) -> dict:
+    return profile("A100-80GB", run_id, source_commit, joint_confirmation)
 
 
 @app.function(gpu="RTX-PRO-6000", **RESOURCES)
-def rtx_pro(run_id: str, source_commit: str) -> dict:
-    return profile("RTX-PRO-6000", run_id, source_commit)
+def rtx_pro(run_id: str, source_commit: str, joint_confirmation: bool = False) -> dict:
+    return profile("RTX-PRO-6000", run_id, source_commit, joint_confirmation)
 
 
 @app.function(gpu="H100!", **RESOURCES)
-def h100(run_id: str, source_commit: str) -> dict:
-    return profile("H100!", run_id, source_commit)
+def h100(run_id: str, source_commit: str, joint_confirmation: bool = False) -> dict:
+    return profile("H100!", run_id, source_commit, joint_confirmation)
 
 
 @app.local_entrypoint()
 def compare_main(run_id: str) -> None:
+    run_comparison(
+        run_id,
+        (
+            ("L40S", l40s),
+            ("A100-80GB", a100),
+            ("RTX-PRO-6000", rtx_pro),
+            ("H100!", h100),
+        ),
+        joint_confirmation=False,
+    )
+
+
+@app.local_entrypoint()
+def confirm_main(run_id: str) -> None:
+    """Resolve close RTX/H100 economics with three 1000-step joint trials."""
+    run_comparison(
+        run_id, (("RTX-PRO-6000", rtx_pro), ("H100!", h100)), joint_confirmation=True
+    )
+
+
+def run_comparison(run_id: str, functions: tuple, *, joint_confirmation: bool) -> None:
     validate_run_id(run_id)
     destination = ROOT / "results" / f"{run_id}.json"
     if destination.exists() or list(ROOT.glob(f"results/{run_id}-*.json")):
@@ -92,13 +120,8 @@ def compare_main(run_id: str) -> None:
     # Independent workers read the same cached data and write different folders.
     # Each has one container, zero retries and a fixed timeout; no fallback GPU.
     calls = [
-        (requested, function.spawn(run_id, source_commit))
-        for requested, function in (
-            ("L40S", l40s),
-            ("A100-80GB", a100),
-            ("RTX-PRO-6000", rtx_pro),
-            ("H100!", h100),
-        )
+        (requested, function.spawn(run_id, source_commit, joint_confirmation))
+        for requested, function in functions
     ]
     reports = []
     for requested, call in calls:
@@ -119,7 +142,7 @@ def compare_main(run_id: str) -> None:
             json.dumps(result, indent=2, allow_nan=False) + "\n", encoding="utf-8"
         )
         print(f"Saved {requested}: {result['status']}", flush=True)
-    summary = summarize_comparison(reports)
+    summary = summarize_comparison(reports, joint_confirmation=joint_confirmation)
     summary.update(run_id=run_id, source_commit=source_commit)
     destination.write_text(
         json.dumps(summary, indent=2, allow_nan=False) + "\n", encoding="utf-8"

@@ -69,3 +69,18 @@ def test_exact_gpu_validation_rejects_free_upgrades_and_wrong_a100_memory():
         validate_device("H100!", "NVIDIA H200", 140 * 1024**3)
     with pytest.raises(ValueError, match="differs"):
         validate_device("A100-80GB", "NVIDIA A100-SXM4-40GB", 40 * 1024**3)
+
+
+def test_long_confirmation_cannot_rank_short_measurements_as_long_trials():
+    short = report("RTX-PRO-6000", 200000)
+    with pytest.raises(ValueError, match="full fixed protocol"):
+        summarize_comparison([short], joint_confirmation=True)
+    long = report("RTX-PRO-6000", 200000)
+    for case in long["cases"]:
+        case["measured_steps"] = 1000
+        case["measured_input_tokens"] *= 5
+        case["training_seconds"] *= 5
+    long["cases"] = [x for x in long["cases"] if x["mode"] == "joint"]
+    summary = summarize_comparison([long], joint_confirmation=True)
+    assert len(summary["measurements"]) == 1
+    assert summary["measurements"][0]["input_tokens_per_second"] == 200000
