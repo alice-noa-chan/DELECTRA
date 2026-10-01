@@ -1,0 +1,776 @@
+{
+  "run_id": "modal-l40s-wikitext2-20261001-pilot",
+  "modal_volume": "deletcra-experiments",
+  "remote_directory": "/vol/runs/modal-l40s-wikitext2-20261001-pilot",
+  "requested_gpu": "L40S",
+  "cuda_checks": {
+    "gpu": "NVIDIA L40S",
+    "cuda": "12.8",
+    "torch": "2.8.0+cu128",
+    "bf16_supported": true,
+    "future_prefix_max_difference": 0.0,
+    "joint_loss": 10.3806734085083,
+    "gradient_check": "passed"
+  },
+  "remote_gpu_function_seconds": 34.359421929,
+  "gpu_rate_usd_per_second": 0.000542,
+  "estimated_gpu_charge_usd": 0.018622806685518,
+  "cost_note": "Runtime-based GPU estimate, not a billing receipt. Excludes startup, scaledown, CPU, host memory, image building, storage, and egress. Published rate checked https://modal.com/pricing on 2026-10-01.",
+  "command": [
+    "/usr/local/bin/python",
+    "-m",
+    "deletcra",
+    "run",
+    "--data-dir",
+    "/vol/data/wikitext2-128-1m-100k",
+    "--output-dir",
+    "/vol/runs/modal-l40s-wikitext2-20261001-pilot",
+    "--mode",
+    "all",
+    "--preset",
+    "small",
+    "--steps",
+    "100",
+    "--batch-size",
+    "32",
+    "--probe-steps",
+    "20",
+    "--seed",
+    "7",
+    "--device",
+    "cuda",
+    "--precision",
+    "bf16",
+    "--cpu-threads",
+    "2",
+    "--eval-batches",
+    "4"
+  ],
+  "summary": {
+    "results": [
+      {
+        "mode": "clm",
+        "initial_validation": {
+          "next_token_targets": 16256,
+          "lm_loss": 10.346322059631348,
+          "perplexity": 31142.292431914964
+        },
+        "final_validation": {
+          "next_token_targets": 16256,
+          "lm_loss": 7.279059410095215,
+          "perplexity": 1449.623882076228
+        },
+        "frozen_probe": {
+          "steps": 20,
+          "nll": 8.308483719825745,
+          "perplexity": 4058.1550162882063
+        },
+        "training_tokens": 406400,
+        "training_seconds": 3.721011274000002,
+        "input_tokens_per_second": 133327.7956437357,
+        "estimated_hours_per_10m_tokens": 0.02083419863327118,
+        "peak_cuda_allocated_bytes": 2110500864
+      },
+      {
+        "mode": "rtd",
+        "initial_validation": {
+          "next_token_targets": 16256,
+          "generator_loss": 10.350447654724121,
+          "rtd_loss": 0.7165496810281252,
+          "rtd_accuracy": 0.21274613330020498,
+          "rtd_majority_baseline": 0.8442760419901857,
+          "rtd_replacement_rate": 0.15572395800981428,
+          "rtd_precision": 0.15495825697413967,
+          "rtd_recall": 0.9106501794974072,
+          "rtd_f1": 0.2648491879350348,
+          "rtd_balanced_accuracy": 0.49733509563451883,
+          "rtd_confusion": {
+            "tp": 2283,
+            "tn": 1142,
+            "fp": 12450,
+            "fn": 224
+          }
+        },
+        "final_validation": {
+          "next_token_targets": 16256,
+          "generator_loss": 7.282236218452454,
+          "rtd_loss": 0.4308263992025168,
+          "rtd_accuracy": 0.8453941238586248,
+          "rtd_majority_baseline": 0.8453941238586248,
+          "rtd_replacement_rate": 0.15460587614137525,
+          "rtd_precision": 0.0,
+          "rtd_recall": 0.0,
+          "rtd_f1": 0.0,
+          "rtd_balanced_accuracy": 0.5,
+          "rtd_confusion": {
+            "tp": 0,
+            "tn": 13610,
+            "fp": 0,
+            "fn": 2489
+          }
+        },
+        "frozen_probe": {
+          "steps": 20,
+          "nll": 8.84172534942627,
+          "perplexity": 6916.916448855877
+        },
+        "training_tokens": 406400,
+        "training_seconds": 4.447347513,
+        "input_tokens_per_second": 92127.81067947943,
+        "estimated_hours_per_10m_tokens": 0.03015134905834141,
+        "peak_cuda_allocated_bytes": 2023706112
+      },
+      {
+        "mode": "joint",
+        "initial_validation": {
+          "next_token_targets": 16256,
+          "lm_loss": 10.346322059631348,
+          "perplexity": 31142.292431914964,
+          "generator_loss": 10.350447654724121,
+          "rtd_loss": 0.7165496810281252,
+          "rtd_accuracy": 0.21274613330020498,
+          "rtd_majority_baseline": 0.8442760419901857,
+          "rtd_replacement_rate": 0.15572395800981428,
+          "rtd_precision": 0.15495825697413967,
+          "rtd_recall": 0.9106501794974072,
+          "rtd_f1": 0.2648491879350348,
+          "rtd_balanced_accuracy": 0.49733509563451883,
+          "rtd_confusion": {
+            "tp": 2283,
+            "tn": 1142,
+            "fp": 12450,
+            "fn": 224
+          }
+        },
+        "final_validation": {
+          "next_token_targets": 16256,
+          "lm_loss": 7.344178795814514,
+          "perplexity": 1547.1639059708957,
+          "generator_loss": 7.325181841850281,
+          "rtd_loss": 0.41054491001490856,
+          "rtd_accuracy": 0.845332008199267,
+          "rtd_majority_baseline": 0.845332008199267,
+          "rtd_replacement_rate": 0.15466799180073296,
+          "rtd_precision": 0.0,
+          "rtd_recall": 0.0,
+          "rtd_f1": 0.0,
+          "rtd_balanced_accuracy": 0.5,
+          "rtd_confusion": {
+            "tp": 0,
+            "tn": 13609,
+            "fp": 0,
+            "fn": 2490
+          }
+        },
+        "frozen_probe": {
+          "steps": 20,
+          "nll": 8.641859769821167,
+          "perplexity": 5663.853499405938
+        },
+        "training_tokens": 406400,
+        "training_seconds": 6.781849915999999,
+        "input_tokens_per_second": 60000.30744562843,
+        "estimated_hours_per_10m_tokens": 0.046296059070946714,
+        "peak_cuda_allocated_bytes": 3928966656
+      }
+    ],
+    "total_training_seconds": 14.950208703000001,
+    "estimated_total_hours_per_10m_tokens_each": 0.09728160676255931,
+    "comparison_note": "Matched initialization, data, input-token budget, and seed. Compute is not matched. Probe uses identical fresh linear heads and a frozen backbone. RTD-only has no trained main LM head or main LM perplexity."
+  },
+  "reports": {
+    "clm": {
+      "model_config": {
+        "vocab_size": 30522,
+        "embedding_size": 128,
+        "hidden_size": 256,
+        "num_layers": 12,
+        "num_heads": 4,
+        "intermediate_size": 1024,
+        "max_positions": 128,
+        "dropout": 0.0,
+        "pad_token_id": 0,
+        "bos_token_id": 101
+      },
+      "objective_config": {
+        "mode": "clm",
+        "replacement_probability": 0.15,
+        "temperature": 1.0,
+        "generator_weight": 1.0,
+        "rtd_weight": 5.0,
+        "lm_weight": 1.0
+      },
+      "train_config": {
+        "steps": 100,
+        "batch_size": 32,
+        "learning_rate": 0.0003,
+        "weight_decay": 0.01,
+        "max_grad_norm": 1.0,
+        "seed": 7,
+        "device": "cuda",
+        "precision": "bf16",
+        "cpu_threads": 2,
+        "eval_batches": 4,
+        "probe_steps": 20,
+        "probe_learning_rate": 0.01
+      },
+      "dataset": {
+        "dataset": "Salesforce/wikitext",
+        "subset": "wikitext-2-raw-v1",
+        "dataset_source": "https://huggingface.co/datasets/Salesforce/wikitext",
+        "license_note": "WikiText has separate CC BY-SA/GFDL notices. Its current card lists CC BY-SA 3.0/GFDL in metadata and CC BY-SA 4.0 in prose; preserve the upstream card and review that inconsistency before redistribution.",
+        "tokenizer": "google/electra-small-discriminator",
+        "vocab_size": 30522,
+        "bos_token_id": 101,
+        "pad_token_id": 0,
+        "special_token_ids": [
+          100,
+          102,
+          0,
+          101,
+          103
+        ],
+        "sequence_length": 128,
+        "max_train_tokens": 1000000,
+        "max_validation_tokens": 100000,
+        "train_content_tokens": 999998,
+        "validation_content_tokens": 99949
+      },
+      "special_token_ids": [
+        100,
+        102,
+        0,
+        101,
+        103
+      ],
+      "environment": {
+        "python": "3.11.12",
+        "torch": "2.8.0+cu128",
+        "transformers": "4.57.6",
+        "device": "NVIDIA L40S"
+      },
+      "model_parameters": 13563579,
+      "generator_parameters": 0,
+      "initial_validation": {
+        "next_token_targets": 16256,
+        "lm_loss": 10.346322059631348,
+        "perplexity": 31142.292431914964
+      },
+      "final_validation": {
+        "next_token_targets": 16256,
+        "lm_loss": 7.279059410095215,
+        "perplexity": 1449.623882076228
+      },
+      "frozen_probe": {
+        "steps": 20,
+        "nll": 8.308483719825745,
+        "perplexity": 4058.1550162882063
+      },
+      "history": [
+        {
+          "step": 1,
+          "loss": 10.356668472290039,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 10.356668472290039
+        },
+        {
+          "step": 10,
+          "loss": 9.830509185791016,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 9.830509185791016
+        },
+        {
+          "step": 20,
+          "loss": 9.435639381408691,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 9.435639381408691
+        },
+        {
+          "step": 30,
+          "loss": 9.030326843261719,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 9.030326843261719
+        },
+        {
+          "step": 40,
+          "loss": 8.70973014831543,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 8.70973014831543
+        },
+        {
+          "step": 50,
+          "loss": 8.37867546081543,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 8.37867546081543
+        },
+        {
+          "step": 60,
+          "loss": 8.082477569580078,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 8.082477569580078
+        },
+        {
+          "step": 70,
+          "loss": 7.871762752532959,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 7.871762752532959
+        },
+        {
+          "step": 80,
+          "loss": 7.623485088348389,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 7.623485088348389
+        },
+        {
+          "step": 90,
+          "loss": 7.3203277587890625,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 7.3203277587890625
+        },
+        {
+          "step": 100,
+          "loss": 7.2392425537109375,
+          "generator_loss": 0.0,
+          "rtd_loss": 0.0,
+          "lm_loss": 7.2392425537109375
+        }
+      ],
+      "training_tokens": 406400,
+      "training_seconds": 3.721011274000002,
+      "warmup_steps": 5,
+      "input_tokens_per_second": 133327.7956437357,
+      "peak_cuda_allocated_bytes": 2110500864,
+      "estimated_hours_per_10m_tokens": 0.02083419863327118,
+      "measurement_note": "Throughput includes this objective's generator/discriminator passes and optimizer step, excludes warmup, validation, probe training, and saving. RTD/joint use a changing generator, so initial/final RTD corruption is not identical. Equal input tokens do not imply equal compute."
+    },
+    "rtd": {
+      "model_config": {
+        "vocab_size": 30522,
+        "embedding_size": 128,
+        "hidden_size": 256,
+        "num_layers": 12,
+        "num_heads": 4,
+        "intermediate_size": 1024,
+        "max_positions": 128,
+        "dropout": 0.0,
+        "pad_token_id": 0,
+        "bos_token_id": 101
+      },
+      "objective_config": {
+        "mode": "rtd",
+        "replacement_probability": 0.15,
+        "temperature": 1.0,
+        "generator_weight": 1.0,
+        "rtd_weight": 5.0,
+        "lm_weight": 1.0
+      },
+      "train_config": {
+        "steps": 100,
+        "batch_size": 32,
+        "learning_rate": 0.0003,
+        "weight_decay": 0.01,
+        "max_grad_norm": 1.0,
+        "seed": 7,
+        "device": "cuda",
+        "precision": "bf16",
+        "cpu_threads": 2,
+        "eval_batches": 4,
+        "probe_steps": 20,
+        "probe_learning_rate": 0.01
+      },
+      "dataset": {
+        "dataset": "Salesforce/wikitext",
+        "subset": "wikitext-2-raw-v1",
+        "dataset_source": "https://huggingface.co/datasets/Salesforce/wikitext",
+        "license_note": "WikiText has separate CC BY-SA/GFDL notices. Its current card lists CC BY-SA 3.0/GFDL in metadata and CC BY-SA 4.0 in prose; preserve the upstream card and review that inconsistency before redistribution.",
+        "tokenizer": "google/electra-small-discriminator",
+        "vocab_size": 30522,
+        "bos_token_id": 101,
+        "pad_token_id": 0,
+        "special_token_ids": [
+          100,
+          102,
+          0,
+          101,
+          103
+        ],
+        "sequence_length": 128,
+        "max_train_tokens": 1000000,
+        "max_validation_tokens": 100000,
+        "train_content_tokens": 999998,
+        "validation_content_tokens": 99949
+      },
+      "special_token_ids": [
+        100,
+        102,
+        0,
+        101,
+        103
+      ],
+      "environment": {
+        "python": "3.11.12",
+        "torch": "2.8.0+cu128",
+        "transformers": "4.57.6",
+        "device": "NVIDIA L40S"
+      },
+      "model_parameters": 13563579,
+      "generator_parameters": 4175227,
+      "initial_validation": {
+        "next_token_targets": 16256,
+        "generator_loss": 10.350447654724121,
+        "rtd_loss": 0.7165496810281252,
+        "rtd_accuracy": 0.21274613330020498,
+        "rtd_majority_baseline": 0.8442760419901857,
+        "rtd_replacement_rate": 0.15572395800981428,
+        "rtd_precision": 0.15495825697413967,
+        "rtd_recall": 0.9106501794974072,
+        "rtd_f1": 0.2648491879350348,
+        "rtd_balanced_accuracy": 0.49733509563451883,
+        "rtd_confusion": {
+          "tp": 2283,
+          "tn": 1142,
+          "fp": 12450,
+          "fn": 224
+        }
+      },
+      "final_validation": {
+        "next_token_targets": 16256,
+        "generator_loss": 7.282236218452454,
+        "rtd_loss": 0.4308263992025168,
+        "rtd_accuracy": 0.8453941238586248,
+        "rtd_majority_baseline": 0.8453941238586248,
+        "rtd_replacement_rate": 0.15460587614137525,
+        "rtd_precision": 0.0,
+        "rtd_recall": 0.0,
+        "rtd_f1": 0.0,
+        "rtd_balanced_accuracy": 0.5,
+        "rtd_confusion": {
+          "tp": 0,
+          "tn": 13610,
+          "fp": 0,
+          "fn": 2489
+        }
+      },
+      "frozen_probe": {
+        "steps": 20,
+        "nll": 8.84172534942627,
+        "perplexity": 6916.916448855877
+      },
+      "history": [
+        {
+          "step": 1,
+          "loss": 13.929924964904785,
+          "generator_loss": 10.346610069274902,
+          "rtd_loss": 0.7166630029678345,
+          "lm_loss": 0.0
+        },
+        {
+          "step": 10,
+          "loss": 12.108711242675781,
+          "generator_loss": 9.919045448303223,
+          "rtd_loss": 0.4379331171512604,
+          "lm_loss": 0.0
+        },
+        {
+          "step": 20,
+          "loss": 11.621572494506836,
+          "generator_loss": 9.49307918548584,
+          "rtd_loss": 0.42569857835769653,
+          "lm_loss": 0.0
+        },
+        {
+          "step": 30,
+          "loss": 11.126184463500977,
+          "generator_loss": 9.052026748657227,
+          "rtd_loss": 0.4148315191268921,
+          "lm_loss": 0.0
+        },
+        {
+          "step": 40,
+          "loss": 10.793452262878418,
+          "generator_loss": 8.704693794250488,
+          "rtd_loss": 0.4177516996860504,
+          "lm_loss": 0.0
+        },
+        {
+          "step": 50,
+          "loss": 10.43083381652832,
+          "generator_loss": 8.346956253051758,
+          "rtd_loss": 0.41677555441856384,
+          "lm_loss": 0.0
+        },
+        {
+          "step": 60,
+          "loss": 10.119173049926758,
+          "generator_loss": 8.053372383117676,
+          "rtd_loss": 0.4131600856781006,
+          "lm_loss": 0.0
+        },
+        {
+          "step": 70,
+          "loss": 9.840065956115723,
+          "generator_loss": 7.838082790374756,
+          "rtd_loss": 0.4003966748714447,
+          "lm_loss": 0.0
+        },
+        {
+          "step": 80,
+          "loss": 9.666250228881836,
+          "generator_loss": 7.592942714691162,
+          "rtd_loss": 0.4146615266799927,
+          "lm_loss": 0.0
+        },
+        {
+          "step": 90,
+          "loss": 9.487814903259277,
+          "generator_loss": 7.305756568908691,
+          "rtd_loss": 0.43641164898872375,
+          "lm_loss": 0.0
+        },
+        {
+          "step": 100,
+          "loss": 9.359258651733398,
+          "generator_loss": 7.233317852020264,
+          "rtd_loss": 0.42518821358680725,
+          "lm_loss": 0.0
+        }
+      ],
+      "training_tokens": 406400,
+      "training_seconds": 4.447347513,
+      "warmup_steps": 5,
+      "input_tokens_per_second": 92127.81067947943,
+      "peak_cuda_allocated_bytes": 2023706112,
+      "estimated_hours_per_10m_tokens": 0.03015134905834141,
+      "measurement_note": "Throughput includes this objective's generator/discriminator passes and optimizer step, excludes warmup, validation, probe training, and saving. RTD/joint use a changing generator, so initial/final RTD corruption is not identical. Equal input tokens do not imply equal compute."
+    },
+    "joint": {
+      "model_config": {
+        "vocab_size": 30522,
+        "embedding_size": 128,
+        "hidden_size": 256,
+        "num_layers": 12,
+        "num_heads": 4,
+        "intermediate_size": 1024,
+        "max_positions": 128,
+        "dropout": 0.0,
+        "pad_token_id": 0,
+        "bos_token_id": 101
+      },
+      "objective_config": {
+        "mode": "joint",
+        "replacement_probability": 0.15,
+        "temperature": 1.0,
+        "generator_weight": 1.0,
+        "rtd_weight": 5.0,
+        "lm_weight": 1.0
+      },
+      "train_config": {
+        "steps": 100,
+        "batch_size": 32,
+        "learning_rate": 0.0003,
+        "weight_decay": 0.01,
+        "max_grad_norm": 1.0,
+        "seed": 7,
+        "device": "cuda",
+        "precision": "bf16",
+        "cpu_threads": 2,
+        "eval_batches": 4,
+        "probe_steps": 20,
+        "probe_learning_rate": 0.01
+      },
+      "dataset": {
+        "dataset": "Salesforce/wikitext",
+        "subset": "wikitext-2-raw-v1",
+        "dataset_source": "https://huggingface.co/datasets/Salesforce/wikitext",
+        "license_note": "WikiText has separate CC BY-SA/GFDL notices. Its current card lists CC BY-SA 3.0/GFDL in metadata and CC BY-SA 4.0 in prose; preserve the upstream card and review that inconsistency before redistribution.",
+        "tokenizer": "google/electra-small-discriminator",
+        "vocab_size": 30522,
+        "bos_token_id": 101,
+        "pad_token_id": 0,
+        "special_token_ids": [
+          100,
+          102,
+          0,
+          101,
+          103
+        ],
+        "sequence_length": 128,
+        "max_train_tokens": 1000000,
+        "max_validation_tokens": 100000,
+        "train_content_tokens": 999998,
+        "validation_content_tokens": 99949
+      },
+      "special_token_ids": [
+        100,
+        102,
+        0,
+        101,
+        103
+      ],
+      "environment": {
+        "python": "3.11.12",
+        "torch": "2.8.0+cu128",
+        "transformers": "4.57.6",
+        "device": "NVIDIA L40S"
+      },
+      "model_parameters": 13563579,
+      "generator_parameters": 4175227,
+      "initial_validation": {
+        "next_token_targets": 16256,
+        "lm_loss": 10.346322059631348,
+        "perplexity": 31142.292431914964,
+        "generator_loss": 10.350447654724121,
+        "rtd_loss": 0.7165496810281252,
+        "rtd_accuracy": 0.21274613330020498,
+        "rtd_majority_baseline": 0.8442760419901857,
+        "rtd_replacement_rate": 0.15572395800981428,
+        "rtd_precision": 0.15495825697413967,
+        "rtd_recall": 0.9106501794974072,
+        "rtd_f1": 0.2648491879350348,
+        "rtd_balanced_accuracy": 0.49733509563451883,
+        "rtd_confusion": {
+          "tp": 2283,
+          "tn": 1142,
+          "fp": 12450,
+          "fn": 224
+        }
+      },
+      "final_validation": {
+        "next_token_targets": 16256,
+        "lm_loss": 7.344178795814514,
+        "perplexity": 1547.1639059708957,
+        "generator_loss": 7.325181841850281,
+        "rtd_loss": 0.41054491001490856,
+        "rtd_accuracy": 0.845332008199267,
+        "rtd_majority_baseline": 0.845332008199267,
+        "rtd_replacement_rate": 0.15466799180073296,
+        "rtd_precision": 0.0,
+        "rtd_recall": 0.0,
+        "rtd_f1": 0.0,
+        "rtd_balanced_accuracy": 0.5,
+        "rtd_confusion": {
+          "tp": 0,
+          "tn": 13609,
+          "fp": 0,
+          "fn": 2490
+        }
+      },
+      "frozen_probe": {
+        "steps": 20,
+        "nll": 8.641859769821167,
+        "perplexity": 5663.853499405938
+      },
+      "history": [
+        {
+          "step": 1,
+          "loss": 24.28659439086914,
+          "generator_loss": 10.346610069274902,
+          "rtd_loss": 0.7166630029678345,
+          "lm_loss": 10.356668472290039
+        },
+        {
+          "step": 10,
+          "loss": 21.96332550048828,
+          "generator_loss": 9.917215347290039,
+          "rtd_loss": 0.4370671510696411,
+          "lm_loss": 9.860774040222168
+        },
+        {
+          "step": 20,
+          "loss": 21.083126068115234,
+          "generator_loss": 9.491326332092285,
+          "rtd_loss": 0.42611703276634216,
+          "lm_loss": 9.461214065551758
+        },
+        {
+          "step": 30,
+          "loss": 20.168052673339844,
+          "generator_loss": 9.05521011352539,
+          "rtd_loss": 0.4145745038986206,
+          "lm_loss": 9.039969444274902
+        },
+        {
+          "step": 40,
+          "loss": 19.504241943359375,
+          "generator_loss": 8.711844444274902,
+          "rtd_loss": 0.41771456599235535,
+          "lm_loss": 8.703824996948242
+        },
+        {
+          "step": 50,
+          "loss": 18.807514190673828,
+          "generator_loss": 8.358521461486816,
+          "rtd_loss": 0.41724392771720886,
+          "lm_loss": 8.362773895263672
+        },
+        {
+          "step": 60,
+          "loss": 18.192508697509766,
+          "generator_loss": 8.063652992248535,
+          "rtd_loss": 0.4127156734466553,
+          "lm_loss": 8.065276145935059
+        },
+        {
+          "step": 70,
+          "loss": 17.68947982788086,
+          "generator_loss": 7.849547863006592,
+          "rtd_loss": 0.3945564329624176,
+          "lm_loss": 7.8671488761901855
+        },
+        {
+          "step": 80,
+          "loss": 17.219261169433594,
+          "generator_loss": 7.6259074211120605,
+          "rtd_loss": 0.3904227018356323,
+          "lm_loss": 7.641240119934082
+        },
+        {
+          "step": 90,
+          "loss": 16.771718978881836,
+          "generator_loss": 7.3499860763549805,
+          "rtd_loss": 0.41036465764045715,
+          "lm_loss": 7.369909763336182
+        },
+        {
+          "step": 100,
+          "loss": 16.61688995361328,
+          "generator_loss": 7.278804779052734,
+          "rtd_loss": 0.40682968497276306,
+          "lm_loss": 7.303937911987305
+        }
+      ],
+      "training_tokens": 406400,
+      "training_seconds": 6.781849915999999,
+      "warmup_steps": 5,
+      "input_tokens_per_second": 60000.30744562843,
+      "peak_cuda_allocated_bytes": 3928966656,
+      "estimated_hours_per_10m_tokens": 0.046296059070946714,
+      "measurement_note": "Throughput includes this objective's generator/discriminator passes and optimizer step, excludes warmup, validation, probe training, and saving. RTD/joint use a changing generator, so initial/final RTD corruption is not identical. Equal input tokens do not imply equal compute."
+    }
+  },
+  "provenance": {
+    "source_commit": "a21e5fa",
+    "branch": "causal-electra",
+    "modal_app_url": "https://modal.com/apps/gaon12/main/ap-NZ9gCH6fcfGW1sQadTkEKy",
+    "date_kst": "2026-10-01",
+    "setup_attempt": {
+      "app_url": "https://modal.com/apps/gaon12/main/ap-yD9OLX3F4l5hkc2YitSjsR",
+      "outcome": "Stopped before GPU allocation: Modal requires scaledown_window >= 2."
+    }
+  },
+  "modal_app_completion": {
+    "state": "stopped",
+    "tasks": 0,
+    "stopped_at_kst": "2026-10-01 13:08:28+09:00"
+  }
+}
