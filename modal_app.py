@@ -46,7 +46,7 @@ app = modal.App("deletcra-pilot", image=image)
     timeout=900,
     retries=0,
     max_containers=1,
-    scaledown_window=1,
+    scaledown_window=2,
 )
 def prepare_data() -> dict:
     """Prepare/cache data on CPU before allocating the paid GPU."""
@@ -135,7 +135,7 @@ def cuda_checks() -> dict:
     startup_timeout=300,
     retries=0,
     max_containers=1,
-    scaledown_window=1,
+    scaledown_window=2,
 )
 def run_pilot(run_id: str, config: dict) -> dict:
     import subprocess
