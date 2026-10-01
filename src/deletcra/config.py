@@ -6,6 +6,15 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class ModelConfig:
+    """Architecture settings independent of the dataset and training loop.
+
+    ``embedding_size`` is the width of token and position embeddings.
+    ``hidden_size`` is the width used inside attention and feed-forward blocks.
+    ELECTRA projects between them when they differ, allowing a smaller token
+    table without shrinking the entire backbone. ``max_positions`` includes
+    the initial BOS token and must fit each prepared block.
+    """
+
     vocab_size: int = 32
     embedding_size: int = 16
     hidden_size: int = 32
@@ -42,3 +51,30 @@ class ModelConfig:
             raise ValueError("PAD and BOS must have different token IDs")
         if self.vocab_size < 3 or self.max_positions < 2:
             raise ValueError("need at least one content token and two positions")
+
+
+def generator_model_config(discriminator: ModelConfig) -> ModelConfig:
+    """Build a smaller causal generator with compatible embeddings and IDs.
+
+    Preserve embedding width, vocabulary, positions, and special-token IDs so
+    generator and discriminator can share their token/position tables. Reduce
+    attention width and feed-forward width to about one quarter and depth to
+    about one third. These are this project's experiment defaults, not a claim
+    to reproduce the original ELECTRA hyperparameters.
+    """
+    # Each attention head needs an equal, nonzero slice of the hidden vector.
+    # Round down to a multiple of the head count, with at least one value/head.
+    heads = discriminator.num_heads
+    hidden_size = max(heads, (discriminator.hidden_size // 4 // heads) * heads)
+    return ModelConfig(
+        vocab_size=discriminator.vocab_size,
+        embedding_size=discriminator.embedding_size,
+        hidden_size=hidden_size,
+        num_layers=max(1, discriminator.num_layers // 3),
+        num_heads=heads,
+        intermediate_size=max(heads, discriminator.intermediate_size // 4),
+        max_positions=discriminator.max_positions,
+        dropout=discriminator.dropout,
+        pad_token_id=discriminator.pad_token_id,
+        bos_token_id=discriminator.bos_token_id,
+    )

@@ -24,7 +24,9 @@ from deletcra.target import story_model_config
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser(description="Causal ELECTRA experiments")
     commands = result.add_subparsers(dest="command", required=True)
-    prepare = commands.add_parser("prepare", help="prepare opt-in WikiText data")
+    prepare = commands.add_parser(
+        "prepare", help="prepare opt-in WikiText or TinyStories data"
+    )
     prepare.add_argument("--output-dir", type=Path, required=True)
     prepare.add_argument(
         "--dataset", choices=["wikitext", "tinystories"], default="wikitext"

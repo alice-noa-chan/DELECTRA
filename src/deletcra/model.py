@@ -12,6 +12,12 @@ from deletcra.config import ModelConfig
 
 
 def electra_config(settings: ModelConfig) -> ElectraConfig:
+    """Keep ELECTRA's blocks and heads, but allow attention only to the prefix.
+
+    Transformers uses ``is_decoder`` to build the causal self-attention mask.
+    Cross-attention stays disabled because there is no separate encoder here.
+    Learned absolute positions, GELU, and LayerNorm remain ELECTRA defaults.
+    """
     return ElectraConfig(
         vocab_size=settings.vocab_size,
         embedding_size=settings.embedding_size,
@@ -80,6 +86,9 @@ class CausalElectra(nn.Module):
         pretrained = ElectraForPreTraining(config)
         self.electra = pretrained.electra
         self.rtd_head = pretrained.discriminator_predictions
+        # The discriminator head scores the current token as original/replaced.
+        # A separate vocabulary head predicts the next token. Project to the
+        # embedding width first so its output weights can reuse the token table.
         self.lm_projection = nn.Sequential(
             nn.Linear(config.hidden_size, config.embedding_size),
             nn.GELU(),
@@ -112,6 +121,8 @@ class CausalElectra(nn.Module):
             raise ValueError("shared embeddings require matching devices")
         other.word_embeddings = main.word_embeddings
         other.position_embeddings = main.position_embeddings
+        # Replacing the input table does not automatically update the old output
+        # alias. Retie it explicitly so generation uses the newly shared weights.
         generator.lm_head.weight = main.word_embeddings.weight
 
     def forward(

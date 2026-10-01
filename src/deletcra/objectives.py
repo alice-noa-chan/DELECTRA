@@ -51,6 +51,13 @@ def causal_lm_loss(logits: Tensor, input_ids: Tensor, attention_mask: Tensor) ->
 
 @dataclass
 class Corruption:
+    """Corrupted batch plus masks needed to train and evaluate the discriminator.
+
+    ``selected`` marks requested replacements; ``labels`` marks actual changes.
+    ``eligible`` includes every valid nonspecial position, even unselected ones.
+    All three masks have the same [batch, sequence] shape as ``input_ids``.
+    """
+
     input_ids: Tensor
     labels: Tensor
     selected: Tensor
@@ -105,6 +112,8 @@ def corrupt_tokens(
 
     corrupted = input_ids.clone()
     if selected.any():
+        # Logits at t have already seen x_t, so using them to replace x_t would
+        # leak the answer. Logits at t-1 only saw the original prefix x_<t.
         shifted = torch.zeros_like(generator_logits)
         shifted[:, 1:] = generator_logits[:, :-1]
         sample_logits = shifted[selected].float().clone()
@@ -112,11 +121,18 @@ def corrupt_tokens(
         probs = F.softmax(sample_logits / temperature, dim=-1)
         samples = torch.multinomial(probs, 1, generator=rng).squeeze(-1)
         corrupted[selected] = samples
+    # Selection alone does not make a token fake. The generator can sample the
+    # original token again; those positions must still be labeled original.
     labels = corrupted.ne(input_ids) & eligible
     return Corruption(corrupted, labels, selected, eligible)
 
 
 def rtd_loss(logits: Tensor, corruption: Corruption) -> Tensor:
+    """Detect actual changes at every eligible position, not just selected ones.
+
+    A label of 1 means replaced and 0 means original. Padding and special tokens
+    do not contribute. Unchanged content is needed to learn the original class.
+    """
     if logits.shape != corruption.labels.shape:
         raise ValueError("RTD logits must match replacement labels")
     valid = corruption.eligible
@@ -147,6 +163,13 @@ def pretraining_step(
     rng: torch.Generator | None = None,
     special_token_ids: tuple[int, ...] = (),
 ) -> PretrainingOutput:
+    """Compute one objective's losses without updating model parameters.
+
+    RTD/joint first train the generator on clean next-token targets, sample a
+    corrupted batch without gradients, and classify that batch with the main
+    model. CLM/joint also run the main model on a separate clean batch. The
+    training loop owns backward, gradient clipping, and the optimizer update.
+    """
     validate_batch(input_ids, attention_mask)
     if not input_ids[:, 0].eq(model.config.bos_token_id).all():
         raise ValueError("training sequences must begin with BOS")
@@ -161,6 +184,9 @@ def pretraining_step(
             if getattr(generator.config, key) != getattr(model.config, key):
                 raise ValueError("generator and discriminator must share token IDs")
         generator_logits = generator(input_ids, attention_mask).lm_logits
+        # The generator learns through this CLM loss. RTD loss cannot train it
+        # through discrete sampling; shared embeddings are the separate path
+        # by which both objectives can update the same embedding parameters.
         generator_loss = causal_lm_loss(generator_logits, input_ids, attention_mask)
         corruption = corrupt_tokens(
             input_ids,

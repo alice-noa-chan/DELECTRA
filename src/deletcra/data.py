@@ -1,4 +1,4 @@
-"""Offline synthetic batches and explicitly downloaded WikiText preparation."""
+"""Offline synthetic batches and opt-in WikiText/TinyStories preparation."""
 
 import json
 from array import array
@@ -40,8 +40,10 @@ def pack_texts(
 ) -> Tensor:
     """Pack independent split text into full BOS-prefixed blocks, drop the tail.
 
-    SEP separates records when available, otherwise BOS does. max_tokens caps
-    content including boundaries before block BOS. Split boundaries stay separate.
+    SEP separates records when available, otherwise BOS does. ``max_tokens``
+    counts content and record separators before inserting a BOS per block.
+    Each block therefore holds ``sequence_length - 1`` stream tokens plus BOS.
+    Call this function separately for each split so no block mixes their texts.
     """
     if sequence_length < 3 or max_tokens < sequence_length - 1:
         raise ValueError("length >= 3 and a budget of at least one block are required")
@@ -68,6 +70,8 @@ def pack_texts(
     block_count = len(content) // block_size
     if block_count == 0:
         raise ValueError("text split contains too few tokens for one complete block")
+    # Drop the incomplete tail, then widen compact int32 storage to the int64
+    # token IDs required by PyTorch embeddings. Prefix each full block with BOS.
     data = torch.frombuffer(content, dtype=torch.int32)[
         : block_count * block_size
     ].long()

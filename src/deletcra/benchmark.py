@@ -12,6 +12,13 @@ from deletcra.objectives import causal_lm_loss
 
 
 def load_story_candidate(directory: Path, metadata: dict) -> CausalElectra:
+    """Load a trained main LM only when its data/tokenizer protocol matches.
+
+    The adjacent training report distinguishes CLM/joint checkpoints from an
+    RTD-only model whose main vocabulary projection was never trained. Matching
+    vocabulary size alone is not enough: tokenizer revisions and token IDs must
+    agree with the validation data before perplexity can be compared.
+    """
     report = json.loads((directory.parent / "report.json").read_text(encoding="utf-8"))
     if directory.name not in {"model", "best_model"}:
         raise ValueError("benchmark requires a trained main model checkpoint")
@@ -35,6 +42,12 @@ def load_story_candidate(directory: Path, metadata: dict) -> CausalElectra:
 def score_language_model(
     model: nn.Module, tokens: Tensor, *, pad_token_id: int, batch_size: int = 4
 ) -> dict:
+    """Average next-token loss over actual targets, then exponentiate for PPL.
+
+    Weight each batch by its nonpadding target count so partial batches and
+    padded blocks contribute correctly. Both model types use the same shifted
+    targets; Hugging Face's built-in label loss is intentionally not used here.
+    """
     if batch_size < 1:
         raise ValueError("batch_size must be positive")
     validate_batch(tokens, tokens.ne(pad_token_id))

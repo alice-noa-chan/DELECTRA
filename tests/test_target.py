@@ -1,5 +1,6 @@
 import pytest
 
+from deletcra.config import generator_model_config
 from deletcra.data import pack_texts, prepare_tinystories
 from deletcra.model import CausalElectra
 from deletcra.target import profile_command, story_model_config
@@ -25,6 +26,15 @@ def test_story_target_has_reference_scale_and_context():
     assert sum(parameter.numel() for parameter in model.parameters()) == 15041505
     assert model.config.max_position_embeddings == 256
     assert model.config.is_decoder
+
+
+def test_story_generator_preserves_the_executed_pilot_parameter_counts():
+    main = CausalElectra(story_model_config())
+    generator = CausalElectra(generator_model_config(story_model_config()))
+    assert sum(parameter.numel() for parameter in generator.parameters()) == 9487625
+    main.share_generator_embeddings(generator)
+    parameters = {id(p): p for p in [*main.parameters(), *generator.parameters()]}
+    assert sum(parameter.numel() for parameter in parameters.values()) == 15239402
 
 
 def test_story_downloads_are_opt_in_and_memory_budgets_bounded(tmp_path):

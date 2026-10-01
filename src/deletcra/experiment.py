@@ -12,7 +12,7 @@ import torch
 import transformers
 from torch import Tensor, nn
 
-from deletcra.config import ModelConfig
+from deletcra.config import ModelConfig, generator_model_config
 from deletcra.metrics import binary_ranking_metrics
 from deletcra.model import CausalElectra, validate_batch
 from deletcra.objectives import ObjectiveConfig, causal_lm_loss, pretraining_step
@@ -20,6 +20,14 @@ from deletcra.objectives import ObjectiveConfig, causal_lm_loss, pretraining_ste
 
 @dataclass(frozen=True)
 class TrainConfig:
+    """Training limits and measurement settings, separate from model shape.
+
+    ``steps`` is always an upper bound. ``max_training_seconds`` can stop a run
+    earlier, after a complete optimizer update. Periodic validation and saving
+    do not consume that training-time budget. ``eval_batches`` limits evaluation
+    coverage; it must be large enough to cover all blocks for full validation.
+    """
+
     steps: int = 100
     batch_size: int = 16
     learning_rate: float = 0.001
@@ -249,24 +257,7 @@ def run_experiment(
     model = CausalElectra(model_settings).to(settings.device)
     generator = None
     if objective.mode != "clm":
-        generator_settings = ModelConfig(
-            vocab_size=model_settings.vocab_size,
-            embedding_size=model_settings.embedding_size,
-            hidden_size=max(
-                model_settings.num_heads,
-                (model_settings.hidden_size // 4 // model_settings.num_heads)
-                * model_settings.num_heads,
-            ),
-            num_layers=max(1, model_settings.num_layers // 3),
-            num_heads=model_settings.num_heads,
-            intermediate_size=max(
-                model_settings.num_heads, model_settings.intermediate_size // 4
-            ),
-            max_positions=model_settings.max_positions,
-            dropout=model_settings.dropout,
-            pad_token_id=model_settings.pad_token_id,
-            bos_token_id=model_settings.bos_token_id,
-        )
+        generator_settings = generator_model_config(model_settings)
         generator = CausalElectra(generator_settings).to(settings.device)
         if settings.share_embeddings:
             model.share_generator_embeddings(generator)
@@ -303,7 +294,9 @@ def run_experiment(
     if settings.device == "cuda":
         torch.cuda.reset_peak_memory_stats()
     history = []
-    # A time-limited run can stop before planned warmup finishes; measure all steps.
+    # This is a timing warmup, not a learning-rate schedule: discard the first
+    # few steps from throughput to avoid counting one-time setup as steady work.
+    # Timed runs may stop early, so their throughput includes every trained step.
     warmup_steps = 0 if settings.max_training_seconds else min(5, settings.steps // 5)
     training_tokens = measured_tokens = 0
     _synchronize(settings.device)
@@ -376,6 +369,8 @@ def run_experiment(
                 generator.train()
             _synchronize(settings.device)
             excluded = time.perf_counter() - evaluation_started
+            # Move both clocks forward by the validation/save duration. The
+            # elapsed training time then includes only actual training work.
             started += excluded
             measured_started += excluded
     completed_steps = step
