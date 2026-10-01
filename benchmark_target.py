@@ -11,7 +11,7 @@ import torch
 import transformers
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from deletcra.benchmark import score_language_model
+from deletcra.benchmark import load_story_candidate, score_language_model
 from deletcra.data import load_prepared
 from deletcra.target import REFERENCE_MODEL, REFERENCE_REVISION
 
@@ -28,8 +28,9 @@ def main() -> None:
     parser.add_argument("--data-dir", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--allow-download", action="store_true")
+    parser.add_argument("--checkpoint", type=Path)
     args = parser.parse_args()
-    if not args.allow_download:
+    if args.checkpoint is None and not args.allow_download:
         parser.error("reference checkpoint download requires --allow-download")
     if args.output.exists():
         raise FileExistsError(f"refusing to overwrite: {args.output}")
@@ -44,12 +45,15 @@ def main() -> None:
     tokenizer = AutoTokenizer.from_pretrained(
         args.data_dir / "tokenizer", local_files_only=True
     )
-    model = AutoModelForCausalLM.from_pretrained(
-        REFERENCE_MODEL,
-        revision=REFERENCE_REVISION,
-        use_safetensors=True,
-        dtype=torch.float32,
-    ).eval()
+    if args.checkpoint is None:
+        model = AutoModelForCausalLM.from_pretrained(
+            REFERENCE_MODEL,
+            revision=REFERENCE_REVISION,
+            use_safetensors=True,
+            dtype=torch.float32,
+        ).eval()
+    else:
+        model = load_story_candidate(args.checkpoint, metadata)
     started = time.perf_counter()
     metrics = score_language_model(
         model, validation, pad_token_id=metadata["pad_token_id"]
@@ -58,13 +62,16 @@ def main() -> None:
     samples = []
     for prompt in PROMPTS:
         encoded = tokenizer(prompt, return_tensors="pt")
-        output = model.generate(
-            **encoded,
-            max_new_tokens=96,
-            do_sample=False,
-            pad_token_id=metadata["pad_token_id"],
-            use_cache=True,
-        )
+        if args.checkpoint is None:
+            output = model.generate(
+                **encoded,
+                max_new_tokens=96,
+                do_sample=False,
+                pad_token_id=metadata["pad_token_id"],
+                use_cache=True,
+            )
+        else:
+            output = model.generate(encoded["input_ids"], max_new_tokens=96)
         samples.append(
             {
                 "prompt": prompt,
@@ -74,6 +81,8 @@ def main() -> None:
     result = {
         "reference_model": REFERENCE_MODEL,
         "reference_revision": REFERENCE_REVISION,
+        "evaluated_model": "reference" if args.checkpoint is None else "candidate",
+        "candidate_checkpoint": str(args.checkpoint) if args.checkpoint else None,
         "model_parameters": sum(p.numel() for p in model.parameters()),
         "dataset": metadata,
         "validation_sha256": hashlib.sha256(
@@ -87,13 +96,22 @@ def main() -> None:
             "transformers": transformers.__version__,
             "python": platform.python_version(),
         },
-        "generation": {"max_new_tokens": 96, "do_sample": False, "samples": samples},
+        "generation": {
+            "max_new_tokens": 96,
+            "do_sample": False,
+            "samples": samples,
+            "note": (
+                "Candidate generation masks BOS/PAD; reference uses native HF "
+                "generation. Qualitative samples are not a controlled "
+                "generation-quality score."
+            ),
+        },
         "note": (
             "Common BOS-prefixed packed-block protocol, context 256; measure candidate "
             "with identical validation tokens. This is not upstream's private shard "
             "loss or independent held-out evidence for the reference (training overlap "
             "unknown). Prior WikiText/ELECTRA-tokenizer perplexities are incomparable. "
-            "No candidate has yet been trained on this TinyStories protocol."
+            "Candidate results refer only to the explicitly provided checkpoint."
         ),
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)

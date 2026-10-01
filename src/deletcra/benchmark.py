@@ -1,12 +1,34 @@
 """Common shifted token scoring for Hugging Face and causal ELECTRA models."""
 
+import json
 import math
+from pathlib import Path
 
 import torch
 from torch import Tensor, nn
 
 from deletcra.model import CausalElectra, validate_batch
 from deletcra.objectives import causal_lm_loss
+
+
+def load_story_candidate(directory: Path, metadata: dict) -> CausalElectra:
+    report = json.loads((directory.parent / "report.json").read_text(encoding="utf-8"))
+    if directory.name not in {"model", "best_model"}:
+        raise ValueError("benchmark requires a trained main model checkpoint")
+    if report["objective_config"]["mode"] not in {"clm", "joint"}:
+        raise ValueError("RTD-only has no trained main LM head")
+    for key in ("dataset", "dataset_revision", "tokenizer", "tokenizer_revision"):
+        if report["dataset"].get(key) != metadata.get(key):
+            raise ValueError(f"candidate data protocol mismatch: {key}")
+    model = CausalElectra.load(directory).eval()
+    if (
+        model.config.vocab_size != metadata["vocab_size"]
+        or model.config.pad_token_id != metadata["pad_token_id"]
+        or model.config.bos_token_id != metadata["bos_token_id"]
+        or model.config.max_position_embeddings < metadata["sequence_length"]
+    ):
+        raise ValueError("candidate configuration does not match validation tokens")
+    return model
 
 
 @torch.no_grad()
