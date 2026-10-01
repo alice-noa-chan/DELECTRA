@@ -1,0 +1,163 @@
+{
+  "run_id": "modal-l40s-wikitext2-20261001-research",
+  "paired_results": [
+    {
+      "seed": 7,
+      "perplexity": {
+        "joint": 314.7236998747094,
+        "clm": 374.4153902930235,
+        "clm_time": 1652.5893811997798
+      },
+      "probe_perplexity": {
+        "joint": 580.7090744166296,
+        "clm": 685.1198022283404,
+        "clm_time": 1697.8201922446513
+      },
+      "training_seconds": {
+        "joint": 163.30453416199998,
+        "clm": 70.32224543499999,
+        "clm_time": 163.33174452500003
+      },
+      "training_tokens": {
+        "joint": 10001504,
+        "clm": 10001504,
+        "clm_time": 22766528
+      },
+      "joint_ppl_change_vs_token_clm_percent": -15.942638034082535,
+      "joint_ppl_change_vs_time_clm_percent": -80.95572297298558,
+      "joint_nll_minus_token_clm": -0.1736707396549678,
+      "joint_nll_minus_time_clm": -1.6584035480794945
+    },
+    {
+      "seed": 19,
+      "perplexity": {
+        "joint": 320.25318496004735,
+        "clm": 368.4669469460822,
+        "clm_time": 1426.5756476081149
+      },
+      "probe_perplexity": {
+        "joint": 601.4395708949346,
+        "clm": 711.5947216329572,
+        "clm_time": 1776.4548104494925
+      },
+      "training_seconds": {
+        "joint": 167.14916215799997,
+        "clm": 75.79476084399994,
+        "clm_time": 167.16995983099991
+      },
+      "training_tokens": {
+        "joint": 10001504,
+        "clm": 10001504,
+        "clm_time": 21864320
+      },
+      "joint_ppl_change_vs_token_clm_percent": -13.084962541589917,
+      "joint_ppl_change_vs_time_clm_percent": -77.55091463274285,
+      "joint_nll_minus_token_clm": -0.14023912543717285,
+      "joint_nll_minus_time_clm": -1.493920313509174
+    },
+    {
+      "seed": 37,
+      "perplexity": {
+        "joint": 321.9607482182493,
+        "clm": 368.9734683130343,
+        "clm_time": 1606.4283917501527
+      },
+      "probe_perplexity": {
+        "joint": 592.0852993582477,
+        "clm": 688.2037708307821,
+        "clm_time": 1737.7907223351576
+      },
+      "training_seconds": {
+        "joint": 164.88852306900003,
+        "clm": 75.91157828799987,
+        "clm_time": 164.89037564700016
+      },
+      "training_tokens": {
+        "joint": 10001504,
+        "clm": 10001504,
+        "clm_time": 22648672
+      },
+      "joint_ppl_change_vs_token_clm_percent": -12.741490684880286,
+      "joint_ppl_change_vs_time_clm_percent": -79.95797697104423,
+      "joint_nll_minus_token_clm": -0.13629510169410966,
+      "joint_nll_minus_time_clm": -1.6073389653177994
+    }
+  ],
+  "aggregates": {
+    "joint": {
+      "ppl_mean": 318.97921101766866,
+      "ppl_sample_std": 3.782984851420685,
+      "ppl_geometric_mean": 318.964202385723,
+      "probe_ppl_mean": 591.4113148899373,
+      "training_seconds_mean": 165.11407312966665
+    },
+    "clm": {
+      "ppl_mean": 370.61860185071333,
+      "ppl_sample_std": 3.2978542767290127,
+      "ppl_geometric_mean": 370.6088525064302,
+      "probe_ppl_mean": 694.9727648973599,
+      "training_seconds_mean": 74.00952818899994
+    },
+    "clm_time": {
+      "ppl_mean": 1561.864473519349,
+      "ppl_sample_std": 119.41527979732048,
+      "ppl_geometric_mean": 1558.7401127282521,
+      "probe_ppl_mean": 1737.3552416764337,
+      "training_seconds_mean": 165.13069333433336
+    }
+  },
+  "validation_targets_per_model": 99949,
+  "total_remote_gpu_seconds": 1330.6093903510002,
+  "estimated_gpu_charge_usd": 0.7211902895702419,
+  "diagnostics": {
+    "metrics": {
+      "rtd": {
+        "next_token_targets": 99949,
+        "generator_loss": 6.052512806282867,
+        "rtd_loss": 0.39903504542825274,
+        "rtd_accuracy": 0.8632495927638435,
+        "rtd_majority_baseline": 0.8632495927638435,
+        "rtd_replacement_rate": 0.1367504072361565,
+        "rtd_precision": 0.0,
+        "rtd_recall": 0.0,
+        "rtd_f1": 0.0,
+        "rtd_balanced_accuracy": 0.5,
+        "rtd_confusion": {
+          "tp": 0,
+          "tn": 85321,
+          "fp": 0,
+          "fn": 13516
+        },
+        "rtd_auroc": 0.5018355870653319,
+        "rtd_average_precision": 0.13718526609314796
+      },
+      "joint": {
+        "next_token_targets": 99949,
+        "lm_loss": 5.751695110655497,
+        "perplexity": 314.7236998747094,
+        "generator_loss": 6.052512806282867,
+        "rtd_loss": 0.40846830403621326,
+        "rtd_accuracy": 0.8510982729139897,
+        "rtd_majority_baseline": 0.8632495927638435,
+        "rtd_replacement_rate": 0.1367504072361565,
+        "rtd_precision": 0.317643486182812,
+        "rtd_recall": 0.07738976028410773,
+        "rtd_f1": 0.12445713605806413,
+        "rtd_balanced_accuracy": 0.5255269613412897,
+        "rtd_confusion": {
+          "tp": 1046,
+          "tn": 83074,
+          "fp": 2247,
+          "fn": 12470
+        },
+        "rtd_auroc": 0.6462292810932531,
+        "rtd_average_precision": 0.2163271608635647
+      }
+    },
+    "reference_generator": "/vol/runs/modal-l40s-wikitext2-20261001-10m/joint/generator",
+    "note": "Same frozen joint generator, validation tokens and RNG seed for both checkpoints. Generator loss refers to this reference. AP baseline is replacement rate; F1 uses sigmoid threshold 0.5.",
+    "remote_gpu_function_seconds": 5.17157586,
+    "estimated_gpu_charge_usd": 0.0028029941161199995
+  },
+  "note": "Arithmetic PPL means and sample SD describe three seeds, not a significance test. Negative paired PPL/NLL changes favor joint. Full prepared validation; no test set or FLOP matching."
+}

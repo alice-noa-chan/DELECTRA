@@ -1,0 +1,115 @@
+{
+  "root": "D:\\models\\DELETCRA\\runs\\modal-checkpoints\\modal-l40s-wikitext2-20261001-research",
+  "torch": "2.14.1+cpu",
+  "checkpoints": [
+    {
+      "checkpoint": "seed-19\\clm\\clm\\model\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "seed-19\\clm_time\\clm\\model\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "seed-19\\joint\\joint\\generator\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "seed-19\\joint\\joint\\model\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "seed-37\\clm\\clm\\model\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "seed-37\\clm_time\\clm\\model\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "seed-37\\joint\\joint\\generator\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "seed-37\\joint\\joint\\model\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "seed-7\\clm\\clm\\model\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "seed-7\\clm_time\\clm\\model\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "seed-7\\joint\\joint\\generator\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    },
+    {
+      "checkpoint": "seed-7\\joint\\joint\\model\\model.pt",
+      "strict_reload": "passed",
+      "finite_outputs": "passed",
+      "future_prefix_max_difference": 0.0
+    }
+  ],
+  "shared_embedding_pairs_verified": [],
+  "sha256": {
+    "seed-19\\clm\\clm\\model\\config.json": "0de7b2c5ca4fbdebda9f778677c17b1614b97523b7c47cd7f0382ffb4a785c42",
+    "seed-19\\clm\\clm\\model\\model.pt": "2ceeae96d7d8e31ccffe46a04fc630bb24f6c63b9cee91de0ec14d6a3ed679ed",
+    "seed-19\\clm\\clm\\probe.pt": "30212389fffeb031e91b64cd87233c0ef832e242c0b9c4428dab2c30324296df",
+    "seed-19\\clm_time\\clm\\model\\config.json": "0de7b2c5ca4fbdebda9f778677c17b1614b97523b7c47cd7f0382ffb4a785c42",
+    "seed-19\\clm_time\\clm\\model\\model.pt": "7b988829e1fa09ecb7a75e98b9ce894a3ac1beb034c5d1d8e70b3dd67e747e73",
+    "seed-19\\clm_time\\clm\\probe.pt": "b6ed425f06f5c8f18ec3f13bba149c8bd495be444e7ffb003edb1468ab9858f9",
+    "seed-19\\joint\\joint\\generator\\config.json": "f793ceedade99627d1ec89481f2fcfa7fd3e1c0f9d9800397e738ccf11cf2543",
+    "seed-19\\joint\\joint\\generator\\model.pt": "6dce5ac595ccf28f63d4ed4560e3697f8dec6e2f6b67e0c5dae3b0e63c1756a2",
+    "seed-19\\joint\\joint\\model\\config.json": "0de7b2c5ca4fbdebda9f778677c17b1614b97523b7c47cd7f0382ffb4a785c42",
+    "seed-19\\joint\\joint\\model\\model.pt": "4ef2c6a8af758edbba744ecc737202c011dce324f37f6f91d0de7e0db98b9c7b",
+    "seed-19\\joint\\joint\\probe.pt": "3e7f4f8f752251286a41305b48afd1ceb1b52b483ff7c5bbfd19d0983d45c568",
+    "seed-37\\clm\\clm\\model\\config.json": "0de7b2c5ca4fbdebda9f778677c17b1614b97523b7c47cd7f0382ffb4a785c42",
+    "seed-37\\clm\\clm\\model\\model.pt": "419b868f751b309cef0a75de5588612df171a9f4318ebca361a59db0b1a4ad00",
+    "seed-37\\clm\\clm\\probe.pt": "5ab15d108983bb287c202b6922d75291d03488879ca0f06b4f23ea3468edb878",
+    "seed-37\\clm_time\\clm\\model\\config.json": "0de7b2c5ca4fbdebda9f778677c17b1614b97523b7c47cd7f0382ffb4a785c42",
+    "seed-37\\clm_time\\clm\\model\\model.pt": "2b8f13a79eac51a177bec16afe64a0c9ff605ddf7bf53c9a364c98a94fd13fb8",
+    "seed-37\\clm_time\\clm\\probe.pt": "d83d9fbe6961cbc5b865512d27087591bf41d53eba89845bdf1d3755df0eee7d",
+    "seed-37\\joint\\joint\\generator\\config.json": "f793ceedade99627d1ec89481f2fcfa7fd3e1c0f9d9800397e738ccf11cf2543",
+    "seed-37\\joint\\joint\\generator\\model.pt": "767c0365adf7f2ee253e11ca431eb0205358b72caeb0089aeb8a7e1ef7ca2815",
+    "seed-37\\joint\\joint\\model\\config.json": "0de7b2c5ca4fbdebda9f778677c17b1614b97523b7c47cd7f0382ffb4a785c42",
+    "seed-37\\joint\\joint\\model\\model.pt": "11de8c68fcccefdde4a39a958ddf3ebfb85ed6055d8722e06ec33b1dd9fcb64a",
+    "seed-37\\joint\\joint\\probe.pt": "0913a07c3fc0cc84281f3355dbca2e871dd0bebf391fe2792f8db3ca4e1610ff",
+    "seed-7\\clm\\clm\\model\\config.json": "0de7b2c5ca4fbdebda9f778677c17b1614b97523b7c47cd7f0382ffb4a785c42",
+    "seed-7\\clm\\clm\\model\\model.pt": "c40406762ebc6db393bc27727f13717c47862a6810b009c29ebddbfd653f6631",
+    "seed-7\\clm\\clm\\probe.pt": "355c2c7c739164c6ba4f2be1ce4cc5a72c385b4fd95a6ef2198c2a23d47ff14a",
+    "seed-7\\clm_time\\clm\\model\\config.json": "0de7b2c5ca4fbdebda9f778677c17b1614b97523b7c47cd7f0382ffb4a785c42",
+    "seed-7\\clm_time\\clm\\model\\model.pt": "50867bb58d029b00a0e2a620f9b98b7e1ad0b063806c3ca57a6e0db8e42fd904",
+    "seed-7\\clm_time\\clm\\probe.pt": "6f7c7be64d8dec6de0812ad6882e8772017d1ecc83d436aeb4a40f23033f9cf6",
+    "seed-7\\joint\\joint\\generator\\config.json": "f793ceedade99627d1ec89481f2fcfa7fd3e1c0f9d9800397e738ccf11cf2543",
+    "seed-7\\joint\\joint\\generator\\model.pt": "a69221557c119f2e5f04fab04a86d28f62bc33385a705615d288bda1b8118adc",
+    "seed-7\\joint\\joint\\model\\config.json": "0de7b2c5ca4fbdebda9f778677c17b1614b97523b7c47cd7f0382ffb4a785c42",
+    "seed-7\\joint\\joint\\model\\model.pt": "9c884592e8276f8d264a22b14295a59bef8d422c450a2a0167c895c2b924e9b5",
+    "seed-7\\joint\\joint\\probe.pt": "cc75bea7c81009b3b6ea7e1e87dbeab794742fa3df3d970733f7ba9360783c3d"
+  },
+  "note": "Local CPU strict loading, finite outputs and bit-exact future isolation; not a generation quality benchmark."
+}

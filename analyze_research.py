@@ -126,6 +126,7 @@ def plot(summary: dict, destination: Path) -> None:
         )
     axis.set_xticks(range(3), labels)
     axis.set_ylabel("Validation perplexity (lower is better)")
+    axis.set_yscale("log")
     axis.set_title("Causal ELECTRA: paired seed comparison on WikiText-2")
     axis.grid(axis="y", alpha=0.25)
     axis.legend()
