@@ -10,9 +10,15 @@ from pathlib import Path
 import torch
 
 from deletcra.config import ModelConfig
-from deletcra.data import load_prepared, prepare_wikitext, synthetic_sequences
+from deletcra.data import (
+    load_prepared,
+    prepare_tinystories,
+    prepare_wikitext,
+    synthetic_sequences,
+)
 from deletcra.experiment import TrainConfig, run_experiment
 from deletcra.objectives import ObjectiveConfig
+from deletcra.target import story_model_config
 
 
 def parser() -> argparse.ArgumentParser:
@@ -21,11 +27,14 @@ def parser() -> argparse.ArgumentParser:
     prepare = commands.add_parser("prepare", help="prepare opt-in WikiText data")
     prepare.add_argument("--output-dir", type=Path, required=True)
     prepare.add_argument(
+        "--dataset", choices=["wikitext", "tinystories"], default="wikitext"
+    )
+    prepare.add_argument(
         "--subset",
         choices=["wikitext-2-raw-v1", "wikitext-103-raw-v1"],
         default="wikitext-2-raw-v1",
     )
-    prepare.add_argument("--tokenizer", default="google/electra-small-discriminator")
+    prepare.add_argument("--tokenizer")
     prepare.add_argument("--sequence-length", type=int, default=128)
     prepare.add_argument("--max-train-tokens", type=int, default=1_000_000)
     prepare.add_argument("--max-validation-tokens", type=int, default=100_000)
@@ -34,7 +43,7 @@ def parser() -> argparse.ArgumentParser:
     run.add_argument("--output-dir", type=Path, required=True)
     run.add_argument("--mode", choices=["all", "rtd", "clm", "joint"], default="all")
     run.add_argument("--data-dir", type=Path)
-    run.add_argument("--preset", choices=["tiny", "small"], default="tiny")
+    run.add_argument("--preset", choices=["tiny", "small", "story15m"], default="tiny")
     run.add_argument("--sequence-length", type=int)
     run.add_argument("--vocab-size", type=int, default=16)
     budget = run.add_mutually_exclusive_group()
@@ -91,6 +100,8 @@ def _run(args: argparse.Namespace) -> dict:
         }
     if args.preset == "tiny":
         model_settings = ModelConfig()
+    elif args.preset == "story15m":
+        model_settings = story_model_config()
     else:
         model_settings = ModelConfig(
             embedding_size=128,
@@ -204,15 +215,27 @@ def main(argv: list[str] | None = None) -> int:
     args = argument_parser.parse_args(argv)
     try:
         if args.command == "prepare":
-            result = prepare_wikitext(
-                args.output_dir,
-                subset=args.subset,
-                tokenizer_name=args.tokenizer,
-                sequence_length=args.sequence_length,
-                max_train_tokens=args.max_train_tokens,
-                max_validation_tokens=args.max_validation_tokens,
-                allow_download=args.allow_download,
-            )
+            if args.dataset == "tinystories":
+                if args.tokenizer is not None:
+                    raise ValueError("TinyStories target pins its reference tokenizer")
+                result = prepare_tinystories(
+                    args.output_dir,
+                    sequence_length=args.sequence_length,
+                    max_train_tokens=args.max_train_tokens,
+                    max_validation_tokens=args.max_validation_tokens,
+                    allow_download=args.allow_download,
+                )
+            else:
+                result = prepare_wikitext(
+                    args.output_dir,
+                    subset=args.subset,
+                    tokenizer_name=args.tokenizer
+                    or "google/electra-small-discriminator",
+                    sequence_length=args.sequence_length,
+                    max_train_tokens=args.max_train_tokens,
+                    max_validation_tokens=args.max_validation_tokens,
+                    allow_download=args.allow_download,
+                )
         else:
             result = _run(args)
     except (ValueError, FileExistsError, RuntimeError) as error:

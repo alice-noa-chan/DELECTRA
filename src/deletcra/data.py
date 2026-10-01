@@ -1,6 +1,7 @@
 """Offline synthetic batches and explicitly downloaded WikiText preparation."""
 
 import json
+from array import array
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
@@ -39,20 +40,26 @@ def pack_texts(
 ) -> Tensor:
     """Pack independent split text into full BOS-prefixed blocks, drop the tail.
 
-    SEP separates nonempty records. max_tokens caps content tokens, including
-    SEP, before adding BOS. No text crosses a train/validation/test split.
+    SEP separates records when available, otherwise BOS does. max_tokens caps
+    content including boundaries before block BOS. Split boundaries stay separate.
     """
     if sequence_length < 3 or max_tokens < sequence_length - 1:
         raise ValueError("length >= 3 and a budget of at least one block are required")
-    if tokenizer.cls_token_id is None or tokenizer.pad_token_id is None:
+    bos_id = getattr(tokenizer, "cls_token_id", None)
+    if bos_id is None:
+        bos_id = getattr(tokenizer, "bos_token_id", None)
+    if bos_id is None or tokenizer.pad_token_id is None:
         raise ValueError("tokenizer must define CLS/BOS and PAD")
-    content: list[int] = []
+    separator = getattr(tokenizer, "sep_token_id", None)
+    if separator is None:
+        separator = bos_id
+    # Compact storage avoids millions of boxed Python integers for larger corpora.
+    content = array("i")
     for text in texts:
         if not text.strip():
             continue
         tokens = tokenizer(text, add_special_tokens=False)["input_ids"]
-        if tokenizer.sep_token_id is not None:
-            tokens.append(tokenizer.sep_token_id)
+        tokens.append(separator)
         remaining = max_tokens - len(content)
         content.extend(tokens[:remaining])
         if len(content) >= max_tokens:
@@ -61,9 +68,11 @@ def pack_texts(
     block_count = len(content) // block_size
     if block_count == 0:
         raise ValueError("text split contains too few tokens for one complete block")
-    data = torch.tensor(content[: block_count * block_size], dtype=torch.long)
+    data = torch.frombuffer(content, dtype=torch.int32)[
+        : block_count * block_size
+    ].long()
     content_tensor = data.reshape(block_count, block_size)
-    bos = torch.full((block_count, 1), tokenizer.cls_token_id, dtype=torch.long)
+    bos = torch.full((block_count, 1), bos_id, dtype=torch.long)
     return torch.cat((bos, content_tensor), dim=1)
 
 
@@ -161,5 +170,90 @@ def prepare_wikitext(
         torch.save(tensor, directory / f"{split}.pt")
     (directory / "metadata.json").write_text(
         json.dumps(metadata, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
+    return metadata
+
+
+def prepare_tinystories(
+    directory: str | Path,
+    *,
+    sequence_length: int = 256,
+    max_train_tokens: int = 100_000_000,
+    max_validation_tokens: int = 1_000_000,
+    allow_download: bool = False,
+) -> dict:
+    """Pinned TinyStories parquet splits and the reference's exact tokenizer."""
+    if not allow_download:
+        raise ValueError("preparation downloads data; pass --allow-download explicitly")
+    if not 3 <= sequence_length <= 256:
+        raise ValueError("TinyStories target context must be in [3, 256]")
+    if min(max_train_tokens, max_validation_tokens) < sequence_length - 1:
+        raise ValueError("budgets must fit a complete block")
+    if max_train_tokens > 100_000_000 or max_validation_tokens > 5_000_000:
+        raise ValueError("in-memory preparation capped at 100M train / 5M validation")
+    directory = Path(directory)
+    if directory.exists():
+        raise FileExistsError(f"refusing to overwrite prepared data: {directory}")
+    from datasets import load_dataset
+    from transformers import AutoTokenizer
+
+    from deletcra.target import (
+        REFERENCE_MODEL,
+        REFERENCE_REVISION,
+        STORIES_DATASET,
+        STORIES_REVISION,
+    )
+
+    tokenizer = AutoTokenizer.from_pretrained(
+        REFERENCE_MODEL, revision=REFERENCE_REVISION
+    )
+    # Llama's reserved UNK=0 is used only for padding; byte fallback must keep
+    # real English content free of UNK/PAD. Training validates visible sequences.
+    tokenizer.pad_token = tokenizer.unk_token
+    tensors = {}
+    for split, budget in (
+        ("train", max_train_tokens),
+        ("validation", max_validation_tokens),
+    ):
+        dataset = load_dataset(
+            STORIES_DATASET, revision=STORIES_REVISION, split=split, streaming=True
+        )
+        tensors[split] = pack_texts(
+            (row["text"] for row in dataset),
+            tokenizer,
+            sequence_length=sequence_length,
+            max_tokens=budget,
+        )
+        if tensors[split].eq(tokenizer.pad_token_id).any():
+            raise ValueError("reference tokenizer produced UNK/PAD in content")
+    metadata = {
+        "dataset": STORIES_DATASET,
+        "dataset_revision": STORIES_REVISION,
+        "tokenizer": REFERENCE_MODEL,
+        "tokenizer_revision": REFERENCE_REVISION,
+        "vocab_size": len(tokenizer),
+        "bos_token_id": tokenizer.bos_token_id,
+        "pad_token_id": tokenizer.pad_token_id,
+        "special_token_ids": tokenizer.all_special_ids,
+        "sequence_length": sequence_length,
+        "train_content_tokens": tensors["train"].shape[0] * (sequence_length - 1),
+        "validation_content_tokens": tensors["validation"].shape[0]
+        * (sequence_length - 1),
+        "license_note": (
+            "TinyStories data is CDLA-Sharing-1.0; reference model card labels MIT. "
+            "These are separate from project licenses."
+        ),
+        "protocol": (
+            "BOS-prefixed packed blocks; BOS separates stories, no appended EOS. "
+            "Official HF train/validation; reference pretraining overlap is unknown. "
+            "Different from upstream's private shard evaluation."
+        ),
+    }
+    directory.mkdir(parents=True)
+    tokenizer.save_pretrained(directory / "tokenizer")
+    for split, tensor in tensors.items():
+        torch.save(tensor, directory / f"{split}.pt")
+    (directory / "metadata.json").write_text(
+        json.dumps(metadata, indent=2) + "\n", encoding="utf-8"
     )
     return metadata
