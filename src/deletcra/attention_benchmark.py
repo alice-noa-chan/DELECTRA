@@ -13,7 +13,7 @@ from deletcra.objectives import ObjectiveConfig, pretraining_step
 from deletcra.target import story_model_config
 
 BACKENDS = ("eager", "flash")
-BATCH_SIZES = (16, 32, 64, 128)
+BATCH_SIZES = (16, 32, 64, 128, 192, 256)
 WARMUP_STEPS = 5
 MEASURED_STEPS = 20
 

@@ -1,0 +1,34 @@
+{
+  "experiments": [
+    {
+      "result_file": "modal-l40s-tinystories15m-20261001-attention.json",
+      "sha256": "bd5b49f0920327dc35a21cf0d8daab84a0877d4ef85b3b1c217420dd107ace42",
+      "source_commit": "4a39ad06ba2c115b406213b6251cc6a39f6d7031",
+      "modal_app_url": "https://modal.com/apps/gaon12/main/ap-0TRGg8GdfKumDZJOndI2iV",
+      "app_state": "stopped",
+      "remaining_tasks": 0,
+      "status_checked_at": "2026-10-01T16:08:00+09:00"
+    }
+  ],
+  "settings": {
+    "seed": 7,
+    "batch_rng_seed": 9,
+    "replacement_rng_seed": 10,
+    "optimizer": "AdamW",
+    "learning_rate": 0.0003,
+    "weight_decay": 0.01,
+    "gradient_norm_limit": 1.0,
+    "precision": "CUDA autocast BF16 with FP32 parameters",
+    "replacement_probability": 0.15,
+    "loss_weights": {"generator": 1.0, "rtd": 5.0, "main_clm": 1.0},
+    "joint_shares_token_and_position_embeddings": true,
+    "gpu_rate_usd_per_second": 0.000542,
+    "timing": "Five warmup steps, then twenty complete measured optimizer steps per case; a separate profiler step is excluded from throughput."
+  },
+  "limitations": [
+    "Throughput measurements do not evaluate story quality or validate large-batch training hyperparameters.",
+    "Input tokens count 255 next-token positions per 256-token packed block; joint generator and repeated backbone passes are not counted as additional input tokens.",
+    "GPU-only cost estimates cover the measured benchmark function and exclude startup, data loading before the timer, CPU, host memory, storage, and egress.",
+    "Maximum allocated and reserved PyTorch memory are not total device memory."
+  ]
+}
