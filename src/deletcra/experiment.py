@@ -33,6 +33,7 @@ class TrainConfig:
     probe_steps: int = 50
     probe_learning_rate: float = 0.01
     max_training_seconds: float | None = None
+    share_embeddings: bool = False
 
     def __post_init__(self) -> None:
         for name in ("steps", "batch_size", "cpu_threads", "eval_batches"):
@@ -58,6 +59,8 @@ class TrainConfig:
             or self.max_training_seconds <= 0
         ):
             raise ValueError("max_training_seconds must be finite and positive")
+        if not isinstance(self.share_embeddings, bool):
+            raise ValueError("share_embeddings must be boolean")
 
 
 def _autocast(settings: TrainConfig):
@@ -217,6 +220,8 @@ def run_experiment(
         raise ValueError("CUDA requested but unavailable in this PyTorch environment")
     if settings.precision == "bf16" and not torch.cuda.is_bf16_supported():
         raise ValueError("this CUDA device does not support bf16")
+    if settings.share_embeddings and objective.mode == "clm":
+        raise ValueError("sharing requires an RTD generator")
     for tokens in (train, validation):
         if tokens.device.type != "cpu":
             raise ValueError(
@@ -256,9 +261,13 @@ def run_experiment(
             bos_token_id=model_settings.bos_token_id,
         )
         generator = CausalElectra(generator_settings).to(settings.device)
+        if settings.share_embeddings:
+            model.share_generator_embeddings(generator)
     parameters = list(model.parameters())
     if generator is not None:
         parameters += list(generator.parameters())
+    # Shared embeddings occur in both modules; update each parameter exactly once.
+    parameters = list({id(parameter): parameter for parameter in parameters}.values())
     optimizer = torch.optim.AdamW(
         parameters, lr=settings.learning_rate, weight_decay=settings.weight_decay
     )
@@ -370,6 +379,9 @@ def run_experiment(
         "generator_parameters": sum(p.numel() for p in generator.parameters())
         if generator is not None
         else 0,
+        "unique_optimized_parameters": sum(
+            parameter.numel() for parameter in parameters
+        ),
         "initial_validation": initial,
         "final_validation": final,
         "frozen_probe": probe_metrics,

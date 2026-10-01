@@ -91,6 +91,29 @@ class CausalElectra(nn.Module):
             nn.init.zeros_(layer.bias)
         self.lm_head.weight = self.electra.embeddings.word_embeddings.weight
 
+    def share_generator_embeddings(self, generator: "CausalElectra") -> None:
+        """Tie token/position embeddings and retie the generator vocabulary head.
+
+        Generator CLM gradients then reach discriminator embeddings directly.
+        Call before constructing an optimizer; deduplicate joint parameters.
+        Independently saved models preserve values but not cross-model aliases.
+        """
+        for name in (
+            "vocab_size",
+            "embedding_size",
+            "max_position_embeddings",
+            "pad_token_id",
+            "bos_token_id",
+        ):
+            if getattr(self.config, name) != getattr(generator.config, name):
+                raise ValueError(f"shared embeddings require matching {name}")
+        main, other = self.electra.embeddings, generator.electra.embeddings
+        if main.word_embeddings.weight.device != other.word_embeddings.weight.device:
+            raise ValueError("shared embeddings require matching devices")
+        other.word_embeddings = main.word_embeddings
+        other.position_embeddings = main.position_embeddings
+        generator.lm_head.weight = main.word_embeddings.weight
+
     def forward(
         self,
         input_ids: Tensor,

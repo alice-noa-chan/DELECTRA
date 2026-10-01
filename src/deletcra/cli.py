@@ -41,6 +41,7 @@ def parser() -> argparse.ArgumentParser:
     budget.add_argument("--steps", type=int)
     budget.add_argument("--train-tokens", type=int)
     run.add_argument("--max-training-seconds", type=float)
+    run.add_argument("--share-embeddings", action="store_true")
     run.add_argument("--batch-size", type=int, default=16)
     run.add_argument("--learning-rate", type=float)
     run.add_argument("--replacement-probability", type=float, default=0.15)
@@ -126,6 +127,7 @@ def _run(args: argparse.Namespace) -> dict:
         eval_batches=args.eval_batches,
         probe_steps=args.probe_steps,
         max_training_seconds=args.max_training_seconds,
+        share_embeddings=args.share_embeddings,
     )
     modes = ["clm", "rtd", "joint"] if args.mode == "all" else [args.mode]
     rows = []
