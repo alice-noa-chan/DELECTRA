@@ -3,8 +3,10 @@
 import argparse
 import hashlib
 import json
+import os
 import shutil
 import subprocess
+import time
 from pathlib import Path
 from uuid import uuid4
 
@@ -96,7 +98,16 @@ def archive_pilot(destination: Path) -> dict:
     (staging / "manifest.json").write_text(
         json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
     )
-    staging.rename(destination)
+    # Windows indexers can briefly hold freshly copied files open. Retry only
+    # that permission error; preserve staging and surface any persistent failure.
+    for attempt in range(6):
+        try:
+            staging.rename(destination)
+            break
+        except PermissionError:
+            if os.name != "nt" or attempt == 5:
+                raise
+            time.sleep(0.2 * (attempt + 1))
     return {
         "archive": destination.relative_to(ROOT).as_posix()
         if destination.is_relative_to(ROOT)
