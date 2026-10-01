@@ -53,8 +53,18 @@ detaches its already-backpropagated graph. Combined and sequential execution
 are checked for matching gradients and optimizer updates, including dropout.
 `--fused-optimizer` explicitly selects CUDA fused AdamW. Defaults stay unchanged.
 
-```powershell
-.venv/Scripts/python -m deletcra run --preset story15m --mode joint --generator-mode self --lm-loss-backend liger --sequential-backward --fused-optimizer --attention-backend flash --device cuda --precision bf16 --data-dir data/tinystories-benchmark --sequence-length 256 --batch-size 64 --steps 300 --probe-steps 0 --output-dir runs/self-liger-new
+The Linux/CUDA example below is a bounded pilot, not a release recipe. Install
+the optional kernel dependency explicitly. Batch 256 is a measured RTX PRO 6000
+candidate; reprofile another GPU or production loader before adopting it.
+
+```bash
+python -m pip install -e '.[kernels]'
+python -m deletcra run --preset story15m --mode joint --generator-mode self \
+  --lm-loss-backend liger --sequential-backward --fused-optimizer \
+  --attention-backend flash --device cuda --precision bf16 \
+  --data-dir data/tinystories-benchmark --sequence-length 256 \
+  --batch-size 256 --steps 300 --max-training-seconds 300 --probe-steps 0 \
+  --output-dir runs/self-liger-new
 ```
 
 [Liger fused loss API](https://linkedin.github.io/Liger-Kernel/Low-Level-APIs/),

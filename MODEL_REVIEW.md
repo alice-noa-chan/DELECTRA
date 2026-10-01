@@ -55,20 +55,22 @@ data. See [TRAINING_PLAN.md](TRAINING_PLAN.md).
 
 | Finding | Implemented response | Limit |
 | --- | --- | --- |
-| Dense vocabulary logits and CE copies consume memory | Optional Liger fused CE with original projection, bias and tied weight | Needs CUDA accuracy and speed checks |
+| Dense vocabulary logits and CE copies consume memory | Optional Liger fused CE with original projection, bias and tied weight | Passed CUDA loss/gradient checks; speed depends on batch |
 | Proposals used a full shifted-logit copy | Select source `t-1`; fused path projects selected sites only | Selected vocabulary probabilities still consume memory |
 | Clean and RTD activation graphs overlap | Optional clean backward before RTD; one clip/update | Saving depends on backend and batch |
 | Clean/generator passes computed unused RTD heads | Explicitly skip those heads | Small saving compared with backbone work |
 | Decoding projected every prefix position and computed RTD | Project final position only and omit RTD | Backbone still recomputes the prefix |
 | Probes and LM scoring computed unused RTD heads | Skip RTD for those operations | Dense vocabulary evaluation remains expensive |
 | Benchmark read a scalar on every update | Read final detached loss after synchronization | Validation and safety checks still synchronize |
-| Larger physical batches are assumed faster | Compare batch 64 and 256 at fixed architecture | Updates per token change convergence |
+| Larger physical batches are assumed faster | Measured 64, 256 and 512; 512 added memory without speed | Updates per token change convergence |
 
 Liger is a loss kernel here, preserving ELECTRA's LayerNorm, GELU and absolute
 positions. Forced native FlashAttention preserves Q/K/V weights and configured
 dropout. Installing another FlashAttention version is not improvement evidence.
 AdamW fusion is explicit. Measure execution changes separately from the
 self-replacement algorithm change.
+The completed [optimization experiments](OPTIMIZATION.md) establish memory and
+throughput improvements while leaving the quality objections above unresolved.
 [Liger APIs](https://linkedin.github.io/Liger-Kernel/Low-Level-APIs/),
 [PyTorch AdamW](https://docs.pytorch.org/docs/2.8/generated/torch.optim.AdamW.html).
 

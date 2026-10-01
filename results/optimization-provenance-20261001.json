@@ -13,6 +13,19 @@
       "verified_app_state": "stopped",
       "verified_running_tasks": 0,
       "stopped_at": "2026-10-01 17:54:06+09:00"
+    },
+    {
+      "path": "results/modal-integration-20261001-followup.json",
+      "sha256": "9753447566adb12d99b69d66851d7f370b0ae44517038f416316a9c2b4a19185",
+      "source_commit": "1424d2ea96c5ff8da51ed07561ab49771f1bdf25",
+      "volume": "deletcra-experiments",
+      "volume_path": "/runs/modal-integration-20261001-followup/result.json",
+      "downloaded_volume_bytes_match": true,
+      "summary_recomputed": true,
+      "app_id": "ap-6MTGYqJ6vgnNM7kVA5HfrJ",
+      "verified_app_state": "stopped",
+      "verified_running_tasks": 0,
+      "stopped_at": "2026-10-01 18:05:12+09:00"
     }
   ],
   "empty_console_failure_app": {

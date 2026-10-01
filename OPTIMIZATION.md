@@ -75,11 +75,43 @@ Windows console-encoding failure created an empty app, which was also stopped.
 
 ## Follow-up experiment
 
-The initial results motivate a bounded, separate comparison of the measured
-batch-256 configuration against ordinary combined backward/AdamW at batch 256
-and batch 512. It uses three fresh trials, 20 warmup and 100 measured steps,
-rotating all three settings with a same-allocation control. Its shorter protocol
-is recorded separately rather than merged with the initial measurements.
+The completed follow-up compares the measured batch-256 configuration against
+ordinary combined backward/AdamW at batch 256 and 512. It uses three fresh trials,
+20 warmup and 100 measured steps, rotating all three settings with a control in
+the same allocation. Its shorter protocol remains separate from the first run.
+Device/software and the loss/gradient gates were unchanged and passed again.
+Code: `1424d2ea96c5ff8da51ed07561ab49771f1bdf25`.
+[Follow-up execution](https://modal.com/apps/gaon12/main/ap-6MTGYqJ6vgnNM7kVA5HfrJ),
+[raw evidence](results/modal-integration-20261001-followup.json).
+
+| Self + Liger setting | Batch | Targets/s | Peak allocated GiB | Trial throughput SD |
+| --- | ---: | ---: | ---: | ---: |
+| Sequential backward + fused AdamW control | 256 | 396,409 | 8.52 | 0.28% |
+| Combined backward + ordinary AdamW | 256 | 398,192 | 9.47 | 0.50% |
+| Combined backward + ordinary AdamW | 512 | 394,482 | 18.69 | 0.10% |
+
+Batch 512 did not improve throughput over batch 256 and used almost twice its
+memory. The combined batch-256 setting is only 0.45% faster than the control,
+within observed trial variation; the control uses 10.0% less allocated memory.
+There is no demonstrated benefit from filling all available VRAM. Retain batch
+256 as the measured candidate for the next quality pilot. The control's two
+execution flags remain optional, rather than becoming defaults for every batch.
+
+The control is 1.45% faster than its initial-run counterpart, illustrating why
+different allocations should not be merged into one precise speedup. The
+follow-up's 16.4B-target projection is 11.49 hours / $34.83 GPU-only for the
+control, or 11.44 hours / $34.68 for combined batch 256. These have all of the
+initial projection's exclusions and unverified convergence assumptions.
+
+All nine follow-up trials completed: 78,336,000 measured targets and 12 native
+FlashAttention forward/backward operations per profiled self step. Function time
+was 253.05 seconds, estimated $0.213 GPU-only; the app was verified stopped.
+Across both experiments, 27 trials measured 166,464,000 targets, with about
+**$0.494 GPU-only estimated execution cost**, excluding the charges listed above.
+Both downloaded volume files match local canonical UTF-8/LF content; both
+summaries were recomputed exactly. Source hashes, artifact hashes and stopped
+app states are recorded in the
+[provenance manifest](results/optimization-provenance-20261001.json).
 
 ```powershell
 .venv/Scripts/python -X utf8 -m modal run optimization_app.py --run-id YOUR_NEW_RUN_ID --follow-up

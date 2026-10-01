@@ -154,6 +154,13 @@ by this cost experiment.
 
 ## Archived pilot
 
+The implementation now also supports integrated self replacement. The bounded
+[optimization study](OPTIMIZATION.md) suggests a batch-256 candidate on RTX PRO
+6000, but does not establish quality equivalence or change the accepted release
+recipe. Compare separate joint, self joint and CLM with matched quality selection
+before adopting that variant for full training. Exact resume, full-corpus data
+and independent release tests remain required.
+
 The frozen local copy is at
 `runs/archives/tinystories15m-20261001-pilot`; it contains 52 copied files and
 about 165MB, with per-file SHA-256 hashes. Its manifest explicitly marks

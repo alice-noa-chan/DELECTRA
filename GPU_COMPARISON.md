@@ -169,3 +169,14 @@ files using UTF-8 with LF line endings for cross-platform Git verification.
 Recomputing both aggregates reproduced them exactly; all 30 cases account
 for 176,256,000 measured input targets. The two phases total approximately
 **USD 0.788 GPU-only estimated function charges**, subject to the exclusions above.
+
+## Subsequent integrated-model experiment
+
+[OPTIMIZATION.md](OPTIMIZATION.md) records a later RTX PRO 6000 comparison of
+separate versus self-replacement joint training, Liger loss, backward execution,
+AdamW fusion and batches 64/256/512. Its current separate baseline is retained
+within that run; these historical four-GPU measurements remain unchanged.
+The measured self batch-256 configuration substantially reduces token cost,
+but changes the proposal distribution and update count. Original separate-model
+costs above are not predictions for the integrated variant on other GPUs.
+Full training and quality equivalence remain unverified.
