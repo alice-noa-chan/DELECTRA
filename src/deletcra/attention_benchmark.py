@@ -53,6 +53,9 @@ def measure_case(
     backend: str,
     mode: str,
     batch_size: int,
+    *,
+    warmup_steps: int = WARMUP_STEPS,
+    measured_steps: int = MEASURED_STEPS,
 ) -> dict:
     """Measure complete optimizer steps, including generator and both joint passes.
 
@@ -60,6 +63,8 @@ def measure_case(
     Only kernel and physical batch change. Larger batches imply fewer updates at
     equal input tokens; this benchmark does not claim equivalent trained quality.
     """
+    if warmup_steps < 1 or measured_steps < 1:
+        raise ValueError("benchmark warmup and measured steps must be positive")
     torch.manual_seed(7)
     config = replace(story_model_config(), attention_backend=backend)
     main = CausalElectra(config).cuda().train()
@@ -97,13 +102,13 @@ def measure_case(
         optimizer.step()
         return output.loss.item()
 
-    for _ in range(WARMUP_STEPS):
+    for _ in range(warmup_steps):
         step()
     torch.cuda.synchronize()
     torch.cuda.reset_peak_memory_stats()
     started = time.perf_counter()
     last_loss = None
-    for _ in range(MEASURED_STEPS):
+    for _ in range(measured_steps):
         last_loss = step()
     torch.cuda.synchronize()
     elapsed = time.perf_counter() - started
@@ -141,11 +146,11 @@ def measure_case(
         "batch_size": batch_size,
         "context": train.shape[1],
         "dropout": config.dropout,
-        "warmup_steps": WARMUP_STEPS,
-        "measured_steps": MEASURED_STEPS,
-        "measured_input_tokens": MEASURED_STEPS * batch_size * (train.shape[1] - 1),
+        "warmup_steps": warmup_steps,
+        "measured_steps": measured_steps,
+        "measured_input_tokens": measured_steps * batch_size * (train.shape[1] - 1),
         "training_seconds": elapsed,
-        "input_tokens_per_second": MEASURED_STEPS
+        "input_tokens_per_second": measured_steps
         * batch_size
         * (train.shape[1] - 1)
         / elapsed,
