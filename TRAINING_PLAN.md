@@ -37,7 +37,12 @@ targets/s: 32.6 hours / $7.17 GPU-only, or $7.30 including its container, for
 changes the proposal algorithm, so compare quality against the separate generator
 before selecting the full-training recipe. The actual fresh-corpus loader,
 checkpointing and evaluation still require validation. Full training has not
-been started or authorized by the short benchmark.
+been started by the short benchmark. The user subsequently requested training,
+then deferred allocation until a total-credit review through IT is complete.
+See the [whole-lineup scenario](BUDGET_GPU.md#whole-lineup-credit-scenario-october-1-2026)
+for proposed TinyStories/IT allowances, storage and evaluation costs, and explicit
+unknowns. Its conditional $13-15 range is not an accepted spending limit or a
+guaranteed cost to meet the release criteria.
 
 The [original ELECTRA paper](https://cs.stanford.edu/~kevclark/resources/electra.pdf)
 uses 3.3B Wikipedia/BooksCorpus tokens for its basic experiments. Basic small
