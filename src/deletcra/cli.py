@@ -53,6 +53,9 @@ def parser() -> argparse.ArgumentParser:
     budget.add_argument("--train-tokens", type=int)
     run.add_argument("--max-training-seconds", type=float)
     run.add_argument("--share-embeddings", action="store_true")
+    run.add_argument(
+        "--generator-mode", choices=["separate", "self"], default="separate"
+    )
     run.add_argument("--dropout", type=float)
     run.add_argument(
         "--attention-backend", choices=["eager", "sdpa", "flash"], default="eager"
@@ -76,6 +79,8 @@ def parser() -> argparse.ArgumentParser:
 
 
 def _run(args: argparse.Namespace) -> dict:
+    if args.generator_mode == "self" and args.mode != "joint":
+        raise ValueError("--generator-mode self requires --mode joint")
     if args.output_dir.exists():
         raise FileExistsError(f"refusing to overwrite run: {args.output_dir}")
     special_ids = ()
@@ -155,6 +160,7 @@ def _run(args: argparse.Namespace) -> dict:
     for mode in modes:
         objective = ObjectiveConfig(
             mode=mode,
+            generator_mode=args.generator_mode,
             replacement_probability=args.replacement_probability,
             temperature=args.temperature,
             rtd_weight=args.rtd_weight,

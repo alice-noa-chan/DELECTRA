@@ -151,7 +151,6 @@ def evaluate(
         recall = tp / (tp + fn) if tp + fn else None
         specificity = tn / (tn + fp) if tn + fp else None
         metrics.update(
-            generator_loss=gen_sum / lm_count,
             rtd_loss=rtd_sum / rtd_count,
             rtd_accuracy=(tp + tn) / rtd_count,
             rtd_majority_baseline=max(tp + fn, tn + fp) / rtd_count,
@@ -167,6 +166,8 @@ def evaluate(
         metrics.update(
             binary_ranking_metrics(torch.cat(ranking_scores), torch.cat(ranking_labels))
         )
+        if objective.generator_mode == "separate":
+            metrics["generator_loss"] = gen_sum / lm_count
     return metrics
 
 
@@ -237,6 +238,8 @@ def run_experiment(
         raise ValueError("this CUDA device does not support bf16")
     if settings.share_embeddings and objective.mode == "clm":
         raise ValueError("sharing requires an RTD generator")
+    if settings.share_embeddings and objective.generator_mode == "self":
+        raise ValueError("self replacement already uses one model; no sharing flag")
     for tokens in (train, validation):
         if tokens.device.type != "cpu":
             raise ValueError(
@@ -256,7 +259,7 @@ def run_experiment(
     torch.manual_seed(settings.seed)
     model = CausalElectra(model_settings).to(settings.device)
     generator = None
-    if objective.mode != "clm":
+    if objective.mode != "clm" and objective.generator_mode == "separate":
         generator_settings = generator_model_config(model_settings)
         generator = CausalElectra(generator_settings).to(settings.device)
         if settings.share_embeddings:

@@ -13,6 +13,7 @@ from deletcra.model import CausalElectra, validate_batch
 @dataclass(frozen=True)
 class ObjectiveConfig:
     mode: str = "joint"
+    generator_mode: str = "separate"
     replacement_probability: float = 0.15
     temperature: float = 1.0
     generator_weight: float = 1.0
@@ -22,6 +23,12 @@ class ObjectiveConfig:
     def __post_init__(self) -> None:
         if self.mode not in {"rtd", "clm", "joint"}:
             raise ValueError("mode must be rtd, clm, or joint")
+        if self.generator_mode not in {"separate", "self"}:
+            raise ValueError("generator_mode must be separate or self")
+        if self.generator_mode == "self" and self.mode != "joint":
+            raise ValueError("self replacement requires joint RTD and CLM")
+        if self.generator_mode == "self" and self.generator_weight != 1.0:
+            raise ValueError("self replacement has no separate generator loss weight")
         if not math.isfinite(self.replacement_probability) or not (
             0 <= self.replacement_probability <= 1
         ):
@@ -177,6 +184,34 @@ def pretraining_step(
     generator_loss = discriminator_loss = lm_loss = zero
     corruption = None
     rtd_logits = None
+    if settings.generator_mode == "self":
+        if generator is not None:
+            raise ValueError("self replacement uses only the main model")
+        # One clean pass learns next tokens AND supplies replacement proposals.
+        # Sampling at t uses clean logits[t-1], detached inside corrupt_tokens.
+        # A second pass is essential: RTD must see the actually corrupted prefix.
+        clean = model(input_ids, attention_mask)
+        lm_loss = causal_lm_loss(clean.lm_logits, input_ids, attention_mask)
+        corruption = corrupt_tokens(
+            input_ids,
+            attention_mask,
+            clean.lm_logits,
+            pad_token_id=model.config.pad_token_id,
+            bos_token_id=model.config.bos_token_id,
+            special_token_ids=special_token_ids,
+            probability=settings.replacement_probability,
+            temperature=settings.temperature,
+            rng=rng,
+        )
+        rtd_logits = model(
+            corruption.input_ids, attention_mask, compute_lm=False
+        ).rtd_logits
+        discriminator_loss = rtd_loss(rtd_logits, corruption)
+        # Do not count the same CLM supervision a second time as generator loss.
+        loss = settings.lm_weight * lm_loss + settings.rtd_weight * discriminator_loss
+        return PretrainingOutput(
+            loss, zero, discriminator_loss, lm_loss, rtd_logits, corruption
+        )
     if settings.mode != "clm":
         if generator is None:
             raise ValueError("RTD objectives require a causal generator")

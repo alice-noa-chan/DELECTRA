@@ -113,6 +113,12 @@ Generator CLM gradients then also train the shared discriminator embeddings.
 The TinyStories joint pilot enables sharing; historical independent-embedding
 experiments retain their original settings.
 
+An opt-in `--mode joint --generator-mode self` experiment reuses the main clean
+CLM pass to propose replacements and runs RTD on a second corrupted-input pass.
+It saves one main model without an auxiliary generator. Separate generators
+remain the default; see [INTEGRATION.md](INTEGRATION.md) for loss alignment,
+gradient paths and the differences from original ELECTRA.
+
 ### Attention execution backends
 
 `--attention-backend eager` remains the default for historical reproducibility.
