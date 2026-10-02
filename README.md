@@ -335,9 +335,12 @@ unverified. The temporary Pod is stopped and its results are preserved locally.
 with free Colab TPU access, official CLI constraints, and the XLA changes and
 correctness checks required before quoting TPU training time.
 
-[COLAB.md](COLAB.md) records WSL CLI installation, authenticated free T4/v5e1
-hardware checks, the 15M T4 joint-training resume check, and remaining work for
-TPU-to-GPU checkpoint handoff. Both verification runtimes are no longer active.
+[COLAB.md](COLAB.md) records WSL CLI installation, actual free T4 FP16 and v5e1
+BF16 joint-training/resume checks, a verified TPU-to-GPU checkpoint handoff, and
+a bounded real TinyStories pilot. [TRAINING_RUNTIME.md](TRAINING_RUNTIME.md)
+explains fixed-shape XLA objectives, shared-weight/RNG handling and explicit
+execution migration. Current work excludes Runpod; full training and release
+quality remain outstanding.
 
 ## Licenses and attribution
 

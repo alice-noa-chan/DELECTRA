@@ -1,0 +1,33 @@
+{
+  "status": "passed",
+  "scope": "15m_synthetic_joint_fp16_and_same_device_resume",
+  "device": "cuda",
+  "precision": "fp16",
+  "grad_scaler": {
+    "scale": 1024.0,
+    "growth_factor": 2.0,
+    "backoff_factor": 0.5,
+    "growth_interval": 2000,
+    "_growth_tracker": 4
+  },
+  "model_parameters": 15041505,
+  "state": {
+    "step": 4,
+    "input_positions": 1024,
+    "prediction_targets": 1020,
+    "assistant_targets": 0,
+    "active_wall_seconds": 7.496788388000027,
+    "best_validation_nll": 10.436259269714355,
+    "best_validation_step": 4,
+    "optimizer_updates": 4,
+    "skipped_updates": 0
+  },
+  "model_maximum_absolute_error": 0.0,
+  "model_and_optimizer_tolerance": {
+    "rtol": 1e-05,
+    "atol": 1e-06
+  },
+  "production_throughput_measured": false,
+  "quality_evaluated": false,
+  "cross_device_resume_verified": false
+}

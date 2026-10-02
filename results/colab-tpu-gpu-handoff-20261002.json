@@ -1,0 +1,126 @@
+{
+  "status": "passed",
+  "state": {
+    "step": 2,
+    "input_positions": 512,
+    "prediction_targets": 510,
+    "assistant_targets": 0,
+    "active_wall_seconds": 5.445296412999937,
+    "best_validation_nll": null,
+    "best_validation_step": null,
+    "optimizer_updates": 2,
+    "skipped_updates": 0
+  },
+  "before_update_state_preservation": "exact",
+  "migrations": [
+    {
+      "at_step": 1,
+      "input_positions": 256,
+      "source_spec": {
+        "model": {
+          "vocab_size": 32000,
+          "embedding_size": 288,
+          "hidden_size": 288,
+          "num_layers": 6,
+          "num_heads": 6,
+          "intermediate_size": 1024,
+          "max_positions": 256,
+          "dropout": 0.1,
+          "pad_token_id": 0,
+          "bos_token_id": 1,
+          "attention_backend": "eager"
+        },
+        "objective": {
+          "mode": "joint",
+          "generator_mode": "self",
+          "lm_loss_backend": "torch",
+          "replacement_probability": 0.15,
+          "temperature": 1.0,
+          "generator_weight": 1.0,
+          "rtd_weight": 5.0,
+          "lm_weight": 1.0
+        },
+        "plan": {
+          "max_input_positions": 512,
+          "batch_size": 1,
+          "learning_rate": 0.0003,
+          "warmup_positions": 256,
+          "min_lr_ratio": 0.1,
+          "weight_decay": 0.01,
+          "max_grad_norm": 1.0,
+          "seed": 7,
+          "device": "xla",
+          "precision": "bf16",
+          "cpu_threads": 2,
+          "checkpoint_every": 1,
+          "evaluate_every": 100,
+          "validation_blocks": 1,
+          "max_wall_seconds": null,
+          "sequential_backward": true,
+          "fused_optimizer": false,
+          "share_embeddings": true
+        },
+        "corpus_manifest_sha256": "f27c084050d58dfcdbc7d832a2d42977b27e3bcd16c157d4dfa37e22e7f57220",
+        "initialize_from_sha256": null
+      },
+      "target_spec": {
+        "model": {
+          "vocab_size": 32000,
+          "embedding_size": 288,
+          "hidden_size": 288,
+          "num_layers": 6,
+          "num_heads": 6,
+          "intermediate_size": 1024,
+          "max_positions": 256,
+          "dropout": 0.1,
+          "pad_token_id": 0,
+          "bos_token_id": 1,
+          "attention_backend": "sdpa"
+        },
+        "objective": {
+          "mode": "joint",
+          "generator_mode": "self",
+          "lm_loss_backend": "torch",
+          "replacement_probability": 0.15,
+          "temperature": 1.0,
+          "generator_weight": 1.0,
+          "rtd_weight": 5.0,
+          "lm_weight": 1.0
+        },
+        "plan": {
+          "max_input_positions": 512,
+          "batch_size": 1,
+          "learning_rate": 0.0003,
+          "warmup_positions": 256,
+          "min_lr_ratio": 0.1,
+          "weight_decay": 0.01,
+          "max_grad_norm": 1.0,
+          "seed": 7,
+          "device": "cuda",
+          "precision": "fp16",
+          "cpu_threads": 2,
+          "checkpoint_every": 1,
+          "evaluate_every": 100,
+          "validation_blocks": 1,
+          "max_wall_seconds": null,
+          "sequential_backward": true,
+          "fused_optimizer": true,
+          "share_embeddings": true
+        },
+        "corpus_manifest_sha256": "f27c084050d58dfcdbc7d832a2d42977b27e3bcd16c157d4dfa37e22e7f57220",
+        "initialize_from_sha256": null
+      },
+      "rng_policy": "Preserve host and sampler state; reseed device and proposal RNG at this documented boundary.",
+      "bitwise_continuation": false
+    }
+  ],
+  "grad_scaler": {
+    "scale": 1024.0,
+    "growth_factor": 2.0,
+    "backoff_factor": 0.5,
+    "growth_interval": 2000,
+    "_growth_tracker": 1
+  },
+  "scope": "15m_xla_bf16_to_t4_fp16_joint_checkpoint_handoff",
+  "quality_evaluated": false
+}

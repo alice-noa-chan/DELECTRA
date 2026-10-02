@@ -1,0 +1,66 @@
+{
+  "recorded_at_utc": "2026-10-02T05:27:25.872057+00:00",
+  "scope": "free_colab_training_runtime_and_checkpoint_verification",
+  "status": "passed",
+  "runpod_used": false,
+  "paid_fallback": false,
+  "code_commit": "9f12ccdd2b25560f45d0372d3a55ca1e5899a7de",
+  "wheel_sha256": "f2de8c402f9d973026c68e70724677dab8590e05ca898b4b351d3ae6b4722cd6",
+  "fp16_check_code_commit": "8e7227024250fb036e47f9984e3cd1a0741d0d46",
+  "fp16_check_wheel_sha256": "9925da05141ec466570d808867aff71a5a1276652d9ac92d7e93f8b40004534c",
+  "reports": {
+    "t4_fp16_resume": "colab-t4-fp16-verification-20261002.json",
+    "tied_xla_bf16_resume": "colab-tied-xla-verification-20261002.json",
+    "tpu_to_gpu_handoff": "colab-tpu-gpu-handoff-20261002.json",
+    "real_stories_subset": "colab-real-stories-verification-20261002.json"
+  },
+  "environments": [
+    "colab-t4-fp16-runtime-20261002.json",
+    "colab-tied-xla-runtime-20261002.json",
+    "colab-handoff-t4-runtime-20261002.json"
+  ],
+  "archives": [
+    "colab-xla-export-20261002.json",
+    "colab-gpu-export-20261002.json",
+    "colab-tied-xla-export-20261002.json",
+    "colab-final-gpu-export-20261002.json"
+  ],
+  "transfer": "colab-tied-transfer-20261002.json",
+  "cleanup": "colab-training-cleanup-20261002.json",
+  "diagnostics": {
+    "initial_xla_reports": [
+      "colab-xla-training-verification-20261002.json",
+      "colab-xla-resume-verification-20261002.json"
+    ],
+    "qualification": "Out-of-spec diagnostic: XLA split tied input/output weights, yielding 24,257,505 parameters and 111 optimizer entries. Preserve raw reports, but do not treat their 15m scope label as an accurate parameter count.",
+    "handoff_failure": "colab-untied-handoff-failure-20261002.json",
+    "resolved_by": [
+      "bafbffd",
+      "cb963fb",
+      "9f12ccd"
+    ],
+    "rng_failure": "An RNG getter synchronized XLA and advanced the seed; observed seed 15320202538237034168 became 6390896005953414023 after sync. Fixed snapshot reads and checkpoint synchronization preserve the next-step seed."
+  },
+  "validation": {
+    "ruff_format": "passed",
+    "ruff_lint": "passed",
+    "pytest_passed": 201,
+    "pip_check": "passed"
+  },
+  "limitations": [
+    "Hardware checks use joint self proposals; separate-generator and SFT XLA paths have CPU tests only.",
+    "Same-device model error was zero in bounded checks, not a general determinism guarantee.",
+    "Handoff preserves optimizer/model/cursor state but deliberately reseeds device/proposal RNG; no cross-device bitwise equivalence claim.",
+    "Four real-data updates consume only 16,384 nominal input positions; no full corpus training or release-quality evaluation.",
+    "No sustained production-throughput measurement, total-training-time estimate, or Hugging Face publication.",
+    "Peak allocated CUDA memory excludes driver/context and other process reservations.",
+    "Free availability and quotas vary; no claim of uninterrupted full-training access."
+  ],
+  "protocols": {
+    "colab_gpu_handoff.py": "a956ba669b76ab5460aaf00f390b9aefa41bc404e36ef1b2cca299981611e7ca",
+    "colab_real_stories.py": "704c4d555441e6b9571df5ce60d6ea0815dd707d89c0add5414d1b21e4b807df",
+    "colab_tied_xla.py": "f275f9e3691362ffc425763e3c3b848c416999249d8e943fe6efbed65a37ecba",
+    "colab_verify_fp16.py": "69f4fe0666568c0379dbe325b55f5c161be5b0d7f21a6e4962a0808cff2f4d73",
+    "prepare_colab_story_subset.py": "f312c85dd6e20955f03906d61d051bf35503fd6e6bab43fbca343164a29a352d"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "measured_at_utc": "2026-10-02T05:26:58.009797+00:00",
+  "assignment_inventory_count": 0,
+  "consumption_info_assignment_count": 1,
+  "compute_unit_balance": 0.0,
+  "reported_compute_units_per_hour": 0.8025,
+  "all_created_runtimes_explicitly_stopped": true,
+  "note": "Inventory and consumption-info are separate snapshots; retain any disagreement without inferring a dollar charge or its cause."
+}

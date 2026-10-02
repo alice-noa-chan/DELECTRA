@@ -14,13 +14,13 @@ quality evaluation. Base corpus cleaning remains an unresolved quality gate.
 
 | Item | Runpod RTX 3090 | Free Colab TPU |
 | --- | --- | --- |
-| DELECTRA evidence | Three batch-256 repetitions measured | Unmeasured; XLA port required |
+| DELECTRA evidence | Three batch-256 repetitions measured | 15M BF16 joint update and same-device resume verified; sustained throughput unmeasured |
 | Accelerator charge | Observed $0.22/hour on October 1 | $0 only when allocated under free-tier access |
-| Current training kernels | BF16, PyTorch CUDA Flash Attention, Liger | XLA BF16 and compatible attention/loss implementations required |
+| Current training kernels | BF16, PyTorch CUDA Flash Attention, Liger | XLA BF16, eager attention, dense fixed-shape vocabulary losses/proposals |
 | Base training-step estimate | 32.46 hours for 16.4B nominal input positions | Depends on measured sustainable throughput |
 | Base charge estimate | $7.27 including the measured container rate | Free accelerator; persistence or paid compute can add costs |
 | Continuity | Provider availability and interruption risks remain | Variable quota; free sessions at most 12 hours, potentially shorter |
-| Reproducible restart | CPU checkpoint path verified; production GPU restart still needs checking | XLA RNG, optimizer, sampler and durable checkpoint restart need verification |
+| Reproducible restart | CPU and Colab GPU FP32/FP16 restart verified | Tied 15M BF16 whole/resumed weights and Adam state match; explicit T4 FP16 handoff passed |
 
 Runpod figures derive from [the archived measurement](results/runpod-3090-20261001.json)
 and [its protocol](BUDGET_GPU.md), not a current price guarantee. Batch 256 reached
@@ -39,8 +39,10 @@ The [official Colab CLI](https://github.com/googlecolab/google-colab-cli) suppor
 TPU requests, code execution, file transfer and session inspection. Its README
 currently lists v5e1 and v6e1 and supports Linux/macOS, excluding Windows. This
 machine has an Ubuntu WSL distribution. [COLAB.md](COLAB.md) records subsequent
-CLI installation, authentication and free T4 checks. TPU execution remains
-unverified.
+CLI installation, authentication and actual free T4/v5e1 checks. The later
+single-device XLA implementation is documented in
+[TRAINING_RUNTIME.md](TRAINING_RUNTIME.md). No Runpod allocation is authorized
+for the current Colab work; its numbers remain historical evidence.
 An accepted hardware option does not promise free account entitlement or stock.
 
 The [Colab FAQ](https://research.google.com/colaboratory/faq.html) says free
@@ -56,33 +58,34 @@ and [32GB for v6e](https://cloud.google.com/tpu/docs/v6e). Those are hardware
 specifications, not confirmed Colab allocations, host RAM or predicted DELECTRA
 speed. A TPU request is not an allocation of an entire multi-chip TPU Pod.
 
-## Required DELECTRA changes
+## Implementation and remaining optimization
 
 Preserve ELECTRA embeddings, transformer blocks, learned absolute positions and
 the discriminator head. Preserve shifted learned proposals, detached sampling,
 actual-change RTD labels, and joint loss weights. Hardware migration must not
 silently turn the main experiment into CLM-only training.
 
-1. Add an optional XLA device/runtime boundary and pin a compatible Torch/XLA
-   pair. Implement BF16 autocast, step synchronization, asynchronous logging
-   and device RNG/checkpoint handling. The
+1. An optional XLA runtime, BF16 autocast, synchronization and portable RNG/
+   checkpoint handling are implemented. Logging still reads device scalars and
+   needs profiling before throughput claims. The
    [PyTorch/XLA migration guide](https://docs.pytorch.org/xla/master/learn/migration-to-xla-on-tpus.html)
    describes lazy execution and step synchronization; the
    [AMP guide](https://docs.pytorch.org/xla/master/perf/amp.html) documents TPU BF16.
-2. Replace data-dependent boolean selection in proposal sampling, CLM/RTD loss
-   and response-only SFT with fixed-shape masked or chunked computations.
+2. Proposal sampling, CLM/RTD loss and response-only SFT now use fixed-shape
+   dense masked computations on XLA; CPU equivalence tests pass.
    Python conditions on device tensors also need review. The
    [XLA recompilation guide](https://docs.pytorch.org/xla/master/perf/recompilation.html)
    explains dynamic outputs and host synchronization. This is a local-code
-   performance risk, not a measured failure on TPU.
-3. Supply XLA-compatible attention and vocabulary loss. Existing forced CUDA
+   performance concern; the actual short TPU check records compilation and host
+   scalar reads separately from graph execution.
+3. Eager attention and dense vocabulary loss execute on XLA. Existing forced CUDA
    Flash Attention, Liger loss and fused CUDA AdamW cannot simply be enabled on
    TPU. Validate the new kernels against the reference losses and gradients.
    A dense BF16 vocabulary tensor at batch 256 has roughly 4.18GB of elements
    for [256,255,32000], before gradients, FP32 intermediates and activations;
    chunking may be needed even though the model has only 15M parameters.
-4. Prefetch fixed-shape batches from local VM storage. Preserve partial-batch
-   examples through padding and loss masks rather than silently dropping them.
+4. Prefetch fixed-shape batches from local VM storage before sustained training.
+   Partial batches are preserved through BOS-only padding and loss masks.
    Prepared corpora occupy roughly 15.4GB before ancillary files/checkpoints;
    check durable storage capacity first. Copy data to VM storage rather than
    randomly reading mmap blocks through Drive, consistent with the FAQ's I/O

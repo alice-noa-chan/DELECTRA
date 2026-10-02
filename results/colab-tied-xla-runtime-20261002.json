@@ -1,0 +1,31 @@
+{
+  "status": "passed",
+  "scope": "accelerator_forward_backward_only",
+  "measured_at_utc": "2026-10-02T05:16:16.502714+00:00",
+  "python": "3.13.15",
+  "system": "Linux",
+  "requested_device": "xla",
+  "actual_device": "xla:0",
+  "accelerator": {
+    "backend": "TPU",
+    "device_count": 1
+  },
+  "native_bf16": true,
+  "checks": {
+    "fp32": {
+      "status": "passed",
+      "matmul_dtype": "torch.float32"
+    },
+    "bf16": {
+      "status": "passed",
+      "matmul_dtype": "torch.bfloat16"
+    }
+  },
+  "packages": {
+    "torch": "2.9.0+cpu",
+    "torch-xla": "2.9.0",
+    "transformers": "4.57.6",
+    "google-colab": "1.0.0"
+  },
+  "delectra_training_verified": false
+}

@@ -27,7 +27,7 @@ inventory showed no assignment. It subsequently appeared as a delayed TPU
 allocation. Recovering its exact endpoint into local CLI session state allowed
 the hardware check without issuing another allocation or exposing credentials.
 
-## Measured verification results
+## Initial hardware and FP32 verification
 
 | Check | Result | Scope |
 | --- | --- | --- |
@@ -51,6 +51,70 @@ balance. No paid hardware was allocated or compute units purchased.
 [The verification record](results/colab-free-access-verification-20261002.json)
 links individual reports, provenance, export hashes and limitations. CLI host
 package versions are in [the WSL environment record](results/colab-cli-wsl-20261002.json).
+
+## Later mixed-precision implementation checks
+
+CUDA FP16 whole-versus-resumed training passed on a free T4: four applied joint
+updates, no skipped updates, identical model weights (maximum error 0), matching
+Adam moments/data cursor and restored GradScaler state. This used 1,024 synthetic
+input positions, not TinyStories training or a language-quality measurement.
+[FP16 result](results/colab-t4-fp16-verification-20261002.json).
+
+The first XLA model updates exposed two real portability issues: synchronization
+advanced the device seed, and conversion split the tied vocabulary table into
+independent input/output parameters. The latter produced 24,257,505 parameters
+and 111 Adam entries, so it is an out-of-spec diagnostic, not evidence for the
+intended tied 15M model. Its original reports and checkpoints remain archived.
+The attempted CUDA handoff correctly failed with an optimizer group mismatch;
+no trained moments or divergent weights were silently merged. The implementation
+now reties weights after conversion, rejects divergent checkpoints, and preserves
+the next-step seed during checkpoint synchronization. See
+[TRAINING_RUNTIME.md](TRAINING_RUNTIME.md) for the corrected execution contract.
+
+The corrected tied 15,041,505-parameter model passed whole-versus-resumed BF16
+joint training on v5e1: matching Adam state/data cursor, zero maximum weight error,
+110 optimizer entries and finite nonzero RTD gradients. Its two-step run consumed
+512 input positions; compilation and scalar logging are included in the recorded
+XLA metrics. This is not a sustained throughput measurement.
+[Corrected TPU result](results/colab-tied-xla-verification-20261002.json).
+
+That TPU checkpoint was exported, hash-verified on the T4 destination, and
+explicitly migrated to CUDA FP16/SDPA/fused AdamW. Weights, Adam moments/step and
+the consumed-data cursor were exactly preserved before the next applied update.
+The recorded boundary reseeds device/proposal RNG and starts an FP16 scaler;
+cross-device bitwise continuation is not claimed.
+[TPU-to-GPU result](results/colab-tpu-gpu-handoff-20261002.json).
+
+A separate real TinyStories mmap pilot used 256 sampled training blocks and 16
+validation blocks from the audited prepared corpus, with upstream identity,
+manifest hash and source indices retained. Four batch-16 FP16 joint updates
+consumed 16,384 input positions and 16,320 prediction targets without skipped
+updates. Peak CUDA allocated memory was 2,118,268,928 bytes (1.97 GiB); this is
+not total process VRAM or proof that all larger batches fit. The early validation
+NLL is 10.0622; it is not independent-test or finished-model quality evidence.
+[Real-data pilot](results/colab-real-stories-verification-20261002.json).
+
+Full TinyStories/Base/IT training and publication remain outstanding. These
+checks preserve ELECTRA blocks, tied vocabulary embeddings and the RTD head;
+RTD-only, CLM control and joint objectives remain supported. GPU execution above
+uses joint self proposals; separate-generator and SFT XLA behavior has CPU tests
+but is not independently verified on TPU hardware. Warmed production-loader
+profiling, larger-batch tuning, and XLA vocabulary/logging optimization are still
+needed before making total-training-time estimates.
+
+The [mixed-precision verification record](results/colab-training-runtime-20261002.json)
+links reports, source/wheel provenance, protocols and hash-verified private
+checkpoint archives. No pilot checkpoint or sample data is published to Hugging
+Face or committed to Git.
+Inspect the report's `status` field: this CLI can exit successfully while a
+remote Python cell raised an exception. The archived check reports, rather than
+the process exit code alone, establish the results above.
+All four runtimes created for these checks were explicitly stopped after verified
+export. Final assignment inventory was empty and the CU balance remained 0.00.
+The separate consumption-info snapshot still reported one assignment and
+0.8025 CU/hour; its disagreement with inventory is preserved without assuming
+the cause or treating CU/hour as a dollar invoice.
+[Cleanup snapshots](results/colab-training-cleanup-20261002.json).
 
 ## Bounded verification
 
@@ -77,7 +141,9 @@ colab exec -s delectra-gpu-probe --timeout 180 \
 
 For a TPU session, use `DELECTRA_PROBE_DEVICE=xla` and its session name. The VM
 needs a compatible Torch/XLA pair; do not replace the runtime's packages blindly.
-The current DELECTRA trainer itself still excludes XLA.
+The production trainer now supports single-device XLA BF16. Its fixed-shape
+objectives and explicit checkpoint migration are described in
+[TRAINING_RUNTIME.md](TRAINING_RUNTIME.md).
 
 After installing the project and compatible Transformers, run a bounded check:
 
@@ -89,22 +155,20 @@ This verifies the real 15,041,505-parameter model with four synthetic FP32 joint
 RTD/CLM updates, comparing uninterrupted training with pause/resume. It checks
 weights, Adam moments, token counts and the data cursor within explicit numerical
 tolerances. It is not a real-data benchmark, full training or quality evaluation.
-Free T4 hardware lacks native BF16. FP16 matrix support does not enable FP16
-production training: the current trainer supports FP32 and CUDA BF16 only.
-FP16 training needs loss scaling for both backward paths and checkpointed scaler
-state before it can replace FP32 safely.
+Free T4 hardware lacks native BF16. CUDA FP16 production training now scales both
+backward paths, clips only after unscaling, and checkpoints the GradScaler. Add
+`--precision fp16` to the verification command to check that execution path.
 
 Download reports and check their hashes before releasing the temporary runtime.
 `colab stop -s <name>` deletes runtime-local files; retained research evidence
 must be exported first. Check `colab sessions` and `colab usage` afterward.
 
-## TPU, then Colab GPU, then Runpod GPU
+## TPU, then free Colab GPU
 
 Prefer whichever free accelerator is available and verified for the objective;
 the order is a preference, not a prerequisite to making progress. Preserve
-RTD and the ELECTRA backbone throughout. Use Runpod only for the unfinished
-training budget after free access, with a separately selected spending cap.
-No automatic paid fallback is configured.
+RTD and the ELECTRA backbone throughout. The current user instruction excludes
+Runpod. No paid fallback is configured; stop or wait when free quota is exhausted.
 
 There are three distinct checkpoint situations:
 
@@ -112,16 +176,17 @@ There are three distinct checkpoint situations:
    run, corpus manifest and checkpoint, verify SHA-256, and resume optimizer,
    sampler and scheduler state. Weights alone start a different experiment.
    Actual transfer between providers remains to be verified.
-2. Different GPU capability or backend: changing BF16/FP32, attention, loss
-   kernel, physical batch or fused optimizer currently changes the saved spec,
-   so strict resume refuses it. A future explicit migration must keep the
-   research recipe invariant, define allowed execution changes, and record
-   source/target environment and consumed-token cursor.
+2. Different GPU capability or backend: strict resume refuses specification
+   changes. Explicit `--resume --migrate` allows device, precision, attention/loss
+   kernel, fused optimizer, host threads and wall allowance changes while keeping
+   the research recipe, physical batch, data, input budget and schedule invariant.
+   Record the source/target environment and consumed-token cursor.
 3. TPU to GPU: additionally translate XLA optimizer storage and device RNG
    handling. Restore the same cumulative input budget and LR schedule, not a
    new warmup. Different RNG implementations do not provide a bitwise identical
    continuation; record the boundary and verify finite gradients and comparable
-   validation metrics. This route is not implemented or verified yet.
+   validation metrics. The implementation uses portable CPU tensor storage and
+   records a deliberate device/proposal RNG reseed at the migration boundary.
 
 TPU and GPU requests do not promise independent free quotas. The
 [Colab FAQ](https://research.google.com/colaboratory/faq.html) describes dynamic

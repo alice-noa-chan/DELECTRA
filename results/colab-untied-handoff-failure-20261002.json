@@ -1,0 +1,7 @@
+{
+  "status": "failed",
+  "error_type": "ValueError",
+  "error": "loaded state dict contains a parameter group that doesn't match the size of optimizer's group",
+  "scope": "15m_xla_bf16_to_t4_fp16_joint_checkpoint_handoff",
+  "quality_evaluated": false
+}
