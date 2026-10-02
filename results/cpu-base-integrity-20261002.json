@@ -1,0 +1,33 @@
+{
+  "corpus": "data\\base-2026-39-prose-256",
+  "metadata_sha256": "f3e52ea5e645ba095a80255921b30d44ae9998c4411c502475fe5c934e01eb1f",
+  "status": "verified",
+  "all_token_files_checked": true,
+  "splits": {
+    "train": {
+      "documents": 2793278,
+      "content_tokens": 3300005330,
+      "prediction_targets": 3302720475,
+      "input_positions": 3315672320,
+      "blocks": 12951845,
+      "dropped_tail_tokens": 78133
+    },
+    "validation": {
+      "documents": 28682,
+      "content_tokens": 33688421,
+      "prediction_targets": 33631695,
+      "input_positions": 33763584,
+      "blocks": 131889,
+      "dropped_tail_tokens": 85408
+    },
+    "test": {
+      "documents": 28395,
+      "content_tokens": 33026138,
+      "prediction_targets": 32970735,
+      "input_positions": 33100032,
+      "blocks": 129297,
+      "dropped_tail_tokens": 83798
+    }
+  },
+  "note": "Data integrity alone is not model training or quality evidence."
+}

@@ -1,0 +1,85 @@
+{
+  "corpora": {
+    "tinystories-full-256": {
+      "metadata_sha256": "eebbde315c0582819c6f0de6dac7b82754486d01ee3b8b90717e2c1312166ac2",
+      "identity": {
+        "dataset": "roneneldan/TinyStories",
+        "dataset_revision": "f54c09fd23315a6f9c86f9dc80f725de7d8f9c64",
+        "tokenizer": "nickypro/tinyllama-15M",
+        "tokenizer_revision": "a97e01fa7d54c088df9dc1b53d581a863ce08cd6",
+        "license": "CDLA-Sharing-1.0; preserve upstream attribution",
+        "validation_partition": "first 2000 official validation rows plus even hashes; remaining odd hashes are test"
+      },
+      "counts": {
+        "seen_documents": 2141709,
+        "train_documents": 1799248,
+        "accepted_utf8_bytes": 1618096571,
+        "train_content_tokens": 431917550,
+        "empty": 230,
+        "exact_duplicates": 326842,
+        "validation_documents": 8314,
+        "validation_content_tokens": 1859742,
+        "test_documents": 7075,
+        "test_content_tokens": 1590974
+      },
+      "source_units": 5,
+      "global_unique_document_hashes": 1814637
+    },
+    "base-2026-39-prose-256": {
+      "metadata_sha256": "f3e52ea5e645ba095a80255921b30d44ae9998c4411c502475fe5c934e01eb1f",
+      "identity": {
+        "dataset": "CC-MAIN-2026-39",
+        "inventory_sha256": "a9d8b3c548afc6239a1700f7052a63456f0db1698c1651780157eb9fc2cc9ce3",
+        "tokenizer": "nickypro/tinyllama-15M",
+        "tokenizer_revision": "a97e01fa7d54c088df9dc1b53d581a863ce08cd6",
+        "target_unique_train_content_tokens": 3300000000,
+        "capture_dates": "2026-09-04 through 2026-09-17",
+        "license": "Common Crawl terms; original pages retain their individual rights",
+        "filter": "English-only crawl annotation; 100-20000 words; alphabetic >=0.7; unique words >=0.1; function words >=0.03",
+        "source_order": "SHA-256 sorted WET paths",
+        "cleaning": "prose-v1: remove short menu/link lines; retain >=10 words with sentence ending or >=20 words; exact line dedup within document"
+      },
+      "counts": {
+        "seen_documents": 13976463,
+        "rejected_language": 8708527,
+        "removed_nonprose_utf8_bytes": 16914353302,
+        "train_documents": 2793278,
+        "accepted_utf8_bytes": 13469486703,
+        "rejected_length": 2185372,
+        "rejected_alphabetic_ratio": 29819,
+        "test_documents": 28395,
+        "validation_documents": 28682,
+        "exact_duplicates": 169556,
+        "rejected_english_function_words": 25869,
+        "rejected_repetition": 4729,
+        "train_content_tokens": 3300005330,
+        "test_content_tokens": 33026138,
+        "validation_content_tokens": 33688421,
+        "candidate_documents": 2683293,
+        "rejected_unknown_tokens": 1,
+        "budget_stop_inside_source": 1,
+        "unused_candidate_documents": 2235
+      },
+      "source_units": 660,
+      "global_unique_document_hashes": 2850355,
+      "all_seen_documents_accounted_for": true
+    },
+    "instructions-short-256": {
+      "metadata_sha256": "647328ca16989876a145282a9276c1c8c5f42ceb60ebc4a56c72161de5845c5c",
+      "identity": {
+        "dataset": "HuggingFaceTB/smoltalk2",
+        "revision": "fc6cc2103c066455aade5d7fbb346039ae36ca5e"
+      },
+      "counts": {
+        "seen": 151583,
+        "accepted": 58452,
+        "rejected_unfinished": 256,
+        "rejected_over_context": 92874,
+        "duplicate": 1
+      },
+      "source_units": 3
+    }
+  },
+  "data_quality": "Base prose-v1 remains a candidate with observed boilerplate; review the quality recipe before paid full training.",
+  "note": "All sources retain their own licenses; prepared data and checkpoints remain private local artifacts. Candidate-document counters apply to worker-staged sources, not the earlier serial prefix."
+}
