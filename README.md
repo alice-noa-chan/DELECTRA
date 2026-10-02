@@ -331,6 +331,14 @@ batch 256, projecting 32.6 Base GPU hours / $7.17 GPU-only at its observed offer
 These are training-step estimates; complete training and release quality remain
 unverified. The temporary Pod is stopped and its results are preserved locally.
 
+The October 2 RTX 4090 comparison reached 268,866 targets/s at batch 128,
+projecting 16.94 Base training hours. Its actual Secure offer was $0.74/hour;
+the cheaper $0.34 Community offer was out of capacity. The completed timing
+session cost approximately $0.0835 by observed uptime, not an invoice. Results
+were SHA-256 verified before stop, and the Pod has no ongoing compute/storage
+charge. See the same budget guide for measured batches and conditional costs;
+none of these measurements completes the three-model release plan.
+
 [TPU_COMPARISON.md](TPU_COMPARISON.md) compares that measured Runpod baseline
 with free Colab TPU access, official CLI constraints, and the XLA changes and
 correctness checks required before quoting TPU training time.
@@ -339,7 +347,7 @@ correctness checks required before quoting TPU training time.
 BF16 joint-training/resume checks, a verified TPU-to-GPU checkpoint handoff, and
 a bounded real TinyStories pilot. [TRAINING_RUNTIME.md](TRAINING_RUNTIME.md)
 explains fixed-shape XLA objectives, shared-weight/RNG handling and explicit
-execution migration. Current work excludes Runpod; full training and release
+execution migration. Those Colab phases exclude Runpod; full training and release
 quality remain outstanding.
 
 [COLAB_TRAINING.md](COLAB_TRAINING.md) records the subsequent real-data partial

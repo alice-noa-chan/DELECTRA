@@ -1,0 +1,147 @@
+{
+  "date": "2026-10-02",
+  "type": "archived short throughput measurements and conditional extrapolation",
+  "sources": {
+    "runpod-3090-20261001.json": "6c0f26d258abde7a02e3023d2204ab56067295857c0e52ec89462f357d631f43",
+    "runpod-4090-20261002.json": "7a47a11c347d9b1c75abf3f16cbbc2930539d50f03a02a03da00b30cecbdf68c"
+  },
+  "matched_batch_comparison": [
+    {
+      "batch_size": 64,
+      "rtx3090_targets_per_second": 110577.69174425874,
+      "rtx4090_targets_per_second": 266424.9358627489,
+      "throughput_ratio": 2.4093913669217266
+    },
+    {
+      "batch_size": 128,
+      "rtx3090_targets_per_second": 130192.90270325272,
+      "rtx4090_targets_per_second": 268866.02488098014,
+      "throughput_ratio": 2.0651358046283335
+    },
+    {
+      "batch_size": 256,
+      "rtx3090_targets_per_second": 139815.9245806753,
+      "rtx4090_targets_per_second": 255477.57618480083,
+      "throughput_ratio": 1.8272423327386254
+    }
+  ],
+  "best_observed_batches": {
+    "rtx3090": 256,
+    "rtx4090": 128
+  },
+  "best_to_best_throughput_ratio": 1.9230000136775662,
+  "rtx4090_equal_gpu_cost_hourly_threshold_vs_3090_022": 0.42306000300906454,
+  "base_compute_only": {
+    "measured_secure": {
+      "gpu_hourly_usd": 0.74,
+      "hours": 16.943589498048997,
+      "gpu_only_usd": 12.538256228556257,
+      "gpu_and_container_usd": 12.606030586548453
+    },
+    "unavailable_community_quote": {
+      "gpu_hourly_usd": 0.34,
+      "hours": 16.943589498048997,
+      "gpu_only_usd": 5.760820429336659,
+      "gpu_and_container_usd": 5.828594787328855
+    }
+  },
+  "provisional_stage_targets_or_positions": {
+    "TinyStories": 3000000000,
+    "Base": 16400000000,
+    "IT": 300000000
+  },
+  "proposed_storage": {
+    "container_hourly_usd": 0.004,
+    "persistent_volume_gb": 50,
+    "persistent_volume_hourly_usd": 0.00684931506849315,
+    "allocated_in_measurement": false
+  },
+  "whole_lineup_scenarios": {
+    "measured_secure": [
+      {
+        "sustained_speed_fraction": 1,
+        "stage_training_hours": {
+          "TinyStories": 3.099437103301646,
+          "Base": 16.943589498048997,
+          "IT": 0.3099437103301646
+        },
+        "fixed_overhead_hours": 3,
+        "total_hours": 23.352970311680807,
+        "compute_and_proposed_disks_usd": 17.53456176334039,
+        "with_10_percent_reserve_usd": 19.28801793967443
+      },
+      {
+        "sustained_speed_fraction": 0.8,
+        "stage_training_hours": {
+          "TinyStories": 3.874296379127057,
+          "Base": 21.179486872561245,
+          "IT": 0.38742963791270574
+        },
+        "fixed_overhead_hours": 3,
+        "total_hours": 28.441212889601008,
+        "compute_and_proposed_disks_usd": 21.355065217874117,
+        "with_10_percent_reserve_usd": 23.49057173966153
+      },
+      {
+        "sustained_speed_fraction": 0.7,
+        "stage_training_hours": {
+          "TinyStories": 4.427767290430923,
+          "Base": 24.205127854355712,
+          "IT": 0.44277672904309234
+        },
+        "fixed_overhead_hours": 3,
+        "total_hours": 32.075671873829734,
+        "compute_and_proposed_disks_usd": 24.083996256826786,
+        "with_10_percent_reserve_usd": 26.492395882509467
+      }
+    ],
+    "unavailable_community_quote": [
+      {
+        "sustained_speed_fraction": 1,
+        "stage_training_hours": {
+          "TinyStories": 3.099437103301646,
+          "Base": 16.943589498048997,
+          "IT": 0.3099437103301646
+        },
+        "fixed_overhead_hours": 3,
+        "total_hours": 23.352970311680807,
+        "compute_and_proposed_disks_usd": 8.193373638668065,
+        "with_10_percent_reserve_usd": 9.012711002534873
+      },
+      {
+        "sustained_speed_fraction": 0.8,
+        "stage_training_hours": {
+          "TinyStories": 3.874296379127057,
+          "Base": 21.179486872561245,
+          "IT": 0.38742963791270574
+        },
+        "fixed_overhead_hours": 3,
+        "total_hours": 28.441212889601008,
+        "compute_and_proposed_disks_usd": 9.978580062033712,
+        "with_10_percent_reserve_usd": 10.976438068237085
+      },
+      {
+        "sustained_speed_fraction": 0.7,
+        "stage_training_hours": {
+          "TinyStories": 4.427767290430923,
+          "Base": 24.205127854355712,
+          "IT": 0.44277672904309234
+        },
+        "fixed_overhead_hours": 3,
+        "total_hours": 32.075671873829734,
+        "compute_and_proposed_disks_usd": 11.253727507294892,
+        "with_10_percent_reserve_usd": 12.379100258024382
+      }
+    ]
+  },
+  "limitations": [
+    "Same pinned corpus, model dimensions, objectives, precision, kernels and trial schedule; source revisions, GPU, host and driver differ.",
+    "Only short cached-data trials; no production-loader, checkpoint or complete-validation timing.",
+    "Best-to-best comparison changes physical batch, so optimizer updates per token differ; no convergence equivalence is established.",
+    "TinyStories 3B and IT 0.3B are provisional planning allowances, not accepted or sufficient-quality budgets.",
+    "IT throughput is unmeasured and reuses joint pretraining speed only for planning.",
+    "Existing TinyStories checkpoint has batch 16 and torch loss; these optimized batch-128 times are not measurements of that resume recipe.",
+    "Three overhead hours and slowdown fractions are assumptions, not measured whole-run costs.",
+    "No full training or release-quality evaluation was performed; unavailable prices cannot be rented by this report."
+  ]
+}

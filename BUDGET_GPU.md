@@ -1,6 +1,6 @@
 # Budget GPU measurement
 
-## Planned matched RTX 4090 measurement: October 2, 2026
+## Matched RTX 4090 protocol: October 2, 2026
 
 The benchmark now accepts the exact RTX 4090 device with Ada capability 8.9.
 It preserves the RTX 3090 protocol: the pinned 10M-target cache, BF16, native
@@ -16,14 +16,88 @@ pilots. Export and verify the results before releasing the temporary GPU.
 The intended allocation is one Runpod RTX 4090 at the observed $0.34/GPU-hour
 plus its quoted temporary disk cost, with no persistent volume or automatic
 retry. Limit the measurement session to $0.50; do not start full training.
-Recheck the actual quote and stock before allocation. No RTX 4090 throughput
-result is established by this plan.
+The $0.34 Community offer was out of capacity at allocation. The bounded
+measurement used Secure Cloud at $0.74/GPU-hour instead, keeping the $0.50
+session limit. No $0.34 GPU was rented. Measured outcomes follow below.
 
 ```sh
 python -m deletcra.budget_benchmark --gpu 'RTX 4090' \
   --data-dir data/tinystories-gpu-profile-256-10m-100k \
-  --output results/runpod-4090-20261002.json --hourly-price 0.34
+  --output results/runpod-4090-20261002.json --hourly-price 0.74
 ```
+
+### Completed RTX 4090 measurement
+
+All nine trials completed on NVIDIA GeForce RTX 4090, 24,564 MiB, driver
+580.126.20, PyTorch 2.8.0+cu128, Transformers 4.57.6, Liger 0.8.4 and Triton
+3.4.0. Native BF16, eager/Flash causal equivalence, Liger loss/gradients and
+sequential backward checks passed. Every profiled trial dispatched twelve Flash
+forward and backward operations. No gradients were non-finite. All three data
+files match the earlier RTX 3090 hashes; measured work totaled 34,272,000 targets.
+Code: `82477ebe8a550146e0dd9372a758f43c90837a0c`.
+
+| Batch | Targets/s | Trial speed SD | Peak allocated GiB | Base hours | Base GPU USD at actual $0.74/hr |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 64 | 266,425 | 0.397% | 2.34 | 17.10 | $12.65 |
+| 128 | 268,866 | 0.136% | 4.39 | 16.94 | $12.54 |
+| 256 | 255,478 | 0.049% | 8.52 | 17.83 | $13.20 |
+
+Rates aggregate all three trials, rather than taking the fastest repetition.
+Batch 128 is only 0.92% faster than 64; 256 is 4.98% slower than 128 and uses
+almost twice the allocated memory. More VRAM or a larger batch does not imply
+more throughput here. At matched batches 64/128/256, throughput ratios against
+the archived 3090 are 2.41/2.07/1.83. Source revisions, host and driver differ;
+this is a matched recipe comparison across allocations, not a controlled
+same-host hardware swap. Both GPUs preserve the ELECTRA backbone and RTD head.
+
+Comparing each card's best observed batch gives about 1.92 times the throughput:
+Base optimizer time projects from 32.58 to 16.94 hours. This comparison changes
+optimizer updates per token; quality equivalence is unmeasured. These are cached
+training-step projections, excluding setup, full-corpus I/O, checkpointing,
+validation and any quality-driven extension. They do not time continuation of
+the archived Colab batch-16/torch-loss checkpoint.
+
+The 4090 process took 168.41 seconds including correctness checks, warmup and
+profiling, projecting $0.0348 at the actual GPU-plus-container rate. The Pod was
+rented at 06:36:42 UTC and stopped at 06:43:26 UTC: 404 seconds, approximately
+$0.0835 including temporary container storage. This is an uptime-based estimate,
+not an invoice or a balance difference; unrelated user workloads were also live.
+The recovered archive and each file passed SHA-256 verification before stop.
+CLI state is stopped; the UI confirms compute and container storage Not running
+and total $0.00/hour. No persistent volume was allocated, and other Pods were
+left untouched. No full training or model publication occurred.
+
+### Conditional three-model projection
+
+Retain the previous planning allowances of 3B TinyStories targets, 16.4B Base
+targets (conservative relative to accepted input positions), 0.3B IT positions,
+three setup/evaluation hours and a proposed 50GB volume. TinyStories/IT allowances
+are provisional, and IT speed is not measured. The current full TinyStories
+first pass is only 435.4M positions; 3B represents repeated optimization work,
+not distinct corpus size or a release-quality guarantee.
+
+At the best observed 4090 rate, stage training projections are 3.10/16.94/0.31
+hours. With fixed overhead, total time is 23.35 hours at benchmark speed or
+32.08 hours at 70% speed. The volume is a future planning assumption, not a
+charge incurred by this measurement.
+
+| GPU price scenario | Base GPU + container only | Three-model time with overhead | Three-model cost with proposed disks and 10% reserve |
+| --- | ---: | ---: | ---: |
+| Actual Secure $0.74/hr | $12.61 | 23.35–32.08 hours | $19.29–26.49 |
+| Community $0.34/hr, unavailable at allocation | $5.83 | 23.35–32.08 hours | $9.01–12.38 |
+
+Applying Secure-Cloud throughput to a future Community host is an assumption.
+At best-to-best measured speed, the GPU-only cost break-even price versus the
+$0.22/hr 3090 is approximately $0.423/hr. The $0.34 quote would be favorable
+if available and equally fast; the actual $0.74 allocation is faster but more
+expensive. Never present the unavailable-price scenario as an actual charge.
+
+Evidence: [raw measurement](results/runpod-4090-20261002.json),
+[environment](results/runpod-4090-20261002-packages.txt),
+[provenance and cleanup](results/4090-provenance-20261002.json),
+[recomputed comparison](results/runpod-4090-comparison-20261002.json).
+The [comparison protocol](results/protocols/compare_budget_gpus.py) reproduces
+the scenario arithmetic without allocating compute.
 
 The current Runpod console offers one RTX A5000 at $0.16/GPU-hour on October 1,
 2026. This is a live offer, not a guaranteed future rate. The public pricing
