@@ -331,6 +331,10 @@ batch 256, projecting 32.6 Base GPU hours / $7.17 GPU-only at its observed offer
 These are training-step estimates; complete training and release quality remain
 unverified. The temporary Pod is stopped and its results are preserved locally.
 
+[TPU_COMPARISON.md](TPU_COMPARISON.md) compares that measured Runpod baseline
+with free Colab TPU access, official CLI constraints, and the XLA changes and
+correctness checks required before quoting TPU training time.
+
 ## Licenses and attribution
 
 New code in this repository is [MIT-licensed](LICENSE). Original Google Research
