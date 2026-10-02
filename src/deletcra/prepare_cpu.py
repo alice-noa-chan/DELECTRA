@@ -42,6 +42,30 @@ def web_split(key: bytes) -> str:
     return "validation" if bucket < 100 else "test" if bucket < 200 else "train"
 
 
+def clean_web_text(text: str) -> str:
+    """Keep prose lines and discard short menu/link labels before token counting.
+
+    WET already extracts plaintext, but retains navigation and footer text.
+    Keep lines with ten words and terminal sentence punctuation, or twenty words
+    regardless of punctuation. Deduplicate identical lines within a document.
+    These transparent rules may remove useful headings and poetry; they are
+    intended for this small English prose model, not general web preservation.
+    """
+    kept, seen = [], set()
+    for raw in text.splitlines():
+        line = " ".join(raw.split())
+        words = re.findall(r"[A-Za-z]+(?:'[A-Za-z]+)?", line)
+        if len(words) < 10 or (
+            len(words) < 20 and not line.endswith((".", "!", "?", '"'))
+        ):
+            continue
+        key = document_key(line)
+        if key not in seen:
+            seen.add(key)
+            kept.append(line)
+    return "\n".join(kept)
+
+
 def quality_reason(text: str, languages: str) -> str | None:
     """Transparent baseline filtering, not a FineWeb-quality classifier.
 
@@ -151,6 +175,14 @@ class Preparation:
                     counts["empty"] += 1
                     continue
                 if web_budget is not None:
+                    if language.strip() != "eng":
+                        counts["rejected_language"] += 1
+                        continue
+                    original_bytes = len(text.encode("utf-8"))
+                    text = clean_web_text(text)
+                    counts["removed_nonprose_utf8_bytes"] += original_bytes - len(
+                        text.encode("utf-8")
+                    )
                     reason = quality_reason(text, language)
                     if reason:
                         counts["rejected_" + reason] += 1
@@ -355,6 +387,10 @@ def commoncrawl(directory: Path, budget: int):
                 "unique words >=0.1; function words >=0.03"
             ),
             "source_order": "SHA-256 sorted WET paths",
+            "cleaning": (
+                "prose-v1: remove short menu/link lines; retain >=10 words with "
+                "sentence ending or >=20 words; exact line dedup within document"
+            ),
         },
     )
     (directory / "wet.paths.txt").write_bytes(inventory)

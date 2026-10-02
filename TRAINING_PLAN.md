@@ -123,7 +123,7 @@ loads only selected blocks, adding the same BOS prefix as the pilot.
 
 ```powershell
 .venv/Scripts/python -m deletcra.prepare_cpu stories --output data/tinystories-full-256
-.venv/Scripts/python -m deletcra.prepare_cpu commoncrawl --output data/base-2026-39-256 --train-content-tokens 3300000000
+.venv/Scripts/python -m deletcra.prepare_cpu commoncrawl --output data/base-2026-39-prose-256 --train-content-tokens 3300000000
 ```
 
 Use the identical command to resume. A corpus is ready only when its metadata
@@ -136,6 +136,15 @@ Hash-assigned web partitions are 98% train / 1% validation / 1% test. The token
 limit is checked after each 512-document tokenizer batch, so final source content
 may slightly exceed the requested count; manifests preserve the actual amount.
 Fresh text alone does not establish readable model completions.
+
+A first local WET audit found navigation/menu-heavy prefixes. Preserve that
+partial baseline at `data/base-2026-39-256` and build the final candidate in the
+separate `data/base-2026-39-prose-256` directory. Prose-v1 removes short link/menu
+lines before filtering and counting, and removes identical lines within each
+document. It keeps lines with at least ten words and sentence-ending punctuation,
+or at least twenty words. This may discard useful headings or poetry and is not
+a learned quality classifier. Changed cleaning is a changed preparation identity;
+never resume it into the earlier token files or present that baseline as complete.
 
 TinyStories scans all official rows and records exact duplicates/rejections.
 Official training remains training; official validation is partitioned at the

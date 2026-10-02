@@ -73,3 +73,11 @@ def test_prefetch_preserves_order_and_download_path_guard(tmp_path, monkeypatch)
     assert [name for name, _ in result] == ["third", "first", "second"]
     with pytest.raises(ValueError, match="unexpected crawl"):
         download_wet(tmp_path, "../unrelated")
+
+
+def test_web_cleaning_removes_navigation_and_deduplicates_prose():
+    from deletcra.prepare_cpu import clean_web_text
+
+    prose = "The small town library opens each morning and welcomes every local child."
+    raw = f"Home\nSkip Navigation\nPrivacy policy\n{prose}\n{prose}\nContact us"
+    assert clean_web_text(raw) == prose
