@@ -40,3 +40,34 @@ def fused_causal_lm_loss(
         input_ids[:, 1:][valid].contiguous(),
         bias=head.bias,
     )
+
+
+def response_lm_loss(
+    head: nn.Linear,
+    features: Tensor,
+    labels: Tensor,
+    attention_mask: Tensor,
+    *,
+    backend: str = "torch",
+) -> Tensor:
+    """Shift response labels once, ignoring prompts, role markers and padding.
+
+    Labels use -100 outside assistant content/EOS. Select features before the
+    vocabulary projection so ignored prompt positions do not allocate logits.
+    """
+    if labels.shape != features.shape[:2] or attention_mask.shape != labels.shape:
+        raise ValueError("response labels and mask must match feature positions")
+    valid = (labels[:, 1:] != -100) & attention_mask[:, 1:].bool()
+    valid &= attention_mask[:, :-1].bool()
+    if not valid.any():
+        raise ValueError("no supervised assistant targets")
+    selected, targets = features[:, :-1][valid], labels[:, 1:][valid]
+    if backend == "liger":
+        if features.device.type != "cuda":
+            raise ValueError("liger response loss requires CUDA")
+        return _liger_loss()(
+            head.weight, selected.contiguous(), targets.contiguous(), bias=head.bias
+        )
+    if backend != "torch":
+        raise ValueError("unknown response loss backend")
+    return torch.nn.functional.cross_entropy(head(selected), targets)

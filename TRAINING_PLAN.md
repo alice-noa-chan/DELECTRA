@@ -98,6 +98,21 @@ It was last updated in October 2025 in the verified inventory; this is not a
 claim that its conversations were collected in 2026. An IT data recipe remains
 to be finalized after the Base and short-example audit.
 
+The local short-example candidate now pins SmolTalk2 revision
+`fc6cc2103c066455aade5d7fbb346039ae36ca5e` and scans its non-reasoning everyday
+conversation, smol-rewrite and smol-summarize components. Preparation rejects
+malformed, unfinished, reasoning-bearing, unknown-token and over-context records;
+it does not truncate replies. Role markers use ordinary existing vocabulary IDs,
+so vocabulary size stays 32,000. Assistant content/EOS is supervised; prompts,
+role markers and padding use label -100. Shift labels exactly once in the loss.
+Hash-assigned document partitions keep duplicate conversations in one split.
+This is an auditable candidate subset, not a trained IT model or a claim of
+2026 instruction-data freshness. Preserve component licenses before release.
+
+```powershell
+.venv/Scripts/python -m deletcra.instructions --output data/instructions-short-256
+```
+
 ## Complete TinyStories before considering its release
 
 Local CPU preparation is implemented in `deletcra.prepare_cpu`. It writes compact
