@@ -117,3 +117,35 @@ def test_schedule_and_incomplete_corpus_guard(tmp_path):
         ProductionTrainer(
             data, data, ModelConfig(), ObjectiveConfig(), plan, tmp_path / "run"
         )
+
+
+def test_checkpoint_replacement_failure_preserves_latest_and_previous(
+    tmp_path, monkeypatch
+):
+    from deletcra.corpus import atomic_replace
+
+    data = Corpus(synthetic_sequences(4, 8, 32, seed=7))
+    trainer = ProductionTrainer(
+        data,
+        data,
+        ModelConfig(max_positions=8),
+        ObjectiveConfig(mode="clm"),
+        ProductionPlan(max_input_positions=64, warmup_positions=0),
+        tmp_path / "run",
+    )
+    latest = trainer.directory / "latest.pt"
+    old_bytes = latest.read_bytes()
+
+    def failed_replacement(source, target):
+        if target.name == "latest.pt":
+            raise PermissionError("persistent lock")
+        atomic_replace(source, target)
+
+    monkeypatch.setattr("deletcra.training.atomic_replace", failed_replacement)
+    trainer.state["step"] = 1
+    with pytest.raises(PermissionError, match="persistent"):
+        trainer.save()
+    assert latest.read_bytes() == old_bytes
+    assert latest.with_suffix(".previous.pt").read_bytes() == old_bytes
+    saved = torch.load(latest, weights_only=True)
+    assert saved["state"]["step"] == 0

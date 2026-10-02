@@ -197,6 +197,13 @@ selection rules. The pilot's main/generator evaluation weights have no optimizer
 or RNG resume state. Preserve them; start the production run cleanly unless a
 documented warm start is intentionally selected.
 
+Production checkpoint replacement keeps the existing `latest.pt` readable while
+writing a durable copy to `latest.previous.pt`, then atomically replaces latest.
+This costs one bounded-memory backup copy per save and avoids a missing-latest
+window if replacement fails. Brief sharing locks are retried up to six times;
+persistent permission errors still raise. Tests inject a final replacement
+failure and verify both readable checkpoints retain the old optimizer state.
+
 Reserve fresh, fixed test documents outside historical pilot evaluation before
 checkpoint selection. Score the reference and candidate on identical test tokens
 with the same packing and decoding rules, and report selection validation

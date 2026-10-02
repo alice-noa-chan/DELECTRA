@@ -9,6 +9,7 @@ import json
 import math
 import os
 import random
+import shutil
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -17,7 +18,7 @@ import numpy as np
 import torch
 
 from deletcra.config import ModelConfig, generator_model_config
-from deletcra.corpus import file_sha256, write_json
+from deletcra.corpus import atomic_replace, file_sha256, write_json
 from deletcra.losses import response_lm_loss
 from deletcra.model import CausalElectra
 from deletcra.objectives import ObjectiveConfig, pretraining_step
@@ -390,8 +391,16 @@ class ProductionTrainer:
             handle.flush()
             os.fsync(handle.fileno())
         if target.exists():
-            target.replace(target.with_suffix(".previous.pt"))
-        temporary.replace(target)
+            # Keep latest readable until the new checkpoint replaces it.
+            # Moving latest to previous first creates a crash-time resume gap.
+            previous = target.with_suffix(".previous.pt")
+            backup = previous.with_suffix(".tmp")
+            with target.open("rb") as source, backup.open("wb") as destination:
+                shutil.copyfileobj(source, destination, 8 * 1024 * 1024)
+                destination.flush()
+                os.fsync(destination.fileno())
+            atomic_replace(backup, previous)
+        atomic_replace(temporary, target)
 
     def fit(self, *, pause_after_steps: int | None = None):
         started = time.monotonic()

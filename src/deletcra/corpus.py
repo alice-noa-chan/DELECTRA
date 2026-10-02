@@ -3,6 +3,7 @@
 import hashlib
 import json
 import os
+import time
 from pathlib import Path
 
 import numpy as np
@@ -17,6 +18,18 @@ def file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def atomic_replace(source: Path, target: Path) -> None:
+    """Retry brief filesystem sharing locks; persistent permission errors raise."""
+    for attempt in range(6):
+        try:
+            source.replace(target)
+            return
+        except PermissionError:
+            if attempt == 5:
+                raise
+            time.sleep(0.05 * 2**attempt)
+
+
 def write_json(path: Path, value: dict) -> None:
     """Replace a manifest only after its complete contents reach disk."""
     temporary = path.with_suffix(path.suffix + ".tmp")
@@ -25,7 +38,7 @@ def write_json(path: Path, value: dict) -> None:
         target.write("\n")
         target.flush()
         os.fsync(target.fileno())
-    temporary.replace(path)
+    atomic_replace(temporary, path)
 
 
 class TokenWriter:

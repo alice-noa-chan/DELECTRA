@@ -65,3 +65,40 @@ def test_mmap_reads_across_shards_and_rejects_path_escape(tmp_path):
     (tmp_path / "metadata.json").write_text(json.dumps(metadata))
     with pytest.raises(ValueError, match="escapes"):
         MmapSplit(tmp_path, "train")
+
+
+def test_atomic_replace_retries_sharing_lock_and_keeps_failure_bounded(
+    tmp_path, monkeypatch
+):
+    from pathlib import Path
+
+    from deletcra.corpus import atomic_replace
+
+    source, target = tmp_path / "temporary", tmp_path / "latest"
+    source.write_bytes(b"new")
+    target.write_bytes(b"old")
+    replace = Path.replace
+    calls, delays = [], []
+
+    def locked(path, destination):
+        calls.append(destination)
+        if len(calls) < 3:
+            raise PermissionError("temporary sharing lock")
+        return replace(path, destination)
+
+    monkeypatch.setattr(Path, "replace", locked)
+    monkeypatch.setattr("deletcra.corpus.time.sleep", delays.append)
+    atomic_replace(source, target)
+    assert target.read_bytes() == b"new"
+    assert delays == [0.05, 0.1]
+
+    def denied(*args):
+        calls.append(target)
+        raise PermissionError("persistent")
+
+    calls.clear()
+    monkeypatch.setattr(Path, "replace", denied)
+    with pytest.raises(PermissionError, match="persistent"):
+        atomic_replace(source, target)
+    assert len(calls) == 6
+    assert target.read_bytes() == b"new"
