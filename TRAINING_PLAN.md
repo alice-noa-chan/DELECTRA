@@ -174,6 +174,11 @@ and stage bounded candidate files. The main process consumes sources in the
 original order and alone owns global deduplication and SQLite commits. Worker
 completion order therefore cannot change corpus ordering or duplicate winners.
 Regression tests verify the serial and worker paths produce identical shards.
+Parallel web ingestion excludes documents encoding to UNK/PAD (ID zero), before
+inserting their hashes into global deduplication, and records the rejection
+count. This follows an observed ID-zero record that interrupted
+one uncommitted source. Completed shards already required nonzero IDs; resume
+replays that source without changing the previously committed valid prefix.
 Transient download failures use six attempts with 5/10/20/40/40-second delays,
 alternating the official Hugging Face bucket mirror and Common Crawl HTTPS.
 Prefer the mirror after observed original-server 503s and stalled reads; connect

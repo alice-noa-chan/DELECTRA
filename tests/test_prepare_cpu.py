@@ -127,3 +127,52 @@ def test_failed_download_uses_alternate_endpoint_and_atomic_cache(
     assert not list(tmp_path.glob("*.partial"))
     assert download_wet(tmp_path, name) == (path, digest)
     assert len(calls) == 2
+
+
+def test_encoded_web_rejects_unknown_without_poisoning_resume_dedup(
+    tmp_path, fake_tokenizer
+):
+    import pyarrow as pa
+    import pyarrow.ipc as ipc
+
+    prep = Preparation(tmp_path / "corpus", {"source": "fixture"})
+    candidate_file = tmp_path / "candidates.ipc"
+    invalid_key = document_key("literal unknown")
+    valid_key = document_key("valid story")
+    schema = pa.schema(
+        [
+            ("hash", pa.binary(32)),
+            ("ids", pa.list_(pa.int32())),
+            ("utf8_bytes", pa.int64()),
+        ]
+    )
+    rows = [
+        {"hash": invalid_key, "ids": [2, 0, 3], "utf8_bytes": 16},
+        {"hash": valid_key, "ids": [2, 3] * 200, "utf8_bytes": 400},
+    ]
+    with candidate_file.open("wb") as handle, ipc.new_file(handle, schema) as writer:
+        writer.write_batch(pa.RecordBatch.from_pylist(rows, schema=schema))
+    stats = {
+        "counts": {"seen_documents": 2, "candidate_documents": 2},
+        "processing_seconds": 1,
+    }
+    prep.unit_encoded({"id": "first"}, candidate_file, stats, 10000)
+    assert prep.manifest["counts"]["rejected_unknown_tokens"] == 1
+    assert prep.manifest["counts"].get("unused_candidate_documents", 0) == 0
+    assert (
+        prep.db.execute("SELECT 1 FROM docs WHERE hash=?", (invalid_key,)).fetchone()
+        is None
+    )
+    prep.db.close()
+    resumed = Preparation(tmp_path / "corpus", {"source": "fixture"})
+    resumed.unit_encoded({"id": "second"}, candidate_file, stats, 10000)
+    resumed.complete()
+    assert resumed.manifest["counts"]["rejected_unknown_tokens"] == 2
+    assert resumed.manifest["counts"]["exact_duplicates"] == 1
+    assert (
+        sum(
+            resumed.manifest["counts"].get(f"{s}_documents", 0)
+            for s in ("train", "validation", "test")
+        )
+        == 1
+    )

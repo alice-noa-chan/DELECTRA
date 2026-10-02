@@ -223,13 +223,17 @@ class Preparation:
                     for row in reader.get_batch(batch_index).to_pylist():
                         consumed += 1
                         key, ids = row["hash"], row["ids"]
+                        # Literal special-token text can encode to UNK/PAD.
+                        # Exclude that document before it enters dedup state;
+                        # completed shards have always required nonzero IDs.
+                        if 0 in ids:
+                            counts["rejected_unknown_tokens"] += 1
+                            continue
                         if not self.db.execute(
                             "INSERT OR IGNORE INTO docs VALUES (?)", (key,)
                         ).rowcount:
                             counts["exact_duplicates"] += 1
                             continue
-                        if 0 in ids:
-                            raise ValueError("reference tokenizer produced UNK/PAD")
                         split = web_split(key)
                         writers[split].append(ids, 1)
                         counts[f"{split}_documents"] += 1
