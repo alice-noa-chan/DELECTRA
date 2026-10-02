@@ -133,8 +133,9 @@ Common Crawl source files are SHA-256 ordered. English-only crawl annotations,
 simple prose-quality checks and normalized exact document deduplication are a
 transparent baseline, not near-duplicate filtering or FineWeb-quality evidence.
 Hash-assigned web partitions are 98% train / 1% validation / 1% test. The token
-limit is checked after each 512-document tokenizer batch, so final source content
-may slightly exceed the requested count; manifests preserve the actual amount.
+limit is checked after each tokenizer batch in the serial path and after each
+accepted document in the parallel path. Final source content may slightly exceed
+the requested count; manifests preserve the actual amount.
 Fresh text alone does not establish readable model completions.
 
 A first local WET audit found navigation/menu-heavy prefixes. Preserve that
@@ -145,6 +146,16 @@ document. It keeps lines with at least ten words and sentence-ending punctuation
 or at least twenty words. This may discard useful headings or poetry and is not
 a learned quality classifier. Changed cleaning is a changed preparation identity;
 never resume it into the earlier token files or present that baseline as complete.
+
+Fresh-corpus processing overlaps four downloads and up to three local CPU source
+workers (`--cpu-workers 3`, adjustable from one to four). Worker subprocesses
+import the tokenizer/Arrow/text code without Torch, use one tokenizer thread,
+and stage bounded candidate files. The main process consumes sources in the
+original order and alone owns global deduplication and SQLite commits. Worker
+completion order therefore cannot change corpus ordering or duplicate winners.
+Regression tests verify the serial and worker paths produce identical shards.
+All inspected source rows are counted; the final source may include preprocessed
+candidates not used after the requested training content budget is reached.
 
 TinyStories scans all official rows and records exact duplicates/rejections.
 Official training remains training; official validation is partitioned at the

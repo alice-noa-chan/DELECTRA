@@ -9,14 +9,16 @@ import argparse
 import gzip
 import hashlib
 import json
-import re
+import os
 import sqlite3
+import subprocess
+import sys
 import time
-import unicodedata
 from collections import Counter, deque
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+import pyarrow.ipc as ipc
 import pyarrow.parquet as pq
 import requests
 from huggingface_hub import HfApi, hf_hub_download
@@ -29,68 +31,7 @@ from deletcra.target import (
     STORIES_DATASET,
     STORIES_REVISION,
 )
-
-
-def document_key(text: str) -> bytes:
-    normalized = " ".join(unicodedata.normalize("NFKC", text).casefold().split())
-    return hashlib.sha256(normalized.encode("utf-8")).digest()
-
-
-def web_split(key: bytes) -> str:
-    """Assign each content hash once: 98% train, 1% validation, 1% test."""
-    bucket = int.from_bytes(key[:8], "big") % 10000
-    return "validation" if bucket < 100 else "test" if bucket < 200 else "train"
-
-
-def clean_web_text(text: str) -> str:
-    """Keep prose lines and discard short menu/link labels before token counting.
-
-    WET already extracts plaintext, but retains navigation and footer text.
-    Keep lines with ten words and terminal sentence punctuation, or twenty words
-    regardless of punctuation. Deduplicate identical lines within a document.
-    These transparent rules may remove useful headings and poetry; they are
-    intended for this small English prose model, not general web preservation.
-    """
-    kept, seen = [], set()
-    for raw in text.splitlines():
-        line = " ".join(raw.split())
-        words = re.findall(r"[A-Za-z]+(?:'[A-Za-z]+)?", line)
-        if len(words) < 10 or (
-            len(words) < 20 and not line.endswith((".", "!", "?", '"'))
-        ):
-            continue
-        key = document_key(line)
-        if key not in seen:
-            seen.add(key)
-            kept.append(line)
-    return "\n".join(kept)
-
-
-def quality_reason(text: str, languages: str) -> str | None:
-    """Transparent baseline filtering, not a FineWeb-quality classifier.
-
-    Require English-only crawl annotations, readable alphabetic text, common
-    English function words, and varied prose. Exact normalized-document hashing
-    handles repeats; near-duplicate removal is not established by this filter.
-    """
-    if languages.strip() != "eng":
-        return "language"
-    words = re.findall(r"[A-Za-z]+(?:'[A-Za-z]+)?", text)
-    if not 100 <= len(words) <= 20000:
-        return "length"
-    # C-backed split/map operations preserve the same Unicode predicates while
-    # avoiding Python generator overhead for every character in a large crawl.
-    nonspace = len("".join(text.split()))
-    if not nonspace or sum(map(str.isalpha, text)) / nonspace < 0.7:
-        return "alphabetic_ratio"
-    lower = [word.lower() for word in words]
-    frequencies = Counter(lower)
-    if len(frequencies) / len(lower) < 0.1:
-        return "repetition"
-    function_words = {"the", "a", "an", "and", "of", "to", "is", "in", "for", "that"}
-    if sum(frequencies[word] for word in function_words) / len(lower) < 0.03:
-        return "english_function_words"
-    return None
+from deletcra.web_text import clean_web_text, document_key, quality_reason, web_split
 
 
 class Preparation:
@@ -264,6 +205,78 @@ class Preparation:
         write_json(self.directory / "metadata.json", self.manifest)
         self.db.close()
 
+    def unit_encoded(self, source: dict, arrow_path: Path, stats: dict, budget: int):
+        """Commit worker candidates in source order with global exact deduplication."""
+        index = len(self.manifest["units"])
+        counts = Counter(stats["counts"])
+        writers = {
+            split: TokenWriter(self.directory / f"{split}-{index:05d}.bin", 256, 32000)
+            for split in self.manifest["splits"]
+        }
+        self.db.execute("BEGIN")
+        consumed = 0
+        try:
+            with arrow_path.open("rb") as handle:
+                reader = ipc.open_file(handle)
+                stopped = False
+                for batch_index in range(reader.num_record_batches):
+                    for row in reader.get_batch(batch_index).to_pylist():
+                        consumed += 1
+                        key, ids = row["hash"], row["ids"]
+                        if not self.db.execute(
+                            "INSERT OR IGNORE INTO docs VALUES (?)", (key,)
+                        ).rowcount:
+                            counts["exact_duplicates"] += 1
+                            continue
+                        if 0 in ids:
+                            raise ValueError("reference tokenizer produced UNK/PAD")
+                        split = web_split(key)
+                        writers[split].append(ids, 1)
+                        counts[f"{split}_documents"] += 1
+                        counts[f"{split}_content_tokens"] += len(ids)
+                        counts["accepted_utf8_bytes"] += row["utf8_bytes"]
+                        if (
+                            self.manifest["counts"].get("train_content_tokens", 0)
+                            + counts["train_content_tokens"]
+                            >= budget
+                        ):
+                            counts["budget_stop_inside_source"] = 1
+                            stopped = True
+                            break
+                    if stopped:
+                        break
+            counts["unused_candidate_documents"] = (
+                counts["candidate_documents"] - consumed
+            )
+            entries = {split: writer.finish() for split, writer in writers.items()}
+            candidate = json.loads(json.dumps(self.manifest))
+            for split, entry in entries.items():
+                candidate["splits"][split].append(entry)
+            candidate["units"].append(
+                {
+                    "source": source,
+                    "counts": dict(counts),
+                    "seconds": stats["processing_seconds"],
+                }
+            )
+            candidate["counts"] = dict(Counter(candidate["counts"]) + counts)
+            self.db.execute(
+                "INSERT OR REPLACE INTO state VALUES (1, ?)", (json.dumps(candidate),)
+            )
+            self.db.commit()
+            self.manifest = candidate
+            write_json(self.directory / "metadata.json", candidate)
+            print(
+                json.dumps({"committed_unit": index, "counts": dict(counts)}),
+                flush=True,
+            )
+        except BaseException:
+            self.db.rollback()
+            for writer in writers.values():
+                if not writer.source.closed:
+                    writer.source.close()
+            raise
+
 
 def stories(directory: Path):
     prep = Preparation(
@@ -361,8 +374,60 @@ def prefetched_wet(paths, cache: Path, *, workers: int = 4):
                 pending.append((next_name, pool.submit(download_wet, cache, next_name)))
 
 
-def commoncrawl(directory: Path, budget: int):
-    from warcio.archiveiterator import ArchiveIterator
+def process_wet(item, tokenizer_path: Path):
+    name, (path, digest) = item
+    output = path.with_suffix(".ipc")
+    environment = os.environ.copy()
+    environment["RAYON_NUM_THREADS"] = "1"
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-u",
+            "-m",
+            "deletcra.web_source",
+            "--input",
+            str(path),
+            "--output",
+            str(output),
+            "--tokenizer",
+            str(tokenizer_path),
+        ],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        env=environment,
+        check=True,
+        creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+    )
+    stats = json.loads(result.stdout)
+    return name, path, digest, output, stats
+
+
+def processed_wet(paths, directory: Path, *, workers: int):
+    """Use bounded local CPU processes and consume results in original order."""
+    pending = deque()
+    downloads = iter(prefetched_wet(paths, directory / "downloads"))
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for item in downloads:
+            pending.append(
+                pool.submit(
+                    process_wet, item, directory / "tokenizer" / "tokenizer.json"
+                )
+            )
+            if len(pending) == workers:
+                break
+        while pending:
+            yield pending.popleft().result()
+            item = next(downloads, None)
+            if item is not None:
+                pending.append(
+                    pool.submit(
+                        process_wet, item, directory / "tokenizer" / "tokenizer.json"
+                    )
+                )
+
+
+def commoncrawl(directory: Path, budget: int, *, cpu_workers: int = 3):
 
     crawl = "CC-MAIN-2026-39"
     response = requests.get(
@@ -399,39 +464,34 @@ def commoncrawl(directory: Path, budget: int):
     (directory / "wet.paths.txt").write_bytes(inventory)
     completed = {unit["source"]["id"] for unit in prep.manifest["units"]}
     remaining_paths = [name for name in paths if name not in completed]
-    for name, (path, digest) in prefetched_wet(
-        remaining_paths, directory / "downloads"
+    if prep.manifest["counts"].get("train_content_tokens", 0) >= budget:
+        prep.complete()
+        return
+    for name, path, digest, arrow_path, stats in processed_wet(
+        remaining_paths, directory, workers=cpu_workers
     ):
         if prep.manifest["counts"].get("train_content_tokens", 0) >= budget:
             break
 
-        def rows(path=path):
-            with path.open("rb") as archive:
-                for record in ArchiveIterator(archive):
-                    if record.rec_type != "conversion":
-                        continue
-                    language = (
-                        record.rec_headers.get_header(
-                            "WARC-Identified-Content-Language"
-                        )
-                        or ""
-                    )
-                    text = (
-                        record.content_stream().read().decode("utf-8", errors="replace")
-                    )
-                    yield text, "train", language
-
-        prep.unit(
+        prep.unit_encoded(
             {
                 "id": name,
                 "sha256": digest,
                 "compressed_bytes": path.stat().st_size,
+                "tokenizer_json_sha256": stats["tokenizer_sha256"],
             },
-            rows(),
-            web_budget=budget,
+            arrow_path,
+            stats,
+            budget,
         )
         # Shards and source hashes are durable. Retain only pending raw sources.
-        path.unlink()
+        for cached in (path, arrow_path):
+            try:
+                cached.unlink()
+            except PermissionError:
+                # A local inspector can hold a Windows read handle briefly.
+                # Committed data remains valid; defer disposable-cache cleanup.
+                pass
     if prep.manifest["counts"].get("train_content_tokens", 0) < budget:
         raise RuntimeError("crawl exhausted before the requested content-token budget")
     prep.complete()
@@ -442,13 +502,16 @@ def main():
     parser.add_argument("source", choices=["stories", "commoncrawl"])
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--train-content-tokens", type=int, default=3_300_000_000)
+    parser.add_argument("--cpu-workers", type=int, default=3)
     args = parser.parse_args()
-    if args.train_content_tokens < 1:
-        parser.error("train content budget must be positive")
+    if args.train_content_tokens < 1 or not 1 <= args.cpu_workers <= 4:
+        parser.error("positive token budget and one to four CPU workers required")
     if args.source == "stories":
         stories(args.output)
     else:
-        commoncrawl(args.output, args.train_content_tokens)
+        commoncrawl(
+            args.output, args.train_content_tokens, cpu_workers=args.cpu_workers
+        )
 
 
 if __name__ == "__main__":
