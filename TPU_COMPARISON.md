@@ -38,8 +38,9 @@ container, volume and network-volume charges.
 The [official Colab CLI](https://github.com/googlecolab/google-colab-cli) supports
 TPU requests, code execution, file transfer and session inspection. Its README
 currently lists v5e1 and v6e1 and supports Linux/macOS, excluding Windows. This
-machine has an Ubuntu WSL distribution; Linux inside WSL is a candidate host,
-but CLI installation, authentication and operation there remain unverified.
+machine has an Ubuntu WSL distribution. [COLAB.md](COLAB.md) records subsequent
+CLI installation, authentication and free T4 checks. TPU execution remains
+unverified.
 An accepted hardware option does not promise free account entitlement or stock.
 
 The [Colab FAQ](https://research.google.com/colaboratory/faq.html) says free
@@ -48,7 +49,7 @@ hours depending on availability and usage. It also restricts SSH/remote desktop
 on free runtimes without a positive compute-unit balance. CLI functionality
 does not override those policies: prefer notebook execution for free testing
 and do not assume its SSH workflow is eligible. No account-specific entitlement
-or free allocation has been checked.
+was checked for this initial comparison; subsequent checks are in COLAB.md.
 
 Google lists per-chip HBM of [16GB for v5e](https://cloud.google.com/tpu/docs/v5e)
 and [32GB for v6e](https://cloud.google.com/tpu/docs/v6e). Those are hardware
