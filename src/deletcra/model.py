@@ -56,6 +56,10 @@ def validate_batch(input_ids: Tensor, attention_mask: Tensor) -> None:
         raise ValueError("attention_mask must have the same shape as input_ids")
     if attention_mask.device != input_ids.device:
         raise ValueError("input_ids and attention_mask must use the same device")
+    if input_ids.device.type == "xla":
+        # The production loader validates values on CPU before transferring.
+        # Python conditions on device values would split every XLA graph here.
+        return
     if not ((attention_mask == 0) | (attention_mask == 1)).all():
         raise ValueError("attention_mask must contain only zero or one")
     if not attention_mask[:, 0].bool().all():

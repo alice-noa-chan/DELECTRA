@@ -149,3 +149,46 @@ def test_checkpoint_replacement_failure_preserves_latest_and_previous(
     assert latest.with_suffix(".previous.pt").read_bytes() == old_bytes
     saved = torch.load(latest, weights_only=True)
     assert saved["state"]["step"] == 0
+
+
+def test_explicit_migration_preserves_optimizer_cursor_and_recipe(tmp_path):
+    data = Corpus(synthetic_sequences(7, 8, 32, seed=9))
+    config = ModelConfig(max_positions=8, attention_backend="eager")
+    objective = ObjectiveConfig(generator_mode="self")
+    plan = ProductionPlan(max_input_positions=64, batch_size=2, warmup_positions=16)
+    directory = tmp_path / "run"
+    original = ProductionTrainer(data, data, config, objective, plan, directory)
+    original.fit(pause_after_steps=2)
+    before = torch.load(directory / "latest.pt", weights_only=True)
+    target_config = replace(config, attention_backend="sdpa")
+    with pytest.raises(ValueError, match="resume configuration"):
+        ProductionTrainer(
+            data, data, target_config, objective, plan, directory, resume=True
+        )
+    migrated = ProductionTrainer(
+        data, data, target_config, objective, plan, directory, resume=True, migrate=True
+    )
+    assert migrated.state["input_positions"] == 32
+    assert migrated.sampler.offset == before["sampler"]["offset"]
+    for left, right in zip(
+        original.optimizer.state.values(),
+        migrated.optimizer.state.values(),
+        strict=True,
+    ):
+        for key in left:
+            torch.testing.assert_close(left[key], right[key], rtol=0, atol=0)
+    assert migrated.migrations[0]["bitwise_continuation"] is False
+    migrated.fit()
+    assert migrated.state["input_positions"] == 64
+    changed = replace(plan, max_input_positions=128)
+    with pytest.raises(ValueError, match="resume configuration"):
+        ProductionTrainer(
+            data,
+            data,
+            target_config,
+            objective,
+            changed,
+            directory,
+            resume=True,
+            migrate=True,
+        )

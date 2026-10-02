@@ -77,4 +77,6 @@ class TrainingRuntime:
         if self.xla is not None:
             import torch_xla.core.xla_model as xm
 
+            if state is None:
+                raise ValueError("XLA resume requires saved device RNG state")
             xm.set_rng_state(state, self.device)

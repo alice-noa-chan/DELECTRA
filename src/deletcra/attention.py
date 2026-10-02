@@ -15,7 +15,7 @@ def causal_padding_mask(attention_mask: Tensor) -> Tensor | None:
     triangle for padded inputs. Unpadded blocks use ``is_causal=True`` without
     allocating a [batch, heads, sequence, sequence] attention score matrix.
     """
-    if attention_mask.bool().all():
+    if attention_mask.device.type != "xla" and attention_mask.bool().all():
         return None
     length = attention_mask.shape[1]
     causal = torch.ones(length, length, dtype=torch.bool, device=attention_mask.device)
