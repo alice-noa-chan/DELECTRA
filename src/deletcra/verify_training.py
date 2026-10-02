@@ -38,10 +38,10 @@ class VerificationCorpus:
         return self.tokens[list(indices)]
 
 
-def verify_training(device: str, directory: Path) -> dict:
+def verify_training(device: str, directory: Path, *, precision: str = "fp32") -> dict:
     """Keep optimizer and sampler state when resuming on the same device type.
 
-    GPU kernels may differ numerically, so compare FP32 weights and Adam moments
+    GPU kernels may differ numerically, so compare weights and Adam moments
     with explicit tolerances rather than claiming cross-device bitwise equality.
     This does not enable TPU or a change of device/configuration during resume.
     """
@@ -53,7 +53,7 @@ def verify_training(device: str, directory: Path) -> dict:
         batch_size=1,
         warmup_positions=256,
         device=device,
-        precision="fp32",
+        precision=precision,
         checkpoint_every=2,
         evaluate_every=2,
         validation_blocks=2,
@@ -71,7 +71,13 @@ def verify_training(device: str, directory: Path) -> dict:
         train, validation, config, objective, plan, directory / "resumed", resume=True
     )
     resumed.fit()
-    for field in ("step", "input_positions", "prediction_targets"):
+    for field in (
+        "step",
+        "input_positions",
+        "prediction_targets",
+        "optimizer_updates",
+        "skipped_updates",
+    ):
         if whole.state[field] != resumed.state[field]:
             raise AssertionError(f"resume changed {field}")
     if (whole.sampler.epoch, whole.sampler.offset) != (
@@ -79,6 +85,10 @@ def verify_training(device: str, directory: Path) -> dict:
         resumed.sampler.offset,
     ):
         raise AssertionError("resume changed the data cursor")
+    if whole.runtime.scaler.state_dict() != resumed.runtime.scaler.state_dict():
+        raise AssertionError("resume changed loss scaler state")
+    if resumed.state["optimizer_updates"] == 0:
+        raise AssertionError("no optimizer updates were applied")
     maximum_error = 0.0
     for name, tensor in whole.model.state_dict().items():
         other = resumed.model.state_dict()[name]
@@ -91,8 +101,10 @@ def verify_training(device: str, directory: Path) -> dict:
             torch.testing.assert_close(left[name], right[name], rtol=1e-5, atol=1e-6)
     report = {
         "status": "passed",
-        "scope": "15m_synthetic_joint_fp32_and_same_device_resume",
+        "scope": f"15m_synthetic_joint_{precision}_and_same_device_resume",
         "device": device,
+        "precision": precision,
+        "grad_scaler": resumed.runtime.scaler.state_dict(),
         "model_parameters": sum(value.numel() for value in whole.model.parameters()),
         "state": resumed.state,
         "model_maximum_absolute_error": maximum_error,
@@ -108,11 +120,17 @@ def verify_training(device: str, directory: Path) -> dict:
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--device", choices=["cpu", "cuda"], required=True)
+    parser.add_argument("--precision", choices=["fp32", "bf16", "fp16"], default="fp32")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     import json
 
-    print(json.dumps(verify_training(args.device, args.output), indent=2))
+    print(
+        json.dumps(
+            verify_training(args.device, args.output, precision=args.precision),
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":

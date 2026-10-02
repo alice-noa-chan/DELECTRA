@@ -23,7 +23,10 @@ The [PyTorch AMP guide](https://docs.pytorch.org/docs/2.14/notes/amp_examples.ht
 describes scaling, unscaling before clipping and skipped overflow updates. A CPU
 gradient equivalence test verifies that separately scaled backward passes match
 scaling the combined loss, including dropout and non-unit objective weights.
-Actual T4 FP16 training must be checked separately from this mathematical test.
+Use `python -m deletcra.verify_training --device cuda --precision fp16 --output
+/content/fp16-check` for four real-model synthetic updates, comparing whole and
+interrupted runs including Adam moments and GradScaler state. This hardware
+check is separate from the CPU mathematical test and does not measure quality.
 
 ## XLA and explicit migration
 
