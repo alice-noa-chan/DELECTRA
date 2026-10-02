@@ -100,6 +100,36 @@ to be finalized after the Base and short-example audit.
 
 ## Complete TinyStories before considering its release
 
+Local CPU preparation is implemented in `deletcra.prepare_cpu`. It writes compact
+int32 shards, document/token/tail counts and SHA-256 manifests. SQLite commits
+exact document deduplication and completed-source state together; an interrupted
+source is replayed without losing committed sources. The production mmap reader
+loads only selected blocks, adding the same BOS prefix as the pilot.
+
+```powershell
+.venv/Scripts/python -m deletcra.prepare_cpu stories --output data/tinystories-full-256
+.venv/Scripts/python -m deletcra.prepare_cpu commoncrawl --output data/base-2026-39-256 --train-content-tokens 3300000000
+```
+
+Use the identical command to resume. A corpus is ready only when its metadata
+status is `complete` and shard checks pass. Temporary downloads and token data
+are local, ignored Git artifacts; no GPU or provider allocation is involved.
+Common Crawl source files are SHA-256 ordered. English-only crawl annotations,
+simple prose-quality checks and normalized exact document deduplication are a
+transparent baseline, not near-duplicate filtering or FineWeb-quality evidence.
+Hash-assigned web partitions are 98% train / 1% validation / 1% test. The token
+limit is checked after each 512-document tokenizer batch, so final source content
+may slightly exceed the requested count; manifests preserve the actual amount.
+Fresh text alone does not establish readable model completions.
+
+TinyStories scans all official rows and records exact duplicates/rejections.
+Official training remains training; official validation is partitioned at the
+document level into selection validation and final test. The first 2,000 rows
+stay validation to keep the historic capped pilot's evaluated prefix out of the
+new test. Remaining documents use a stable normalized-content hash. Reference
+pretraining overlap remains unknown. This is a new evaluation protocol; compare
+candidate and reference on its same final-test blocks.
+
 Prepare the **entire official train split** at the already pinned revision,
 without the pilot's 10M-token cap. Record complete document coverage, token
 counts, any rejected records, and incomplete packing tails. Never mix validation

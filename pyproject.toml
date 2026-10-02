@@ -17,7 +17,7 @@ deletcra = "deletcra.cli:main"
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<10", "ruff>=0.12,<1"]
-data = ["datasets>=3,<5"]
+data = ["datasets>=3,<5", "numpy>=1.24,<3", "pyarrow>=15,<25", "requests>=2.31,<3", "warcio>=1.7,<2"]
 cloud = ["modal>=1.6,<2"]
 kernels = ["liger-kernel==0.8.4; sys_platform == 'linux'"]
 
