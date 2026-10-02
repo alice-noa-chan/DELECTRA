@@ -78,14 +78,17 @@ def quality_reason(text: str, languages: str) -> str | None:
     words = re.findall(r"[A-Za-z]+(?:'[A-Za-z]+)?", text)
     if not 100 <= len(words) <= 20000:
         return "length"
-    nonspace = sum(not c.isspace() for c in text)
-    if not nonspace or sum(c.isalpha() for c in text) / nonspace < 0.7:
+    # C-backed split/map operations preserve the same Unicode predicates while
+    # avoiding Python generator overhead for every character in a large crawl.
+    nonspace = len("".join(text.split()))
+    if not nonspace or sum(map(str.isalpha, text)) / nonspace < 0.7:
         return "alphabetic_ratio"
     lower = [word.lower() for word in words]
-    if len(set(lower)) / len(lower) < 0.1:
+    frequencies = Counter(lower)
+    if len(frequencies) / len(lower) < 0.1:
         return "repetition"
     function_words = {"the", "a", "an", "and", "of", "to", "is", "in", "for", "that"}
-    if sum(word in function_words for word in lower) / len(lower) < 0.03:
+    if sum(frequencies[word] for word in function_words) / len(lower) < 0.03:
         return "english_function_words"
     return None
 
