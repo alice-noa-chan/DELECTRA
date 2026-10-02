@@ -81,3 +81,47 @@ def test_web_cleaning_removes_navigation_and_deduplicates_prose():
     prose = "The small town library opens each morning and welcomes every local child."
     raw = f"Home\nSkip Navigation\nPrivacy policy\n{prose}\n{prose}\nContact us"
     assert clean_web_text(raw) == prose
+
+
+def test_failed_download_uses_official_mirror_and_atomic_cache(tmp_path, monkeypatch):
+    import hashlib
+
+    import requests
+
+    from deletcra.prepare_cpu import download_wet
+
+    calls = []
+    delays = []
+
+    class Download:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            pass
+
+        def raise_for_status(self):
+            if len(calls) == 1:
+                raise requests.HTTPError("503")
+
+        def iter_content(self, size):
+            yield b"fixture compressed bytes"
+
+    def get(url, **kwargs):
+        calls.append(url)
+        assert not list(tmp_path.glob("*.wet.gz"))
+        return Download()
+
+    monkeypatch.setattr("deletcra.prepare_cpu.requests.get", get)
+    monkeypatch.setattr("deletcra.prepare_cpu.time.sleep", delays.append)
+    name = "crawl-data/CC-MAIN-2026-39/fixture.wet.gz"
+    path, digest = download_wet(tmp_path, name)
+    assert calls == [
+        "https://data.commoncrawl.org/" + name,
+        "https://huggingface.co/buckets/commoncrawl/commoncrawl/resolve/" + name,
+    ]
+    assert delays == [5]
+    assert digest == hashlib.sha256(path.read_bytes()).hexdigest()
+    assert not list(tmp_path.glob("*.partial"))
+    assert download_wet(tmp_path, name) == (path, digest)
+    assert len(calls) == 2

@@ -149,11 +149,18 @@ never resume it into the earlier token files or present that baseline as complet
 
 Fresh-corpus processing overlaps four downloads and up to three local CPU source
 workers (`--cpu-workers 3`, adjustable from one to four). Worker subprocesses
-import the tokenizer/Arrow/text code without Torch, use one tokenizer thread,
+import the tokenizer/Arrow/text code without Torch, use two tokenizer threads,
 and stage bounded candidate files. The main process consumes sources in the
 original order and alone owns global deduplication and SQLite commits. Worker
 completion order therefore cannot change corpus ordering or duplicate winners.
 Regression tests verify the serial and worker paths produce identical shards.
+Transient download failures use six attempts with 5/10/20/40/40-second delays,
+alternating Common Crawl HTTPS and its official Hugging Face bucket mirror.
+The source inventory, ordering and compressed-file hashes remain recorded.
+A 65,327,358-byte source was verified byte-identical between both endpoints
+(SHA-256 `4478f942c7139afc50d6521951a404093c51fe3b01151e98d71a491087d97741`).
+The mirror uses the documented bucket `resolve/` URL layout; no account or paid
+compute is needed. [Official mirror guide](https://commoncrawl.org/blog/getting-started-with-common-crawl-data-on-hugging-face).
 All inspected source rows are counted; the final source may include preprocessed
 candidates not used after the requested training content budget is reached.
 

@@ -338,11 +338,15 @@ def download_wet(cache: Path, name: str):
     if path.exists():
         return path, file_sha256(path)
     partial = path.with_suffix(".partial")
-    for attempt in range(3):
+    endpoints = (
+        "https://data.commoncrawl.org/",
+        "https://huggingface.co/buckets/commoncrawl/commoncrawl/resolve/",
+    )
+    for attempt in range(6):
         try:
             digest = hashlib.sha256()
             with requests.get(
-                "https://data.commoncrawl.org/" + name, stream=True, timeout=(30, 120)
+                endpoints[attempt % 2] + name, stream=True, timeout=(30, 120)
             ) as download:
                 download.raise_for_status()
                 with partial.open("wb") as target:
@@ -351,10 +355,22 @@ def download_wet(cache: Path, name: str):
                         digest.update(chunk)
             partial.replace(path)
             return path, digest.hexdigest()
-        except requests.RequestException:
-            if attempt == 2:
+        except requests.RequestException as error:
+            if attempt == 5:
                 raise
-            time.sleep(2**attempt)
+            delay = min(40, 5 * 2**attempt)
+            print(
+                json.dumps(
+                    {
+                        "source_retry": name,
+                        "attempt": attempt + 1,
+                        "wait_seconds": delay,
+                        "error": type(error).__name__,
+                    }
+                ),
+                flush=True,
+            )
+            time.sleep(delay)
 
 
 def prefetched_wet(paths, cache: Path, *, workers: int = 4):
@@ -378,7 +394,9 @@ def process_wet(item, tokenizer_path: Path):
     name, (path, digest) = item
     output = path.with_suffix(".ipc")
     environment = os.environ.copy()
-    environment["RAYON_NUM_THREADS"] = "1"
+    # Three workers can use six tokenizer threads on this eight-core host.
+    # Text filtering remains single-threaded within each worker.
+    environment["RAYON_NUM_THREADS"] = "2"
     result = subprocess.run(
         [
             sys.executable,
@@ -479,6 +497,10 @@ def commoncrawl(directory: Path, budget: int, *, cpu_workers: int = 3):
                 "sha256": digest,
                 "compressed_bytes": path.stat().st_size,
                 "tokenizer_json_sha256": stats["tokenizer_sha256"],
+                "download_policy": (
+                    "Common Crawl HTTPS; official Hugging Face bucket on retry; "
+                    "complete compressed-file SHA-256 recorded"
+                ),
             },
             arrow_path,
             stats,
