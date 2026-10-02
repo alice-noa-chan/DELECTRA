@@ -1,0 +1,51 @@
+{
+  "archive_sha256": "3ce77f2c748271e095da784a050dfd143a16d777f7bc5ce1b594b998a150a0c5",
+  "archive_bytes": 8581120,
+  "source_manifest_file_sha256": "eebbde315c0582819c6f0de6dac7b82754486d01ee3b8b90717e2c1312166ac2",
+  "cache": {
+    "status": "complete",
+    "kind": "indexed-transfer-window",
+    "corpus_manifest_sha256": "d1a76e9642c789933e50509adc02ed83604d98f63e38902efb5cdd8a1472a7dd",
+    "splits": {
+      "train": {
+        "source_blocks": 1700848,
+        "cached_blocks": 8192,
+        "indices": "train.npy",
+        "indices_sha256": "d167c5241338dae6e690de14e9b4ba585a6cefe04e6707dd29cd9c38b1997a1d",
+        "tokens": "train.bin",
+        "tokens_sha256": "cba1e227a671844fac1f2fd883e73a243b52d2c27866f5515d63564ff2d4365b",
+        "token_bytes": 8355840
+      },
+      "validation": {
+        "source_blocks": 7325,
+        "cached_blocks": 128,
+        "indices": "validation.npy",
+        "indices_sha256": "384b73789fda94f946b5b2e1d02a26d749024460bccef47e00a20042b00aee1d",
+        "tokens": "validation.bin",
+        "tokens_sha256": "cb066f1fd270bb9a5dd1c4bd04c1a72f703e482b6eca67ba253a3d5f5cc9af32",
+        "token_bytes": 130560
+      }
+    }
+  },
+  "plan": {
+    "max_input_positions": 435417088,
+    "batch_size": 16,
+    "warmup_positions": 1048576,
+    "learning_rate": 0.0003,
+    "checkpoint_every": 64,
+    "evaluate_every": 64,
+    "validation_blocks": 128,
+    "max_wall_seconds": 3600,
+    "sequential_backward": true,
+    "seed": 7
+  },
+  "requested_pause_steps": {
+    "xla": 256,
+    "cuda": 512
+  },
+  "phase_input_positions": 1048576,
+  "current_training_input_limit": 2097152,
+  "scope": "Partial first pass of the complete shuffled TinyStories corpus",
+  "test_split_used": false,
+  "publication": false
+}
