@@ -83,7 +83,9 @@ def test_web_cleaning_removes_navigation_and_deduplicates_prose():
     assert clean_web_text(raw) == prose
 
 
-def test_failed_download_uses_official_mirror_and_atomic_cache(tmp_path, monkeypatch):
+def test_failed_download_uses_alternate_endpoint_and_atomic_cache(
+    tmp_path, monkeypatch
+):
     import hashlib
 
     import requests
@@ -117,8 +119,8 @@ def test_failed_download_uses_official_mirror_and_atomic_cache(tmp_path, monkeyp
     name = "crawl-data/CC-MAIN-2026-39/fixture.wet.gz"
     path, digest = download_wet(tmp_path, name)
     assert calls == [
-        "https://data.commoncrawl.org/" + name,
         "https://huggingface.co/buckets/commoncrawl/commoncrawl/resolve/" + name,
+        "https://data.commoncrawl.org/" + name,
     ]
     assert delays == [5]
     assert digest == hashlib.sha256(path.read_bytes()).hexdigest()

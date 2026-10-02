@@ -339,14 +339,14 @@ def download_wet(cache: Path, name: str):
         return path, file_sha256(path)
     partial = path.with_suffix(".partial")
     endpoints = (
-        "https://data.commoncrawl.org/",
         "https://huggingface.co/buckets/commoncrawl/commoncrawl/resolve/",
+        "https://data.commoncrawl.org/",
     )
     for attempt in range(6):
         try:
             digest = hashlib.sha256()
             with requests.get(
-                endpoints[attempt % 2] + name, stream=True, timeout=(30, 120)
+                endpoints[attempt % 2] + name, stream=True, timeout=(20, 30)
             ) as download:
                 download.raise_for_status()
                 with partial.open("wb") as target:
@@ -498,7 +498,7 @@ def commoncrawl(directory: Path, budget: int, *, cpu_workers: int = 3):
                 "compressed_bytes": path.stat().st_size,
                 "tokenizer_json_sha256": stats["tokenizer_sha256"],
                 "download_policy": (
-                    "Common Crawl HTTPS; official Hugging Face bucket on retry; "
+                    "official Hugging Face bucket; Common Crawl HTTPS on retry; "
                     "complete compressed-file SHA-256 recorded"
                 ),
             },

@@ -167,7 +167,9 @@ original order and alone owns global deduplication and SQLite commits. Worker
 completion order therefore cannot change corpus ordering or duplicate winners.
 Regression tests verify the serial and worker paths produce identical shards.
 Transient download failures use six attempts with 5/10/20/40/40-second delays,
-alternating Common Crawl HTTPS and its official Hugging Face bucket mirror.
+alternating the official Hugging Face bucket mirror and Common Crawl HTTPS.
+Prefer the mirror after observed original-server 503s and stalled reads; connect
+and individual read timeouts are 20 and 30 seconds, respectively.
 The source inventory, ordering and compressed-file hashes remain recorded.
 A 65,327,358-byte source was verified byte-identical between both endpoints
 (SHA-256 `4478f942c7139afc50d6521951a404093c51fe3b01151e98d71a491087d97741`).
