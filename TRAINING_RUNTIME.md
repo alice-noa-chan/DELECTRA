@@ -56,6 +56,10 @@ model/optimizer tensors on CPU and preserve XLA device RNG state separately.
 XLA synchronization advances its device seed even without random work. Snapshot
 reads therefore do not synchronize; checkpoint saving synchronizes first, and
 resume drains loading before restoring the saved next-step seed.
+Device conversion explicitly restores the vocabulary head/input-embedding
+alias before constructing AdamW. XLA otherwise replaces the two references with
+independent parameters. Divergent legacy input/output checkpoint weights are
+rejected rather than silently merged; affected pilots remain archived.
 
 Strict `--resume` still rejects specification changes. `--resume --migrate`
 allows device, precision, attention/loss kernel, fused optimizer, host thread

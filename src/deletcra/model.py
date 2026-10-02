@@ -114,6 +114,26 @@ class CausalElectra(nn.Module):
                     layer.attention.self, self.attention_backend
                 )
 
+    def _apply(self, fn, recurse=True):
+        # XLA conversion creates new Parameter objects for each module and can
+        # break the input/output alias. Retie before an optimizer is constructed.
+        super()._apply(fn, recurse=recurse)
+        self.lm_head.weight = self.electra.embeddings.word_embeddings.weight
+        return self
+
+    def load_state_dict(self, state_dict, strict=True, assign=False):
+        table = "electra.embeddings.word_embeddings.weight"
+        head = "lm_head.weight"
+        if table in state_dict and head in state_dict:
+            if not torch.equal(state_dict[table], state_dict[head]):
+                raise ValueError(
+                    "checkpoint has divergent input/output weights; "
+                    "cannot resume it as the tied DELECTRA model"
+                )
+        result = super().load_state_dict(state_dict, strict=strict, assign=assign)
+        self.lm_head.weight = self.electra.embeddings.word_embeddings.weight
+        return result
+
     def share_generator_embeddings(self, generator: "CausalElectra") -> None:
         """Tie token/position embeddings and retie the generator vocabulary head.
 

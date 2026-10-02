@@ -76,3 +76,30 @@ def test_sharing_without_a_generator_fails_before_creating_output(tmp_path):
             tmp_path / "invalid",
         )
     assert not (tmp_path / "invalid").exists()
+
+
+def test_parameter_replacing_conversion_preserves_the_vocabulary_alias():
+    model = CausalElectra(ModelConfig(vocab_size=8))
+    count = sum(p.numel() for p in model.parameters())
+    previous = torch.__future__.get_overwrite_module_params_on_conversion()
+    try:
+        # Reproduce XLA's replacement behavior on CPU without requiring a TPU.
+        torch.__future__.set_overwrite_module_params_on_conversion(True)
+        model.double()
+    finally:
+        torch.__future__.set_overwrite_module_params_on_conversion(previous)
+    assert model.lm_head.weight is model.electra.embeddings.word_embeddings.weight
+    assert sum(p.numel() for p in model.parameters()) == count
+    tokens = synthetic_sequences(2, 6, 8, seed=1)
+    causal_lm_loss(model(tokens).lm_logits, tokens, tokens.ne(0)).backward()
+    assert model.electra.embeddings.word_embeddings.weight.grad.abs().sum() > 0
+
+
+def test_checkpoint_loading_rejects_divergent_weights_and_retains_assign_alias():
+    model = CausalElectra(ModelConfig(vocab_size=8))
+    saved = {name: tensor.clone() for name, tensor in model.state_dict().items()}
+    model.load_state_dict(saved, assign=True)
+    assert model.lm_head.weight is model.electra.embeddings.word_embeddings.weight
+    saved["lm_head.weight"] += 1
+    with pytest.raises(ValueError, match="divergent input/output weights"):
+        model.load_state_dict(saved)
