@@ -51,6 +51,11 @@ def audit_corpus(directory: Path) -> dict:
                     targets = np.frombuffer(raw_labels, dtype="<i4").reshape(-1, length)
                     if np.any(ids < 0) or np.any(ids >= vocab):
                         raise ValueError("invalid token ID")
+                    visible_mask = ids != metadata["pad_token_id"]
+                    if np.any(ids[:, 0] != metadata["bos_token_id"]):
+                        raise ValueError("instruction sequence must start with BOS")
+                    if np.any(visible_mask[:, 1:] & ~visible_mask[:, :-1]):
+                        raise ValueError("instruction padding must be on the right")
                     active = targets != -100
                     if np.any(targets[active] != ids[active]):
                         raise ValueError("supervised label differs from token")
@@ -58,7 +63,7 @@ def audit_corpus(directory: Path) -> dict:
                         active & (ids == metadata["pad_token_id"])
                     ):
                         raise ValueError("BOS or padding is supervised")
-                    visible += int(np.count_nonzero(ids != metadata["pad_token_id"]))
+                    visible += int(np.count_nonzero(visible_mask))
                     supervised += int(np.count_nonzero(active))
             if (
                 token_hash.hexdigest() != entries["tokens"]["sha256"]

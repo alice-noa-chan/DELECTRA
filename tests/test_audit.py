@@ -65,6 +65,7 @@ def test_audit_checks_sft_labels_even_when_hashes_match(tmp_path):
         "sequence_length": 4,
         "vocab_size": 10,
         "pad_token_id": 0,
+        "bos_token_id": 1,
         "splits": {"train": split},
     }
     write_json(tmp_path / "metadata.json", metadata)
@@ -74,4 +75,34 @@ def test_audit_checks_sft_labels_even_when_hashes_match(tmp_path):
     split["labels"]["sha256"] = file_sha256(labels_path)
     write_json(tmp_path / "metadata.json", metadata)
     with pytest.raises(ValueError, match="differs"):
+        audit_corpus(tmp_path)
+
+
+@pytest.mark.parametrize("ids", [[3, 4, 2, 0], [1, 0, 4, 2]])
+def test_sft_audit_rejects_bad_bos_or_interior_padding(tmp_path, ids):
+    tokens, labels = tmp_path / "tokens.bin", tmp_path / "labels.bin"
+    tokens.write_bytes(np.array(ids, dtype="<i4").tobytes())
+    labels.write_bytes(np.array([-100, -100, -100, -100], dtype="<i4").tobytes())
+    write_json(
+        tmp_path / "metadata.json",
+        {
+            "status": "complete",
+            "kind": "assistant-only-sft",
+            "sequence_length": 4,
+            "vocab_size": 10,
+            "pad_token_id": 0,
+            "bos_token_id": 1,
+            "splits": {
+                "train": {
+                    "examples": 1,
+                    "visible_positions": 3,
+                    "padded_compute_positions": 4,
+                    "assistant_targets": 0,
+                    "tokens": {"path": tokens.name, "sha256": file_sha256(tokens)},
+                    "labels": {"path": labels.name, "sha256": file_sha256(labels)},
+                }
+            },
+        },
+    )
+    with pytest.raises(ValueError, match="BOS|right"):
         audit_corpus(tmp_path)
