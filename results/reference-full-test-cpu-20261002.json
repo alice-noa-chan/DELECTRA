@@ -1,0 +1,17 @@
+{
+  "nll": 1.757636979864384,
+  "perplexity": 5.798718702958276,
+  "supervised_targets": 1597830,
+  "blocks": 6266,
+  "full_split": true,
+  "seconds": 980.780999999959,
+  "split": "test",
+  "selection": false,
+  "provenance": {
+    "model": "nickypro/tinyllama-15M",
+    "revision": "a97e01fa7d54c088df9dc1b53d581a863ce08cd6",
+    "reference_pretraining_overlap": "unknown"
+  },
+  "purpose": "frozen full-partition scoring",
+  "note": "Full partition coverage alone does not establish release quality."
+}

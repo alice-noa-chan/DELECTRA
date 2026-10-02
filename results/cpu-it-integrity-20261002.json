@@ -1,0 +1,27 @@
+{
+  "corpus": "data\\instructions-short-256",
+  "metadata_sha256": "647328ca16989876a145282a9276c1c8c5f42ceb60ebc4a56c72161de5845c5c",
+  "status": "verified",
+  "all_token_files_checked": true,
+  "splits": {
+    "train": {
+      "examples": 57336,
+      "visible_positions": 11750284,
+      "input_positions": 14678016,
+      "assistant_targets": 3243864
+    },
+    "validation": {
+      "examples": 531,
+      "visible_positions": 109951,
+      "input_positions": 135936,
+      "assistant_targets": 29796
+    },
+    "test": {
+      "examples": 585,
+      "visible_positions": 120346,
+      "input_positions": 149760,
+      "assistant_targets": 32099
+    }
+  },
+  "note": "Data integrity alone is not model training or quality evidence."
+}

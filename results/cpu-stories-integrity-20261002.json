@@ -1,0 +1,33 @@
+{
+  "corpus": "data\\tinystories-full-256",
+  "metadata_sha256": "eebbde315c0582819c6f0de6dac7b82754486d01ee3b8b90717e2c1312166ac2",
+  "status": "verified",
+  "all_token_files_checked": true,
+  "splits": {
+    "train": {
+      "documents": 1799248,
+      "content_tokens": 431917550,
+      "prediction_targets": 433716240,
+      "input_positions": 435417088,
+      "blocks": 1700848,
+      "dropped_tail_tokens": 558
+    },
+    "validation": {
+      "documents": 8314,
+      "content_tokens": 1859742,
+      "prediction_targets": 1867875,
+      "input_positions": 1875200,
+      "blocks": 7325,
+      "dropped_tail_tokens": 181
+    },
+    "test": {
+      "documents": 7075,
+      "content_tokens": 1590974,
+      "prediction_targets": 1597830,
+      "input_positions": 1604096,
+      "blocks": 6266,
+      "dropped_tail_tokens": 219
+    }
+  },
+  "note": "Data integrity alone is not model training or quality evidence."
+}
