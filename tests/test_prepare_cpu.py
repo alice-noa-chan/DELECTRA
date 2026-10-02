@@ -61,3 +61,15 @@ def test_content_partition_and_quality_filters():
     assert quality_reason("The book", "eng") == "length"
     # A repetitive fixture fails; language tags alone are insufficient.
     assert quality_reason(text * 100, "eng") == "repetition"
+
+
+def test_prefetch_preserves_order_and_download_path_guard(tmp_path, monkeypatch):
+    from deletcra.prepare_cpu import download_wet, prefetched_wet
+
+    monkeypatch.setattr(
+        "deletcra.prepare_cpu.download_wet", lambda cache, name: (cache / name, name)
+    )
+    result = list(prefetched_wet(["third", "first", "second"], tmp_path, workers=2))
+    assert [name for name, _ in result] == ["third", "first", "second"]
+    with pytest.raises(ValueError, match="unexpected crawl"):
+        download_wet(tmp_path, "../unrelated")

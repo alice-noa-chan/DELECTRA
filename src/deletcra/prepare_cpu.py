@@ -13,7 +13,8 @@ import re
 import sqlite3
 import time
 import unicodedata
-from collections import Counter
+from collections import Counter, deque
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pyarrow.parquet as pq
@@ -280,6 +281,51 @@ def stories(directory: Path):
     prep.complete()
 
 
+def download_wet(cache: Path, name: str):
+    """Cache one complete source download, retaining its exact-byte hash."""
+    if not name.startswith("crawl-data/CC-MAIN-2026-39/") or ".." in name:
+        raise ValueError("unexpected crawl source path")
+    cache.mkdir(exist_ok=True)
+    path = cache / (hashlib.sha256(name.encode()).hexdigest() + ".wet.gz")
+    if path.exists():
+        return path, file_sha256(path)
+    partial = path.with_suffix(".partial")
+    for attempt in range(3):
+        try:
+            digest = hashlib.sha256()
+            with requests.get(
+                "https://data.commoncrawl.org/" + name, stream=True, timeout=(30, 120)
+            ) as download:
+                download.raise_for_status()
+                with partial.open("wb") as target:
+                    for chunk in download.iter_content(1024 * 1024):
+                        target.write(chunk)
+                        digest.update(chunk)
+            partial.replace(path)
+            return path, digest.hexdigest()
+        except requests.RequestException:
+            if attempt == 2:
+                raise
+            time.sleep(2**attempt)
+
+
+def prefetched_wet(paths, cache: Path, *, workers: int = 4):
+    """Overlap up to four source downloads without changing processing order."""
+    pending = deque()
+    iterator = iter(paths)
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for name in iterator:
+            pending.append((name, pool.submit(download_wet, cache, name)))
+            if len(pending) == workers:
+                break
+        while pending:
+            name, future = pending.popleft()
+            yield name, future.result()
+            next_name = next(iterator, None)
+            if next_name is not None:
+                pending.append((next_name, pool.submit(download_wet, cache, next_name)))
+
+
 def commoncrawl(directory: Path, budget: int):
     from warcio.archiveiterator import ArchiveIterator
 
@@ -312,21 +358,13 @@ def commoncrawl(directory: Path, budget: int):
         },
     )
     (directory / "wet.paths.txt").write_bytes(inventory)
-    for name in paths:
+    completed = {unit["source"]["id"] for unit in prep.manifest["units"]}
+    remaining_paths = [name for name in paths if name not in completed]
+    for name, (path, digest) in prefetched_wet(
+        remaining_paths, directory / "downloads"
+    ):
         if prep.manifest["counts"].get("train_content_tokens", 0) >= budget:
             break
-        if any(unit["source"]["id"] == name for unit in prep.manifest["units"]):
-            continue
-        path = directory / "current-source.wet.gz"
-        digest = hashlib.sha256()
-        with requests.get(
-            "https://data.commoncrawl.org/" + name, stream=True, timeout=(30, 120)
-        ) as download:
-            download.raise_for_status()
-            with path.open("wb") as target:
-                for chunk in download.iter_content(1024 * 1024):
-                    target.write(chunk)
-                    digest.update(chunk)
 
         def rows(path=path):
             with path.open("rb") as archive:
@@ -347,12 +385,14 @@ def commoncrawl(directory: Path, budget: int):
         prep.unit(
             {
                 "id": name,
-                "sha256": digest.hexdigest(),
+                "sha256": digest,
                 "compressed_bytes": path.stat().st_size,
             },
             rows(),
             web_budget=budget,
         )
+        # Shards and source hashes are durable. Retain only pending raw sources.
+        path.unlink()
     if prep.manifest["counts"].get("train_content_tokens", 0) < budget:
         raise RuntimeError("crawl exhausted before the requested content-token budget")
     prep.complete()
