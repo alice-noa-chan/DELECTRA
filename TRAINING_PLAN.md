@@ -159,6 +159,14 @@ or at least twenty words. This may discard useful headings or poetry and is not
 a learned quality classifier. Changed cleaning is a changed preparation identity;
 never resume it into the earlier token files or present that baseline as complete.
 
+An additional twelve-block CPU inspection still finds shopping copy, forms,
+name indexes, cookie/newsletter boilerplate and disclaimers in prose-v1.
+[Recorded content audit](results/cpu-base-content-audit-20261002.json).
+These are qualitative observations of an incomplete prefix, not a full-corpus
+quality score. Even when the target token count and integrity checks pass, this
+candidate requires a data-quality decision before paid full training. Improved
+extraction/filtering or a curated source remains a separate preparation identity.
+
 Fresh-corpus processing overlaps four downloads and up to three local CPU source
 workers (`--cpu-workers 3`, adjustable from one to four). Worker subprocesses
 import the tokenizer/Arrow/text code without Torch, use two tokenizer threads,

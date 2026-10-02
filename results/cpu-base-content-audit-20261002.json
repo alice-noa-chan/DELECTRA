@@ -1,0 +1,96 @@
+{
+  "corpus": "data\\base-2026-39-prose-256",
+  "purpose": "qualitative inspection of an incomplete candidate corpus",
+  "complete_corpus": false,
+  "sampling": "12 random blocks from an earlier committed prefix; seed 23; fixed indices recorded below",
+  "method": "read decoded prefixes and record qualitative observations; no learned quality score",
+  "sample_count": 12,
+  "blocks": [
+    {
+      "train_block": 151751,
+      "source_shard": "train-00007.bin",
+      "block_in_shard": 9348,
+      "token_block_sha256": "e62fcc1cccf700a864a532c5a65449455734ee81dc45cda518b79038b8f61f95",
+      "observation": "technical pipe-restraint prose"
+    },
+    {
+      "train_block": 2932516,
+      "source_shard": "train-00146.bin",
+      "block_in_shard": 11657,
+      "token_block_sha256": "31f5f583f395255283ca021caf0bfd821f80f87d40e4ad30fe0c0765e1c3a0ff",
+      "observation": "shopping descriptions and payment boilerplate"
+    },
+    {
+      "train_block": 1784801,
+      "source_shard": "train-00088.bin",
+      "block_in_shard": 13404,
+      "token_block_sha256": "4654fa078beb4ced03e4b004de75e4293a21349940d89a8b03c8089d30ca1dac",
+      "observation": "travel prose with newsletter/cookie boilerplate"
+    },
+    {
+      "train_block": 2710760,
+      "source_shard": "train-00135.bin",
+      "block_in_shard": 6771,
+      "token_block_sha256": "05de7acb5737f9cc2ddacfe45fbfd70d382d6c9e65d3a545245bb662808291fd",
+      "observation": "site introduction and health prose"
+    },
+    {
+      "train_block": 1113684,
+      "source_shard": "train-00054.bin",
+      "block_in_shard": 17906,
+      "token_block_sha256": "4fa6592527c9c0ca25cafb581b4618564dff17f5e1fe4d00dd725c797461dce4",
+      "observation": "form address fields and concatenated country names"
+    },
+    {
+      "train_block": 543642,
+      "source_shard": "train-00026.bin",
+      "block_in_shard": 10368,
+      "token_block_sha256": "d0f11da181ea09ccee286814005455e0854207dca898481e85026c987ea44f6b",
+      "observation": "consumer advice prose"
+    },
+    {
+      "train_block": 2560867,
+      "source_shard": "train-00127.bin",
+      "block_in_shard": 15927,
+      "token_block_sha256": "516680d00e7795463f37ca6e9ae417c203e4a2ab5963b1f88a8e4e1641cd5905",
+      "observation": "technical sealing prose with marketing tags"
+    },
+    {
+      "train_block": 480522,
+      "source_shard": "train-00023.bin",
+      "block_in_shard": 7753,
+      "token_block_sha256": "89282beb7b0edadd98e964af7f8087b5f80bf4dd413e389e91c1f35fbe006032",
+      "observation": "counseling prose"
+    },
+    {
+      "train_block": 507633,
+      "source_shard": "train-00024.bin",
+      "block_in_shard": 14290,
+      "token_block_sha256": "10f7c2ea87a7a61ac8e0227d3eb9aaf7c5ff025391c5c78e7f8625e0cd1ccbb5",
+      "observation": "concatenated name index"
+    },
+    {
+      "train_block": 2760995,
+      "source_shard": "train-00137.bin",
+      "block_in_shard": 17835,
+      "token_block_sha256": "ba298cdc17764dd7f9104faaf4698d80b0e6a784aa54a1388174e7ae18e16a0a",
+      "observation": "television discussion prose"
+    },
+    {
+      "train_block": 2785618,
+      "source_shard": "train-00139.bin",
+      "block_in_shard": 2966,
+      "token_block_sha256": "ea42487607fae456cbb5912d7eef7a1714f86293d74d68b0d557f0fbe0a0f5f1",
+      "observation": "coupon promotion prose"
+    },
+    {
+      "train_block": 3606654,
+      "source_shard": "train-00180.bin",
+      "block_in_shard": 10599,
+      "token_block_sha256": "65a899aff2bceb2698a2ae5a342e3e8ae244c57e25662f1def48017bb16e98e0",
+      "observation": "copyright disclaimer followed by workplace prose"
+    }
+  ],
+  "limitation": "Not a representative full-corpus quality estimate. Commercial, form and index boilerplate survives prose-v1. Integrity and target token count are insufficient for approving full training.",
+  "next_gate": "Review improved extraction/filtering or a curated source before selecting paid full-training data."
+}

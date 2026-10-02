@@ -37,6 +37,16 @@ cleaned text to the baseline. Exact deduplication and crawl language annotations
 remain a transparent baseline; near-duplicate removal and learned text-quality
 classification are not implemented.
 
+A qualitative inspection of twelve random blocks from an incomplete committed
+prefix found readable technical/general prose alongside shopping copy, forms,
+name indexes, newsletter/cookie text and disclaimers. Fixed block indices,
+source shards and token hashes are recorded in
+[the content audit](results/cpu-base-content-audit-20261002.json). This is not a
+representative full-corpus quality estimate. It does show that prose-v1 still
+retains boilerplate. Completion of the 3.3B-token candidate and its integrity
+audit must not be treated as approval for paid full training: review improved
+extraction/filtering or a curated source before selecting the final Base data.
+
 Source revisions, licenses, partition rules and resumable commands are in
 [TRAINING_PLAN.md](TRAINING_PLAN.md). Ignored local data retains source SHA-256
 manifests and pinned upstream dataset cards where available.
@@ -93,7 +103,7 @@ packing/count alignment and, for IT, unshifted supervised-label alignment:
 The production implementation includes shuffled complete-pass coverage,
 token-based warmup/cosine scheduling, exact optimizer/RNG checkpoints,
 assistant-only loss and a frozen evaluator. Ruff passes and the CPU suite has
-181 passing tests. GPU-only FlashAttention/Liger behavior still needs a bounded
+183 passing tests. GPU-only FlashAttention/Liger behavior still needs a bounded
 real-corpus GPU pilot after the user chooses the budget.
 
 A later focused run exposed a transient Windows sharing lock during checkpoint
@@ -102,7 +112,8 @@ previous backup is copied, retries brief sharing locks, and atomically replaces
 latest at the end. Injected permanent failure leaves both old copies readable.
 
 Complete and audit the remaining Base data first. Then choose the production
-recipe and actual epoch/input allowances, measure the prepared loader with the
+data quality recipe and actual epoch/input allowances, measure the prepared
+loader with the
 chosen GPU, compare joint self replacement against the separate-generator
 reference and CLM control, and complete independent generation evaluation.
 No Hugging Face model publication has taken place during this CPU work.
