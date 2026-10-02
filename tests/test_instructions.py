@@ -42,6 +42,8 @@ def test_instruction_rejects_long_and_unfinished_conversations():
     assert encode_conversation(messages[:1], Tokenizer())[1] == "unfinished"
     messages[-1]["content"] = "<think>secret reasoning</think>answer"
     assert encode_conversation(messages, Tokenizer())[1] == "reasoning_or_empty"
+    assert encode_conversation([None], Tokenizer())[1] == "schema"
+    assert encode_conversation([{}], Tokenizer())[1] == "unfinished"
 
 
 def test_response_loss_matches_shifted_cross_entropy_and_ignores_prompts():

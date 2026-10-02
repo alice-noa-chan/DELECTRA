@@ -32,7 +32,13 @@ def encode_conversation(messages, tokenizer, *, context: int = 256):
     predict labels[t+1]. Reject long conversations intact rather than truncating
     a reply. Padding is always invisible and has label -100.
     """
-    if not messages or messages[-1]["role"] != "assistant":
+    if (
+        not isinstance(messages, list)
+        or not messages
+        or any(not isinstance(message, dict) for message in messages)
+    ):
+        return None, "schema"
+    if messages[-1].get("role") != "assistant":
         return None, "unfinished"
     ids, labels = [tokenizer.bos_token_id], [-100]
     previous = None
