@@ -49,6 +49,9 @@ the authorized history cleanup and experiment source-hash correspondence.
 | `objectives.py` | Predict next tokens, sample replacements, and compute losses |
 | `losses.py` | Optional Liger vocabulary loss with original ELECTRA weights |
 | `data.py` | Pack separate dataset splits into BOS-prefixed token blocks |
+| `corpus.py`, `prepare_cpu.py`, `web_source.py` | Prepare resumable CPU corpora and read disk shards |
+| `instructions.py`, `training.py`, `production.py` | Prepare masked SFT examples and run budgeted training with exact resume |
+| `audit.py`, `evaluation.py` | Verify every prepared token file and score frozen models |
 | `experiment.py` | Train, validate, measure throughput, and save checkpoints |
 | `metrics.py` | Compute RTD ranking metrics with explicit tie handling |
 | `benchmark.py` | Score reference and candidate models on the same token targets |

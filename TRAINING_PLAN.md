@@ -129,6 +129,18 @@ loads only selected blocks, adding the same BOS prefix as the pilot.
 Use the identical command to resume. A corpus is ready only when its metadata
 status is `complete` and shard checks pass. Temporary downloads and token data
 are local, ignored Git artifacts; no GPU or provider allocation is involved.
+Run the full CPU integrity audit after preparation:
+
+```powershell
+.venv/Scripts/python -m deletcra.audit --data data/tinystories-full-256 --output results/cpu-stories-integrity-20261002.json
+.venv/Scripts/python -m deletcra.audit --data data/base-2026-39-prose-256 --output results/cpu-base-integrity-20261002.json
+.venv/Scripts/python -m deletcra.audit --data data/instructions-short-256 --output results/cpu-it-integrity-20261002.json
+```
+
+The audit scans every token with bounded memory, verifies SHA-256 and count
+alignment, and checks unshifted supervised SFT labels against their input tokens.
+It rejects incomplete corpora. Data integrity alone does not establish quality.
+
 Common Crawl source files are SHA-256 ordered. English-only crawl annotations,
 simple prose-quality checks and normalized exact document deduplication are a
 transparent baseline, not near-duplicate filtering or FineWeb-quality evidence.
