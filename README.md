@@ -335,6 +335,10 @@ unverified. The temporary Pod is stopped and its results are preserved locally.
 with free Colab TPU access, official CLI constraints, and the XLA changes and
 correctness checks required before quoting TPU training time.
 
+[COLAB.md](COLAB.md) records WSL CLI installation, authenticated free T4/v5e1
+hardware checks, the 15M T4 joint-training resume check, and remaining work for
+TPU-to-GPU checkpoint handoff. Both verification runtimes are no longer active.
+
 ## Licenses and attribution
 
 New code in this repository is [MIT-licensed](LICENSE). Original Google Research

@@ -1,0 +1,23 @@
+{
+  "status": "passed",
+  "scope": "15m_synthetic_joint_fp32_and_same_device_resume",
+  "device": "cuda",
+  "model_parameters": 15041505,
+  "state": {
+    "step": 4,
+    "input_positions": 1024,
+    "prediction_targets": 1020,
+    "assistant_targets": 0,
+    "active_wall_seconds": 5.858496656000057,
+    "best_validation_nll": 10.436033725738525,
+    "best_validation_step": 4
+  },
+  "model_maximum_absolute_error": 0.0,
+  "model_and_optimizer_tolerance": {
+    "rtol": 1e-05,
+    "atol": 1e-06
+  },
+  "production_throughput_measured": false,
+  "quality_evaluated": false,
+  "cross_device_resume_verified": false
+}

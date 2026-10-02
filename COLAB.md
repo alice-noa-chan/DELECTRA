@@ -22,14 +22,42 @@ Follow the printed Google URL and paste its authorization code into that
 terminal. Never put authorization codes, token files or CLI session metadata
 in Git or research logs. Login succeeded: the account initially had 0.00 CU,
 zero active assignments and zero usage rate. A free T4 allocation subsequently
-succeeded; a v5e1 request timed out after 120 seconds with no observed assignment.
-That timeout does not prove permanent TPU ineligibility.
+succeeded. The first v5e1 request timed out after 120 seconds, and immediate
+inventory showed no assignment. It subsequently appeared as a delayed TPU
+allocation. Recovering its exact endpoint into local CLI session state allowed
+the hardware check without issuing another allocation or exposing credentials.
+
+## Measured verification results
+
+| Check | Result | Scope |
+| --- | --- | --- |
+| Colab T4 | FP32 and FP16 matrix gradients passed; native BF16 unavailable | Actual CUDA hardware |
+| T4 DELECTRA | 15,041,505 parameters; four synthetic joint RTD/CLM FP32 steps; interrupted resume matched weights with zero maximum error and matched Adam moments/data cursor | 1,024 input positions; no language-quality or throughput claim |
+| Colab v5e1 | One XLA TPU device; FP32 and native BF16 matrix gradients passed | Hardware only; no DELECTRA training or handoff verified |
+
+The T4 image used Python 3.13.15 and Torch 2.11.0+cu130. Transformers was pinned
+to 4.57.6 before the model check. The TPU image already provided Torch 2.9.0+cpu,
+Torch/XLA 2.9.0 and libtpu 0.0.21.1; those packages were not replaced.
+
+The T4 report and resumable synthetic checkpoint were downloaded and verified
+against remote SHA-256 and byte counts before an explicit stop. The checkpoint
+is retained privately at `runs/colab-t4-verification-20261002/latest.pt`. The TPU
+session disappeared before its report could be downloaded or the project
+installed. Its successful hardware result is preserved from CLI stdout, without
+claiming a verified downloaded artifact. The cause of termination is unknown.
+Final server inventory showed zero assignments, zero CU usage rate and 0.00 CU
+balance. No paid hardware was allocated or compute units purchased.
+
+[The verification record](results/colab-free-access-verification-20261002.json)
+links individual reports, provenance, export hashes and limitations. CLI host
+package versions are in [the WSL environment record](results/colab-cli-wsl-20261002.json).
 
 ## Bounded verification
 
 Use `colab sessions` and `colab usage` to inspect actual allocation and account
-status. Avoid allocating another runtime while a previous request has an
-unknown outcome. A displayed compute-unit hourly rate is not a dollar invoice;
+status. After a timeout, recheck server inventory and recover any observed
+assignment before retrying the same hardware request. An initially empty list
+does not rule out a delayed assignment. A displayed CU hourly rate is not a dollar invoice;
 record balance and rate separately. No paid plan or compute units were bought.
 
 `src/deletcra/runtime_probe.py` can run before DELECTRA is installed. It reports

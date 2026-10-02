@@ -1,0 +1,28 @@
+{
+  "status": "passed",
+  "scope": "accelerator_forward_backward_only",
+  "measured_at_utc": "2026-10-02T04:10:33.739883+00:00",
+  "python": "3.13.15",
+  "system": "Linux",
+  "requested_device": "cuda",
+  "actual_device": "cuda",
+  "accelerator": {
+    "name": "Tesla T4",
+    "total_memory_bytes": 15637086208,
+    "device_count": 1
+  },
+  "native_bf16": false,
+  "checks": {
+    "fp32": {
+      "status": "passed",
+      "matmul_dtype": "torch.float32"
+    }
+  },
+  "packages": {
+    "torch": "2.11.0+cu130",
+    "torch-xla": null,
+    "transformers": "5.17.0",
+    "google-colab": "1.0.0"
+  },
+  "delectra_training_verified": false
+}

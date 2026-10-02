@@ -1,0 +1,63 @@
+{
+  "source_commit": "70e84462c70e47c29487aa19033dfd10f7486d68",
+  "wheel_sha256": "a27369fb76c48d89a025120a09e4f6400fd624e2749ae67c1acd2d408e432adb",
+  "cli_version": "0.7.4",
+  "host": "Ubuntu 26.04 on WSL2",
+  "authentication": "User completed the official OAuth flow in their local terminal.",
+  "credentials_exported": false,
+  "initial_account": {
+    "compute_unit_balance": 0.0,
+    "compute_unit_rate_per_hour": 0.0,
+    "active_assignments": 0
+  },
+  "tpu_request": {
+    "hardware": "v5e1",
+    "initial_cli_result": "ReadTimeout after 120 seconds",
+    "immediate_inventory": "No active assignments observed",
+    "subsequent_inventory": "Delayed V5E1 assignment appeared after the T4 check",
+    "recovery": "Recovered the exact observed endpoint into local CLI session state using the installed CLI State and SessionState APIs, without issuing another allocation or exporting proxy tokens.",
+    "hardware_probe": "passed_fp32_and_bf16_on_one_xla_tpu_device",
+    "probe_evidence": "colab-v5e1-runtime-probe-20261002.json",
+    "delectra_training_verified": false,
+    "export": "CLI stdout captured; report download failed and the next execution returned lost session 404/401.",
+    "termination": "Backend inventory subsequently confirmed no active assignments; reason unknown."
+  },
+  "gpu_request": {
+    "hardware": "T4",
+    "allocation": "Session READY with zero compute-unit balance",
+    "displayed_compute_unit_rate_per_hour": 1.07,
+    "native_bf16": false,
+    "hardware_probe": "passed_fp32_and_fp16",
+    "probe_evidence": "colab-t4-runtime-probe-20261002.json",
+    "initial_environment_evidence": "colab-t4-runtime-probe-initial-20261002.json",
+    "environment_change": "Pinned Transformers 4.57.6 instead of the image's 5.17.0; retained Torch 2.11.0+cu130.",
+    "trainer_check": "15M FP32 joint RTD/CLM, four synthetic updates, interrupted versus uninterrupted training",
+    "training_evidence": "colab-t4-training-verification-20261002.json",
+    "model_maximum_absolute_error": 0.0,
+    "optimizer_moments_and_data_cursor": "passed",
+    "export_evidence": "colab-t4-export-hashes-20261002.json",
+    "local_checkpoint": "runs/colab-t4-verification-20261002/latest.pt",
+    "checkpoint_sha256": "7b9c9e81dd4de065d786ce843040f97bcba1cb2c67e48f0ecb1fbd3d93b887e0",
+    "report_and_checkpoint_export_hashes": "verified_against_remote_SHA256_and_byte_counts",
+    "termination": "Explicit colab stop completed after verified export"
+  },
+  "final_account": {
+    "compute_unit_balance": 0.0,
+    "compute_unit_rate_per_hour": 0.0,
+    "active_assignments": 0,
+    "sessions_output": "No active sessions found on server"
+  },
+  "paid_infrastructure_allocated": false,
+  "compute_units_purchased": false,
+  "language_quality_evaluated": false,
+  "sustained_delectra_throughput_measured": false,
+  "tpu_to_gpu_handoff_verified": false,
+  "colab_to_runpod_handoff_verified": false,
+  "limitations": [
+    "An advertised accelerator or one successful free allocation does not guarantee future quota or session duration.",
+    "Compute-unit rates are account telemetry, not dollar invoices; assignment counters briefly disagreed with session inventory during teardown.",
+    "The production trainer still excludes XLA and FP16. Matmul probes do not enable those training paths.",
+    "The T4 training check uses synthetic data and FP32; it is not a throughput, convergence, or publication-quality result.",
+    "No TPU model/objective smoke run completed: the TPU session disappeared before project installation."
+  ]
+}

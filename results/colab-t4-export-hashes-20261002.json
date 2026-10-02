@@ -1,0 +1,10 @@
+{
+  "/content/trainer-check/verification.json": {
+    "sha256": "e1eab87f5eb9a7dcb8613ec3814f563abc0985afc1501186ae7129ec8fd585d5",
+    "bytes": 616
+  },
+  "/content/trainer-check/resumed/latest.pt": {
+    "sha256": "7b9c9e81dd4de065d786ce843040f97bcba1cb2c67e48f0ecb1fbd3d93b887e0",
+    "bytes": 180650505
+  }
+}
