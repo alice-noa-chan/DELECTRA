@@ -50,6 +50,9 @@ counters, and retain actual compute positions in metrics. No corpus examples are
 dropped. AdamW uses device step counters and tensor learning rates on XLA to
 avoid changing host scalar constants at every step. Checkpoints materialize all
 model/optimizer tensors on CPU and preserve XLA device RNG state separately.
+XLA synchronization advances its device seed even without random work. Snapshot
+reads therefore do not synchronize; checkpoint saving synchronizes first, and
+resume drains loading before restoring the saved next-step seed.
 
 Strict `--resume` still rejects specification changes. `--resume --migrate`
 allows device, precision, attention/loss kernel, fused optimizer, host thread

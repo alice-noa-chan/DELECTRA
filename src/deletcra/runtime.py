@@ -70,7 +70,9 @@ class TrainingRuntime:
             return None
         import torch_xla.core.xla_model as xm
 
-        self.synchronize()
+        # Reading the seed must not introduce a new XLA step: sync advances
+        # the device RNG even when there are no pending random operations.
+        # The checkpoint writer synchronizes before taking this snapshot.
         return xm.get_rng_state(self.device)
 
     def restore_rng(self, state):
@@ -79,4 +81,6 @@ class TrainingRuntime:
 
             if state is None:
                 raise ValueError("XLA resume requires saved device RNG state")
+            # Drain model/optimizer loading before restoring the next-step seed.
+            self.synchronize()
             xm.set_rng_state(state, self.device)

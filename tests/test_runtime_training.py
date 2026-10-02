@@ -1,4 +1,6 @@
+import sys
 from copy import deepcopy
+from types import ModuleType, SimpleNamespace
 
 import pytest
 import torch
@@ -49,3 +51,28 @@ def test_cpu_runtime_clips_then_updates_and_serializes_optimizer():
 def test_fp16_requires_cuda():
     with pytest.raises(ValueError, match="FP16 requires CUDA"):
         ProductionPlan(max_input_positions=16, warmup_positions=0, precision="fp16")
+
+
+def test_xla_rng_snapshot_does_not_advance_the_step(monkeypatch):
+    # Model the observed XLA behavior: every sync advances its device seed.
+    device_state = {"seed": 7}
+    module = ModuleType("torch_xla.core.xla_model")
+    module.get_rng_state = lambda device: device_state["seed"]
+    module.set_rng_state = lambda state, device: device_state.update(seed=state)
+    package = ModuleType("torch_xla")
+    core = ModuleType("torch_xla.core")
+    package.core = core
+    core.xla_model = module
+    for name, value in (
+        ("torch_xla", package),
+        ("torch_xla.core", core),
+        ("torch_xla.core.xla_model", module),
+    ):
+        monkeypatch.setitem(sys.modules, name, value)
+    runtime = TrainingRuntime("cpu", "fp32", 7)
+    runtime.xla = SimpleNamespace(
+        sync=lambda **kwargs: device_state.update(seed=device_state["seed"] + 1)
+    )
+    assert runtime.rng_state() == runtime.rng_state() == 7
+    runtime.restore_rng(42)
+    assert runtime.rng_state() == runtime.rng_state() == 42
