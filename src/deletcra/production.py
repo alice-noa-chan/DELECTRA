@@ -20,7 +20,7 @@ def main():
     parser.add_argument("--warmup-positions", type=int, default=10_000_000)
     parser.add_argument("--batch-size", type=int, default=256)
     parser.add_argument("--device", choices=["cpu", "cuda"], default="cpu")
-    parser.add_argument("--precision", choices=["fp32", "bf16"], default="fp32")
+    parser.add_argument("--precision", choices=["fp32", "bf16", "fp16"], default="fp32")
     parser.add_argument(
         "--attention", choices=["eager", "sdpa", "flash"], default="sdpa"
     )

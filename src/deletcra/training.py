@@ -22,6 +22,7 @@ from deletcra.corpus import atomic_replace, file_sha256, write_json
 from deletcra.losses import response_lm_loss
 from deletcra.model import CausalElectra
 from deletcra.objectives import ObjectiveConfig, pretraining_step
+from deletcra.runtime import TrainingRuntime
 
 
 @dataclass(frozen=True)
@@ -66,10 +67,16 @@ class ProductionPlan:
                 raise ValueError(f"{key} must be finite and positive")
         if not math.isfinite(self.weight_decay) or self.weight_decay < 0:
             raise ValueError("weight decay must be finite and nonnegative")
-        if self.device not in {"cpu", "cuda"} or self.precision not in {"fp32", "bf16"}:
+        if self.device not in {"cpu", "cuda"} or self.precision not in {
+            "fp32",
+            "bf16",
+            "fp16",
+        }:
             raise ValueError("unsupported device or precision")
         if self.precision == "bf16" and self.device != "cuda":
             raise ValueError("BF16 requires CUDA")
+        if self.precision == "fp16" and self.device != "cuda":
+            raise ValueError("FP16 requires CUDA")
         if self.fused_optimizer and self.device != "cuda":
             raise ValueError("fused optimizer requires CUDA")
         if self.max_wall_seconds is not None and (
@@ -191,6 +198,7 @@ class ProductionTrainer:
         torch.manual_seed(plan.seed)
         random.seed(plan.seed)
         np.random.seed(plan.seed)
+        self.runtime = TrainingRuntime(plan.device, plan.precision, plan.seed)
         self.model = CausalElectra(model_config).to(plan.device)
         self.generator = None
         if (
@@ -223,6 +231,8 @@ class ProductionTrainer:
             "active_wall_seconds": 0.0,
             "best_validation_nll": None,
             "best_validation_step": None,
+            "optimizer_updates": 0,
+            "skipped_updates": 0,
         }
         if initialize_from is not None and not resume:
             source = torch.load(initialize_from, map_location="cpu", weights_only=True)
@@ -238,6 +248,10 @@ class ProductionTrainer:
                 self.generator.load_state_dict(saved["generator"])
             self.optimizer.load_state_dict(saved["optimizer"])
             self.state = saved["state"]
+            self.state.setdefault("optimizer_updates", self.state["step"])
+            self.state.setdefault("skipped_updates", 0)
+            if saved.get("grad_scaler"):
+                self.runtime.scaler.load_state_dict(saved["grad_scaler"])
             self.sampler = EpochSampler(
                 len(train),
                 plan.seed + 2,
@@ -271,11 +285,7 @@ class ProductionTrainer:
             self.save()
 
     def _autocast(self):
-        return torch.autocast(
-            self.plan.device,
-            dtype=torch.bfloat16,
-            enabled=self.plan.precision == "bf16",
-        )
+        return self.runtime.autocast()
 
     def _loss(self, corpus, indices, *, evaluation: bool = False):
         tokens = corpus.batch(indices).to(self.plan.device)
@@ -309,6 +319,7 @@ class ProductionTrainer:
                 rng=self.noise,
                 special_token_ids=(self.model.config.bos_token_id, 2),
                 backward_clean=self.plan.sequential_backward and not evaluation,
+                clean_backward=self.runtime.backward,
             )
             return (
                 output.loss,
@@ -383,6 +394,7 @@ class ProductionTrainer:
             if self.plan.device == "cuda"
             else [],
             "noise_rng": self.noise.get_state(),
+            "grad_scaler": self.runtime.scaler.state_dict(),
         }
         target = self.directory / filename
         temporary = target.with_suffix(".tmp")
@@ -439,11 +451,12 @@ class ProductionTrainer:
             loss, record, tokens, mask = self._loss(self.train, indices)
             if not torch.isfinite(loss):
                 raise RuntimeError("nonfinite production loss")
-            loss.backward()
-            torch.nn.utils.clip_grad_norm_(
-                self.parameters, self.plan.max_grad_norm, error_if_nonfinite=True
+            self.runtime.backward(loss)
+            updated = self.runtime.step(
+                self.optimizer, self.parameters, self.plan.max_grad_norm
             )
-            self.optimizer.step()
+            self.state["optimizer_updates"] += int(updated)
+            self.state["skipped_updates"] += int(not updated)
             self.state["step"] += 1
             self.state["input_positions"] += tokens.numel()
             self.state["prediction_targets"] += int((mask[:, 1:] & mask[:, :-1]).sum())
@@ -455,6 +468,7 @@ class ProductionTrainer:
                 input_positions=self.state["input_positions"],
                 epoch=self.sampler.epoch,
                 epoch_offset=self.sampler.offset,
+                optimizer_step_skipped=not updated,
             )
             if self.state["step"] % self.plan.evaluate_every == 0:
                 metrics = self.evaluate(self.validation, self.plan.validation_blocks)

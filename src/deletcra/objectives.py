@@ -1,6 +1,7 @@
 """Shifted causal generation, replacement labels, and three learning objectives."""
 
 import math
+from collections.abc import Callable
 from dataclasses import dataclass
 
 import torch
@@ -194,6 +195,7 @@ def pretraining_step(
     rng: torch.Generator | None = None,
     special_token_ids: tuple[int, ...] = (),
     backward_clean: bool = False,
+    clean_backward: Callable[[Tensor], None] | None = None,
 ) -> PretrainingOutput:
     """Compute losses without updating parameters; optionally backpropagate clean CLM.
 
@@ -254,7 +256,11 @@ def pretraining_step(
         if backward_clean:
             if not torch.isfinite(lm_loss):
                 raise RuntimeError("nonfinite clean CLM loss")
-            (settings.lm_weight * lm_loss).backward()
+            weighted = settings.lm_weight * lm_loss
+            if clean_backward is None:
+                weighted.backward()
+            else:
+                clean_backward(weighted)
             # The caller backpropagates returned loss to accumulate RTD gradients,
             # then clips/updates ONCE. Detaching prevents a second CLM backward.
             lm_loss = lm_loss.detach()
