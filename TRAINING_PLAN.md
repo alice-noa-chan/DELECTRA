@@ -10,6 +10,14 @@ the publishable models. No pilot upload is authorized by this plan.
 | DELECTRA-15M-Base | Recent English data, joint RTD+CLM pretraining | Not yet trained |
 | DELECTRA-15M-IT | Instruction tuning from the evaluated Base checkpoint | Not yet trained |
 
+Local CPU preparation and execution checks are complete, including a 3.3B-token
+fresh-web candidate, full pinned stories and short instruction examples. These
+are data/readiness checks and tiny archived prototypes; none completes the
+planned release training. The fresh-web sample still retains boilerplate and
+needs a quality-recipe review before selecting paid full-training data.
+See [CPU_READINESS.md](CPU_READINESS.md) for actual counts, integrity evidence,
+exact resume checks, Base-to-IT execution and the complete reference test score.
+
 Base is the non-instruction-tuned checkpoint. IT is derived from that same Base;
 it does not repeat a second independent full pretraining run. CLM-only remains an
 internal control for RTD research, not a fourth primary release. A generator is

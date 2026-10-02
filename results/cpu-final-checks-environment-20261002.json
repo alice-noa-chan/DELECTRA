@@ -1,0 +1,26 @@
+{
+  "source_commit": "ef02932c3a7de9ddfe1ee86fa183a36638e4d200",
+  "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+  "packages": {
+    "torch": "2.14.1",
+    "torchvision": "0.29.1+cpu",
+    "transformers": "4.57.6",
+    "tokenizers": "0.22.2",
+    "numpy": "2.4.6",
+    "pyarrow": "21.0.0",
+    "datasets": "4.8.5",
+    "huggingface-hub": "0.36.2",
+    "warcio": "1.8.1",
+    "requests": "2.34.2",
+    "fsspec": "2026.2.0",
+    "ruff": "0.16.9",
+    "pytest": "9.1.1"
+  },
+  "torch_build": "2.14.1+cpu",
+  "torchvision_build": "0.29.1+cpu",
+  "cuda_available": false,
+  "dependency_check": "passed: no broken requirements found",
+  "data_extra_aligned": true,
+  "system_packages_modified": false,
+  "note": "datasets 4.8.5 matches the declared data extra and lock. A compatible torchvision CPU wheel is installed locally to resolve inherited shared-system metadata conflict. Original measured CPU execution environment is preserved separately."
+}

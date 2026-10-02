@@ -1,0 +1,28 @@
+{
+  "nll": 10.300079822540283,
+  "perplexity": 29734.992280782786,
+  "supervised_targets": 1020,
+  "blocks": 4,
+  "full_split": false,
+  "seconds": 0.45300000021234155,
+  "rtd": {
+    "tp": 0,
+    "tn": 864,
+    "fp": 0,
+    "fn": 154,
+    "accuracy": 0.8487229862475442,
+    "precision": null,
+    "recall": 0.0,
+    "replacement_rate": 0.1512770137524558
+  },
+  "split": "test",
+  "selection": false,
+  "provenance": {
+    "checkpoint": "runs\\cpu-base-check\\latest.pt",
+    "sha256": "f8bfbe7af6760e7534a3d7e82e7cb7f72dc851c35145180fab61ae6d31dd2a32",
+    "training_step": 3,
+    "best_validation_step": 2
+  },
+  "purpose": "bounded diagnostic",
+  "note": "Full partition coverage alone does not establish release quality."
+}

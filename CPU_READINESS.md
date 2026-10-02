@@ -10,7 +10,7 @@ training and quality evaluation before publication.
 | Corpus | Current evidence | Training data |
 | --- | --- | --- |
 | Full pinned TinyStories | Complete; every file audited | 1,799,248 unique documents; 431,917,550 content tokens |
-| September 2026 Common Crawl, prose-v1 | Preparation in progress | Target: at least 3,300,000,000 distinct content tokens |
+| September 2026 Common Crawl, prose-v1 | Complete candidate; every file audited | 2,793,278 unique train documents; 3,300,005,330 content tokens |
 | Short non-reasoning SmolTalk2 subset | Complete; every token/label file audited | 57,336 examples; 3,243,864 assistant targets |
 
 TinyStories scans **2,141,709 official rows**, rejects 230 empty records and
@@ -36,6 +36,16 @@ The initial navigation-heavy web baseline is preserved separately at
 cleaned text to the baseline. Exact deduplication and crawl language annotations
 remain a transparent baseline; near-duplicate removal and learned text-quality
 classification are not implemented.
+
+The final Base candidate scans 660 WET sources and 13,976,463 conversion records.
+Every seen record is accounted for by accepted documents, exclusions, exact
+duplicates or unused final-source candidates. The normalized document-hash
+database contains 2,850,355 unique documents across all three partitions.
+The final document exceeds the 3.3B content target by 5,330 tokens. One train
+pass has 3,302,720,475 next-token targets and **3,315,672,320 nominal input
+positions**, after inserting record separators and discarding 78,133 train-tail
+tokens. Thus the accepted 16.4B-position budget would be about 4.95 passes.
+[Preparation counts and source identity](results/cpu-preparation-summary-20261002.json).
 
 A qualitative inspection of twelve random blocks from an incomplete committed
 prefix found readable technical/general prose alongside shopping copy, forms,
@@ -79,6 +89,24 @@ scores and source hashes are recorded separately:
 These deliberately short runs establish execution and resume behavior. Their
 poor generation scores do not establish the quality of a fully trained model.
 
+After Base preparation completes, a separate actual-data chain loads all Base
+shards through the production mmap reader and runs three joint steps: 1,536
+input positions and 1,530 targets. A new SFT run loads that checkpoint and runs
+three response-only steps, 1,536 padded positions and 504 assistant targets.
+The initialization fingerprint matches, the ELECTRA discriminator-head tensors
+are preserved during SFT, and the backbone tensors change through optimization.
+A real 15,041,505-parameter generation call verifies the encoded prompt is
+preserved and the optional EOS path executes. The random early prototype does
+not reach EOS in the sixteen-token diagnostic; the separate controlled batch
+test verifies EOS stopping and right padding.
+[Base-to-IT execution record](results/cpu-base-it-execution-20261002.json).
+
+Frozen four-block diagnostic scores are also retained:
+[Base](results/cpu-base-diagnostic-test-20261002.json),
+[IT from the CPU Base checkpoint](results/cpu-base-it-diagnostic-test-20261002.json).
+These three-step checkpoints remain private in `runs/cpu-base-check` and
+`runs/cpu-base-it-check`; they are not the planned trained Base/IT releases.
+
 ## Frozen reference on the complete new story test split
 
 The pinned `nickypro/tinyllama-15M` revision
@@ -95,25 +123,36 @@ Perplexity and full partition coverage alone do not establish story quality.
 
 ## Verification and remaining decisions
 
-The complete TinyStories and IT scans verify file SHA-256, all token ID ranges,
+The complete TinyStories, Base and IT scans verify file SHA-256, all token ID ranges,
 packing/count alignment and, for IT, unshifted supervised-label alignment:
 [TinyStories audit](results/cpu-stories-integrity-20261002.json),
+[Base audit](results/cpu-base-integrity-20261002.json),
 [IT audit](results/cpu-it-integrity-20261002.json).
 
 The production implementation includes shuffled complete-pass coverage,
 token-based warmup/cosine scheduling, exact optimizer/RNG checkpoints,
 assistant-only loss and a frozen evaluator. Ruff passes and the CPU suite has
-183 passing tests. GPU-only FlashAttention/Liger behavior still needs a bounded
+185 passing tests. GPU-only FlashAttention/Liger behavior still needs a bounded
 real-corpus GPU pilot after the user chooses the budget.
+
+The execution environment is recorded in
+[the original CPU environment](results/cpu-verification-environment-20261002.json).
+Its initially inherited `datasets` 5.0.1 was outside the declared data-extra
+range; pinned-Parquet preparation did not use its dataset loader. The local
+environment is subsequently aligned to `datasets` 4.8.5, matching `uv.lock`.
+A shared-system `torchvision` dependency conflict is resolved by installing the
+compatible CPU wheel into this project's virtual environment. System packages
+are preserved. Final dependency checks and CPU tests are rerun after alignment.
+[Final environment](results/cpu-final-checks-environment-20261002.json).
 
 A later focused run exposed a transient Windows sharing lock during checkpoint
 rotation. Saving now keeps the existing latest checkpoint readable while its
 previous backup is copied, retries brief sharing locks, and atomically replaces
 latest at the end. Injected permanent failure leaves both old copies readable.
 
-Complete and audit the remaining Base data first. Then choose the production
-data quality recipe and actual epoch/input allowances, measure the prepared
-loader with the
+All three candidate corpora are now complete and audited. Review the Base
+quality recipe before choosing production data and actual epoch/input
+allowances, then measure the prepared loader with the
 chosen GPU, compare joint self replacement against the separate-generator
 reference and CLM control, and complete independent generation evaluation.
 No Hugging Face model publication has taken place during this CPU work.

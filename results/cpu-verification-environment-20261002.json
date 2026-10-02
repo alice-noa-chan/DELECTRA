@@ -1,0 +1,32 @@
+{
+  "source_commit": "ef02932c3a7de9ddfe1ee86fa183a36638e4d200",
+  "scope": "final corpus integrity and Base-to-IT CPU execution checks",
+  "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+  "platform": "Windows",
+  "architecture": "AMD64",
+  "cuda_available": false,
+  "packages": {
+    "torch": "2.14.1",
+    "transformers": "4.57.6",
+    "tokenizers": "0.22.2",
+    "numpy": "2.4.6",
+    "pyarrow": "21.0.0",
+    "datasets": "5.0.1",
+    "huggingface-hub": "0.36.2",
+    "warcio": "1.8.1",
+    "requests": "2.34.2",
+    "ruff": "0.16.9",
+    "pytest": "9.1.1"
+  },
+  "cpu_training": {
+    "threads": 2,
+    "precision": "fp32",
+    "attention": "sdpa",
+    "batch_size": 2,
+    "context": 256
+  },
+  "final_web_preparation": {
+    "source_workers": 4,
+    "tokenizer_threads_per_worker": 2
+  }
+}

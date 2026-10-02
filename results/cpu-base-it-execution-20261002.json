@@ -1,0 +1,71 @@
+{
+  "base_checkpoint_sha256": "f8bfbe7af6760e7534a3d7e82e7cb7f72dc851c35145180fab61ae6d31dd2a32",
+  "it_checkpoint_sha256": "e8e559613020fafb7d663217ad56719d4f202a77c2de8762ebc2778d47c47d06",
+  "parameter_count": 15041505,
+  "base_training": {
+    "step": 3,
+    "input_positions": 1536,
+    "prediction_targets": 1530,
+    "assistant_targets": 0,
+    "active_wall_seconds": 3.905999999959022,
+    "best_validation_nll": 10.293656826019287,
+    "best_validation_step": 2
+  },
+  "it_training": {
+    "step": 3,
+    "input_positions": 1536,
+    "prediction_targets": 1268,
+    "assistant_targets": 504,
+    "active_wall_seconds": 1.8439999998081475,
+    "best_validation_nll": 10.135670870542526,
+    "best_validation_step": 2
+  },
+  "initialization_fingerprint_verified": true,
+  "rtd_head_preserved_during_sft": true,
+  "backbone_updated_during_sft": true,
+  "generation": {
+    "prompt": "Write a short friendly greeting.",
+    "prefix_token_ids": [
+      1,
+      4911,
+      29901,
+      13,
+      14350,
+      263,
+      3273,
+      19780,
+      1395,
+      15133,
+      29889,
+      4007,
+      22137,
+      29901,
+      13
+    ],
+    "new_token_ids": [
+      13,
+      13,
+      13,
+      13,
+      13,
+      13,
+      13,
+      13,
+      13,
+      13,
+      13,
+      13,
+      13,
+      13,
+      13,
+      13
+    ],
+    "eos_token_id": 2,
+    "reached_eos": false,
+    "prefix_preserved": true,
+    "max_new_tokens": 16
+  },
+  "quality_claim": false,
+  "published": false,
+  "note": "Three Base steps followed by three SFT steps verify the actual data and checkpoint path. This is an execution prototype, not a planned training release or meaningful instruction quality evidence."
+}

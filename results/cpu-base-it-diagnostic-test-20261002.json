@@ -1,0 +1,18 @@
+{
+  "nll": 10.137674609666625,
+  "perplexity": 25277.61776059063,
+  "supervised_targets": 518,
+  "blocks": 4,
+  "full_split": false,
+  "seconds": 0.1720000000204891,
+  "split": "test",
+  "selection": false,
+  "provenance": {
+    "checkpoint": "runs\\cpu-base-it-check\\latest.pt",
+    "sha256": "e8e559613020fafb7d663217ad56719d4f202a77c2de8762ebc2778d47c47d06",
+    "training_step": 3,
+    "best_validation_step": 2
+  },
+  "purpose": "bounded diagnostic",
+  "note": "Full partition coverage alone does not establish release quality."
+}
