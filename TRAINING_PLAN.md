@@ -189,9 +189,38 @@ CLM/joint PPL 41.87/47.27 does not meet the target.
    original ELECTRA Apache 2.0 NOTICE/license. No placeholder weights or pilot
    checkpoints should be uploaded as completed models.
 
-The current custom evaluation checkpoints require the deletcra loader and are
-not ready-made AutoModelForCausalLM repositories. Native Hub-compatible export
-and IT training are still implementation work, not completed capabilities.
+The current custom checkpoints require the deletcra loader and are not ready-made
+AutoModelForCausalLM repositories. Native Hub-compatible export remains pending.
+The production trainer now supports assistant-only instruction loss; an actual
+IT model still requires an evaluated Base initialization and completed tuning.
+
+## Production trainer and local verification
+
+`deletcra.production` reads completed mmap corpora. It shuffles every block once
+per epoch, including the last partial batch, and records nominal input positions
+separately from valid next-token and assistant targets. A token-based warmup and
+cosine schedule replaces the pilot's fixed learning rate. Atomic checkpoints
+include model/generator, optimizer, sampler epoch/offset, corruption RNG, Python,
+NumPy, CPU and CUDA RNG states, and a data/configuration fingerprint. Changed
+resume settings are rejected. Two rolling checkpoint generations are retained.
+CPU tests compare interrupted and uninterrupted dropout training bit-for-bit for
+CLM, self joint and separate-generator joint objectives. This does not establish
+bitwise CUDA determinism or production-loader GPU throughput.
+
+Run an intentionally bounded CPU diagnostic after preparation:
+
+```powershell
+.venv/Scripts/python -m deletcra.production --data data/tinystories-full-256 --output runs/cpu-production-check --max-input-positions 3072 --warmup-positions 1024 --batch-size 2 --checkpoint-every 2 --evaluate-every 2 --validation-blocks 4 --pause-after-steps 3
+```
+
+Use the same arguments plus `--resume` and omit `--pause-after-steps` to finish
+that diagnostic. Its tiny budget verifies execution and resume, not language
+quality. Instruction data uses `--mode clm --generator separate`; actual IT must
+initialize from the evaluated Base checkpoint with `--initialize-from`.
+The trainer never allocates cloud resources. Its wall-clock limit includes
+validation and checkpoint work, but process exit alone does not stop provider
+GPU/storage billing. Independent final-test scoring remains separate from
+checkpoint selection, and a completed token budget never authorizes publication.
 
 ## Conditional compute estimate
 
