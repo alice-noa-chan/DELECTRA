@@ -26,6 +26,7 @@ REPETITIONS = 3
 WARMUP = 20
 MEASURED = 100
 BASE_TARGETS = 16_400_000_000
+GPU_CAPABILITIES = {"RTX A5000": (8, 6), "RTX 3090": (8, 6), "RTX 4090": (8, 9)}
 
 
 def validate_device(
@@ -35,13 +36,13 @@ def validate_device(
     expected: str = "RTX A5000",
 ) -> None:
     """Reject another GPU instead of attaching the requested device's price."""
-    if expected not in ("RTX A5000", "RTX 3090"):
+    if expected not in GPU_CAPABILITIES:
         raise ValueError("unsupported budget GPU")
     canonical = name.removeprefix("NVIDIA ").removeprefix("GeForce ")
     if canonical != expected:
         raise ValueError(f"expected {expected}, received {name}")
-    if memory < 22 * 2**30 or capability != (8, 6):
-        raise ValueError("expected a 24GB Ampere GPU")
+    if memory < 22 * 2**30 or capability != GPU_CAPABILITIES[expected]:
+        raise ValueError(f"expected a 24GB {expected} with its native capability")
 
 
 def summarize(rows: list[dict], hourly_price: float) -> list[dict]:
@@ -125,7 +126,7 @@ def main() -> None:
     parser.add_argument("--data-dir", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--hourly-price", type=float, required=True)
-    parser.add_argument("--gpu", choices=("RTX A5000", "RTX 3090"), default="RTX A5000")
+    parser.add_argument("--gpu", choices=tuple(GPU_CAPABILITIES), default="RTX A5000")
     args = parser.parse_args()
     if not math.isfinite(args.hourly_price) or args.hourly_price <= 0:
         parser.error("hourly price must be finite and positive")

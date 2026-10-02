@@ -82,3 +82,15 @@ def test_device_guard_does_not_accept_a_different_or_small_gpu():
     ):
         with pytest.raises(ValueError):
             validate_device(name, memory, capability)
+
+
+def test_4090_guard_requires_the_requested_ada_device():
+    validate_device("NVIDIA GeForce RTX 4090", 24 * 2**30, (8, 9), "RTX 4090")
+    for name, memory, capability in (
+        ("NVIDIA GeForce RTX 3090", 24 * 2**30, (8, 6)),
+        ("NVIDIA GeForce RTX 4090", 24 * 2**30, (8, 6)),
+        ("NVIDIA GeForce RTX 4090", 16 * 2**30, (8, 9)),
+        ("NVIDIA L40S", 48 * 2**30, (8, 9)),
+    ):
+        with pytest.raises(ValueError):
+            validate_device(name, memory, capability, "RTX 4090")

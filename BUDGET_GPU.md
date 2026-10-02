@@ -1,5 +1,30 @@
 # Budget GPU measurement
 
+## Planned matched RTX 4090 measurement: October 2, 2026
+
+The benchmark now accepts the exact RTX 4090 device with Ada capability 8.9.
+It preserves the RTX 3090 protocol: the pinned 10M-target cache, BF16, native
+FlashAttention, self RTD/CLM, Liger 0.8.4, sequential backward, fused AdamW,
+context 256, batches 64/128/256 and three rotating repetitions per batch.
+Each trial uses 20 warmup and 100 measured optimizer updates. Device mismatch,
+non-finite gradients or incorrect kernel dispatch fail the measurement.
+
+The requested run is a bounded throughput comparison, not full training. The
+process has a 900-second deadline; provider uptime, setup and transfer costs are
+recorded separately. Use a new result destination and preserve all existing
+pilots. Export and verify the results before releasing the temporary GPU.
+The intended allocation is one Runpod RTX 4090 at the observed $0.34/GPU-hour
+plus its quoted temporary disk cost, with no persistent volume or automatic
+retry. Limit the measurement session to $0.50; do not start full training.
+Recheck the actual quote and stock before allocation. No RTX 4090 throughput
+result is established by this plan.
+
+```sh
+python -m deletcra.budget_benchmark --gpu 'RTX 4090' \
+  --data-dir data/tinystories-gpu-profile-256-10m-100k \
+  --output results/runpod-4090-20261002.json --hourly-price 0.34
+```
+
 The current Runpod console offers one RTX A5000 at $0.16/GPU-hour on October 1,
 2026. This is a live offer, not a guaranteed future rate. The public pricing
 page previously listed $0.27/hour. Container storage and startup add costs.
