@@ -3,7 +3,7 @@ import torch
 from transformers import ElectraForPreTraining
 
 from deletcra import ModelConfig
-from deletcra.model import CausalElectra, electra_config
+from deletcra.model import CausalElectra, DecoderOutput, electra_config
 
 
 def test_future_tokens_cannot_change_prefix_outputs():
@@ -66,6 +66,30 @@ def test_generation_preserves_prefix_excludes_special_tokens_and_restores_mode()
     assert torch.equal(generated[:, :2], prefix)
     assert not torch.isin(generated[:, 2:], torch.tensor([0, 1])).any()
     assert model.training
+
+
+def test_generation_stops_each_row_at_eos_and_masks_completed_padding(monkeypatch):
+    model = CausalElectra(ModelConfig())
+    calls = []
+    choices = [[2, 3], [4, 4], [5, 2]]
+
+    def forward(tokens, mask, **kwargs):
+        assert not kwargs["compute_rtd"]
+        assert kwargs["logits_to_keep"] == 1
+        calls.append(mask.clone())
+        logits = torch.full((2, 1, 32), -10.0)
+        for row, token in enumerate(choices[len(calls) - 1]):
+            logits[row, 0, token] = 10
+        return DecoderOutput(None, None, logits)
+
+    monkeypatch.setattr(model, "forward", forward)
+    result = model.generate(torch.tensor([[1, 7], [1, 8]]), 5, eos_token_id=2)
+    assert result.tolist() == [[1, 7, 2, 0, 0], [1, 8, 3, 4, 2]]
+    assert len(calls) == 3
+    assert calls[-1].tolist() == [[True, True, True, False], [True] * 4]
+    assert model.training
+    with pytest.raises(ValueError, match="EOS"):
+        model.generate(torch.tensor([[1, 7]]), 1, eos_token_id=0)
 
 
 @pytest.mark.parametrize("mask", [[[0, 1, 1]], [[1, 0, 1]], [[1, 2, 1]], [[1, 1]]])

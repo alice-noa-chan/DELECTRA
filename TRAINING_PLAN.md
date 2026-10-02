@@ -105,6 +105,10 @@ malformed, unfinished, reasoning-bearing, unknown-token and over-context records
 it does not truncate replies. Role markers use ordinary existing vocabulary IDs,
 so vocabulary size stays 32,000. Assistant content/EOS is supervised; prompts,
 role markers and padding use label -100. Shift labels exactly once in the loss.
+Pass `eos_token_id=tokenizer.eos_token_id` to `model.generate` for instruction
+replies. Finished batch rows receive right padding while other rows finish;
+generation stops once every row produces EOS. Omitting this argument preserves
+the existing fixed-length story diagnostic behavior.
 Hash-assigned document partitions keep duplicate conversations in one split.
 This is an auditable candidate subset, not a trained IT model or a claim of
 2026 instruction-data freshness. Preserve component licenses before release.

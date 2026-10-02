@@ -188,8 +188,20 @@ class CausalElectra(nn.Module):
         )
 
     @torch.no_grad()
-    def generate(self, prefix: Tensor, max_new_tokens: int = 8) -> Tensor:
-        """Greedy generation; useful only after training the vocabulary head."""
+    def generate(
+        self,
+        prefix: Tensor,
+        max_new_tokens: int = 8,
+        *,
+        eos_token_id: int | None = None,
+    ) -> Tensor:
+        """Greedy generation with optional EOS stopping for instruction replies.
+
+        Return [batch, prefix + generated] IDs. Completed rows get right padding
+        while other rows finish; stop when all rows produce EOS. Without an EOS
+        ID, preserve the original fixed-length behavior. The LM head needs
+        training before these tokens can be useful completions.
+        """
         if max_new_tokens < 0:
             raise ValueError("max_new_tokens must be nonnegative")
         if prefix.ndim != 2 or prefix.shape[1] < 1:
@@ -198,19 +210,38 @@ class CausalElectra(nn.Module):
             raise ValueError("generation requires unpadded prefixes")
         if prefix.shape[1] + max_new_tokens > self.config.max_position_embeddings:
             raise ValueError("generation would exceed max_position_embeddings")
+        if eos_token_id is not None and (
+            isinstance(eos_token_id, bool)
+            or not isinstance(eos_token_id, int)
+            or not 0 <= eos_token_id < self.config.vocab_size
+            or eos_token_id in {self.config.pad_token_id, self.config.bos_token_id}
+        ):
+            raise ValueError("EOS must be a vocabulary ID distinct from PAD and BOS")
         was_training = self.training
         self.eval()
         try:
             tokens = prefix.clone()
+            finished = torch.zeros(len(prefix), dtype=torch.bool, device=prefix.device)
             for _ in range(max_new_tokens):
                 logits = (
-                    self(tokens, compute_rtd=False, logits_to_keep=1)
+                    self(
+                        tokens,
+                        tokens.ne(self.config.pad_token_id),
+                        compute_rtd=False,
+                        logits_to_keep=1,
+                    )
                     .lm_logits[:, -1]
                     .clone()
                 )
                 special_ids = [self.config.pad_token_id, self.config.bos_token_id]
                 logits[:, special_ids] = -torch.inf
-                tokens = torch.cat((tokens, logits.argmax(-1, keepdim=True)), dim=1)
+                next_ids = logits.argmax(-1, keepdim=True)
+                next_ids[finished] = self.config.pad_token_id
+                tokens = torch.cat((tokens, next_ids), dim=1)
+                if eos_token_id is not None:
+                    finished |= next_ids[:, 0].eq(eos_token_id)
+                    if finished.all():
+                        break
             return tokens
         finally:
             self.train(was_training)
