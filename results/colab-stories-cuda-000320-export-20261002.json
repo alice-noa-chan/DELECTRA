@@ -1,0 +1,84 @@
+{
+  "archive": "stories-cuda-000320.tar",
+  "archive_bytes": 217630720,
+  "archive_sha256": "b88e47c94a7c07e723355ca0f3d030175e7e178dc606cf90df3e183f560e1bfc",
+  "checkpoint_sha256": "c3ff585d1a3b3e877c8fb5c0011b32f70485112acfdc97860a588ea35f92f2e9",
+  "state": {
+    "step": 320,
+    "input_positions": 1310720,
+    "prediction_targets": 1305600,
+    "assistant_targets": 0,
+    "active_wall_seconds": 291.72764821400006,
+    "best_validation_nll": 4.120145916938782,
+    "best_validation_step": 320,
+    "optimizer_updates": 320,
+    "skipped_updates": 0
+  },
+  "sampler": {
+    "epoch": 0,
+    "offset": 5120
+  },
+  "spec": {
+    "model": {
+      "vocab_size": 32000,
+      "embedding_size": 288,
+      "hidden_size": 288,
+      "num_layers": 6,
+      "num_heads": 6,
+      "intermediate_size": 1024,
+      "max_positions": 256,
+      "dropout": 0.1,
+      "pad_token_id": 0,
+      "bos_token_id": 1,
+      "attention_backend": "sdpa"
+    },
+    "objective": {
+      "mode": "joint",
+      "generator_mode": "self",
+      "lm_loss_backend": "torch",
+      "replacement_probability": 0.15,
+      "temperature": 1.0,
+      "generator_weight": 1.0,
+      "rtd_weight": 5.0,
+      "lm_weight": 1.0
+    },
+    "plan": {
+      "max_input_positions": 435417088,
+      "batch_size": 16,
+      "learning_rate": 0.0003,
+      "warmup_positions": 1048576,
+      "min_lr_ratio": 0.1,
+      "weight_decay": 0.01,
+      "max_grad_norm": 1.0,
+      "seed": 7,
+      "device": "cuda",
+      "precision": "fp16",
+      "cpu_threads": 2,
+      "checkpoint_every": 64,
+      "evaluate_every": 64,
+      "validation_blocks": 128,
+      "max_wall_seconds": 3600,
+      "sequential_backward": true,
+      "fused_optimizer": true,
+      "share_embeddings": true
+    },
+    "corpus_manifest_sha256": "d1a76e9642c789933e50509adc02ed83604d98f63e38902efb5cdd8a1472a7dd",
+    "initialize_from_sha256": null
+  },
+  "environment": {
+    "python": "3.13.15",
+    "torch": "2.11.0+cu130",
+    "transformers": "4.57.6",
+    "device": "cuda",
+    "name": "Tesla T4",
+    "peak_allocated_bytes": 2123208704
+  },
+  "code_commit": "c51a60a",
+  "wheel_sha256": "e82834f3840a48debf7beba1fe47f6f92de6d437ba02026eac080fa12e7c8ac5",
+  "test_split_used": false,
+  "full_corpus_trained": false,
+  "published": false,
+  "local_archive": "runs/stories-cuda-000320-20261002.tar",
+  "local_checkpoint": "runs/colab-stories-cuda-000320-20261002/stories-training/latest.pt",
+  "locally_verified": true
+}

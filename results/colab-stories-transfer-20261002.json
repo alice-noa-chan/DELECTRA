@@ -1,0 +1,7 @@
+{
+  "archive_sha256": "782b739915380f997816d4df0df21875a18d27316163c2be02e8cee51901b54b",
+  "archive_bytes": 217610240,
+  "source_checkpoint_sha256": "33094c47cbb32b3800ac1fd99c4d9bc8d5423a84f61ba3db6b81d5d5fdd33f61",
+  "source_step": 256,
+  "source_input_positions": 1048576
+}

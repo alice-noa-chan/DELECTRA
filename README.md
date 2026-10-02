@@ -342,6 +342,12 @@ explains fixed-shape XLA objectives, shared-weight/RNG handling and explicit
 execution migration. Current work excludes Runpod; full training and release
 quality remain outstanding.
 
+[COLAB_TRAINING.md](COLAB_TRAINING.md) records the subsequent real-data partial
+run: 1,048,576 input positions on free TPU, then the same amount on free T4 with
+model/Adam/cursor continuation. Its full-corpus shuffle window preserves the
+one-pass schedule for later resume. The loss improves, while frozen RTD recall
+and repetitive generation remain weak; this checkpoint is not a finished model.
+
 ## Licenses and attribution
 
 New code in this repository is [MIT-licensed](LICENSE). Original Google Research

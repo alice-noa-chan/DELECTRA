@@ -47,3 +47,62 @@ replacement is rented. Reports distinguish requested from reached stop steps.
 The plan, corpus provenance and cache fingerprints are in
 [the training-window record](results/colab-stories-window-plan-20261002.json).
 This partial run remains private and cannot be published as a finished model.
+
+## Measured partial-training result
+
+Both requested phases completed. The TPU applied updates 1–256 and the T4
+continued updates 257–512 after an exact model/Adam/cursor transfer. No updates
+were skipped. The run consumed 2,097,152 input positions, 2,088,960 next-token
+targets and 8,192 distinct global blocks in epoch zero: approximately 0.482% of
+the first full pass. This is block coverage, not a claim about unique word types
+or completed stories. The final and selected-best weights both come from step
+512; the full working schedule still has 433,319,936 positions remaining.
+
+| Checkpoint | Device | Cumulative input positions | Validation NLL |
+| --- | --- | --- | --- |
+| Initialization | TPU BF16 | 0 | 10.452616 |
+| 64 | TPU BF16 | 262,144 | 8.811468 |
+| 128 | TPU BF16 | 524,288 | 6.369901 |
+| 192 | TPU BF16 | 786,432 | 5.491644 |
+| 256 | TPU BF16 | 1,048,576 | 4.544028 |
+| 320 | T4 FP16 | 1,310,720 | 4.120146 |
+| 384 | T4 FP16 | 1,572,864 | 3.917611 |
+| 448 | T4 FP16 | 1,835,008 | 3.763245 |
+| 512 | T4 FP16 | 2,097,152 | 3.611341 |
+
+These are the same first 128 validation blocks (32,640 LM targets), not the full
+validation partition or an independent test. Native BF16/eager and FP16/SDPA
+evaluation differ across the boundary. A frozen FP32 CPU check returned
+NLL 3.611345 / PPL 37.015822 on the same blocks, confirming the loss result with
+an additional precision/backend. The nickypro full-test PPL is from a different
+partition and must not be compared directly with this limited validation score.
+
+The frozen RTD check used CPU proposals with seed 1007, actual-change labels and
+the usual logit >= 0 threshold. It returned TP 80, TN 28,400, FP 36 and FN 3,974:
+precision 68.97%, recall 1.97%, accuracy 87.66%. Always predicting original would
+already achieve 87.52% on these labels. High accuracy therefore does not show a
+useful detector, and ranking/calibration quality was not measured. Causal RTD's
+benefit over a matched CLM control remains unestablished.
+
+All three predetermined greedy prompts exhibit repetition; one changes a rabbit
+into a girl mid-continuation. These are unselected diagnostic samples rather
+than a generation-quality pass. The checkpoint remains an early research run;
+more training, RTD diagnostics and controlled comparisons are needed before any
+claim about the intended TinyStories release.
+
+Trainer active time was 279.55 seconds on TPU and another 45.82 seconds on T4,
+including in-loop compilation/validation/checkpoint overhead. This excludes
+allocation, installation, initial baseline evaluation, transfers and teardown,
+and is not a matched sustainable-throughput benchmark or full-training estimate.
+The T4 peak allocated CUDA memory was 2,123,208,704 bytes (about 1.98 GiB), which
+excludes driver/context and other process memory.
+
+Each 64-update archive and latest checkpoint was SHA-256 verified locally.
+Phase-boundary archives also preserve `best.pt`; no weights were pushed to Git
+or Hugging Face. Both runtimes were explicitly stopped after export, and final
+inventory, account assignment count and usage rate were zero with a 0.00 CU
+balance. The overall record links the recovered checkpoints and provenance:
+[partial training record](results/colab-stories-partial-training-20261002.json),
+[frozen validation](results/colab-stories-frozen-validation-20261002.json),
+[generation diagnostics](results/colab-stories-generation-20261002.json),
+[cleanup](results/colab-stories-cleanup-20261002.json).

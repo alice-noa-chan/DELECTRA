@@ -1,0 +1,26 @@
+{
+  "nll": 3.6113454550504684,
+  "perplexity": 37.01582245117444,
+  "supervised_targets": 32640,
+  "blocks": 128,
+  "full_split": false,
+  "seconds": 13.593999999808148,
+  "rtd": {
+    "tp": 80,
+    "tn": 28400,
+    "fp": 36,
+    "fn": 3974,
+    "accuracy": 0.8765774084333641,
+    "precision": 0.6896551724137931,
+    "recall": 0.01973359644795264,
+    "replacement_rate": 0.12477685441674362
+  },
+  "scope": "frozen_partial_checkpoint_on_training_validation_window",
+  "checkpoint_sha256": "463fbcc9abeb36d01937a417b046596300cb3b71a4651ae6d8bb4dab38dc9f39",
+  "checkpoint_step": 512,
+  "device": "cpu",
+  "precision": "fp32",
+  "proposal_rng_seed": 1007,
+  "independent_test": false,
+  "quality_gate_passed": false
+}

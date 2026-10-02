@@ -1,0 +1,325 @@
+{
+  "recorded_at_utc": "2026-10-02T06:16:43.858142+00:00",
+  "status": "requested_partial_training_completed",
+  "run_id": "stories-free-colab-20261002",
+  "model": "DELECTRA-15M joint self RTD/CLM",
+  "model_parameters": 15041505,
+  "initialization": "new random initialization; previous pilots preserved separately",
+  "code_commit": "c51a60afc5dd9870076bda9bd3a0d536945f3fad",
+  "export_protocol_commit": "b064f6bcc89904604b9b8b90abf204409a6c9131",
+  "wheel_sha256": "e82834f3840a48debf7beba1fe47f6f92de6d437ba02026eac080fa12e7c8ac5",
+  "plan": "colab-stories-window-plan-20261002.json",
+  "state": {
+    "step": 512,
+    "input_positions": 2097152,
+    "prediction_targets": 2088960,
+    "assistant_targets": 0,
+    "active_wall_seconds": 325.3712700100001,
+    "best_validation_nll": 3.6113409996032715,
+    "best_validation_step": 512,
+    "optimizer_updates": 512,
+    "skipped_updates": 0
+  },
+  "sampler": {
+    "epoch": 0,
+    "offset": 8192
+  },
+  "grad_scaler": {
+    "scale": 1024.0,
+    "growth_factor": 2.0,
+    "backoff_factor": 0.5,
+    "growth_interval": 2000,
+    "_growth_tracker": 256
+  },
+  "migrations": [
+    {
+      "at_step": 256,
+      "input_positions": 1048576,
+      "source_spec": {
+        "model": {
+          "vocab_size": 32000,
+          "embedding_size": 288,
+          "hidden_size": 288,
+          "num_layers": 6,
+          "num_heads": 6,
+          "intermediate_size": 1024,
+          "max_positions": 256,
+          "dropout": 0.1,
+          "pad_token_id": 0,
+          "bos_token_id": 1,
+          "attention_backend": "eager"
+        },
+        "objective": {
+          "mode": "joint",
+          "generator_mode": "self",
+          "lm_loss_backend": "torch",
+          "replacement_probability": 0.15,
+          "temperature": 1.0,
+          "generator_weight": 1.0,
+          "rtd_weight": 5.0,
+          "lm_weight": 1.0
+        },
+        "plan": {
+          "max_input_positions": 435417088,
+          "batch_size": 16,
+          "learning_rate": 0.0003,
+          "warmup_positions": 1048576,
+          "min_lr_ratio": 0.1,
+          "weight_decay": 0.01,
+          "max_grad_norm": 1.0,
+          "seed": 7,
+          "device": "xla",
+          "precision": "bf16",
+          "cpu_threads": 2,
+          "checkpoint_every": 64,
+          "evaluate_every": 64,
+          "validation_blocks": 128,
+          "max_wall_seconds": 3600,
+          "sequential_backward": true,
+          "fused_optimizer": false,
+          "share_embeddings": true
+        },
+        "corpus_manifest_sha256": "d1a76e9642c789933e50509adc02ed83604d98f63e38902efb5cdd8a1472a7dd",
+        "initialize_from_sha256": null
+      },
+      "target_spec": {
+        "model": {
+          "vocab_size": 32000,
+          "embedding_size": 288,
+          "hidden_size": 288,
+          "num_layers": 6,
+          "num_heads": 6,
+          "intermediate_size": 1024,
+          "max_positions": 256,
+          "dropout": 0.1,
+          "pad_token_id": 0,
+          "bos_token_id": 1,
+          "attention_backend": "sdpa"
+        },
+        "objective": {
+          "mode": "joint",
+          "generator_mode": "self",
+          "lm_loss_backend": "torch",
+          "replacement_probability": 0.15,
+          "temperature": 1.0,
+          "generator_weight": 1.0,
+          "rtd_weight": 5.0,
+          "lm_weight": 1.0
+        },
+        "plan": {
+          "max_input_positions": 435417088,
+          "batch_size": 16,
+          "learning_rate": 0.0003,
+          "warmup_positions": 1048576,
+          "min_lr_ratio": 0.1,
+          "weight_decay": 0.01,
+          "max_grad_norm": 1.0,
+          "seed": 7,
+          "device": "cuda",
+          "precision": "fp16",
+          "cpu_threads": 2,
+          "checkpoint_every": 64,
+          "evaluate_every": 64,
+          "validation_blocks": 128,
+          "max_wall_seconds": 3600,
+          "sequential_backward": true,
+          "fused_optimizer": true,
+          "share_embeddings": true
+        },
+        "corpus_manifest_sha256": "d1a76e9642c789933e50509adc02ed83604d98f63e38902efb5cdd8a1472a7dd",
+        "initialize_from_sha256": null
+      },
+      "rng_policy": "Preserve host and sampler state; reseed device and proposal RNG at this documented boundary.",
+      "bitwise_continuation": false
+    }
+  ],
+  "phase_input_positions": {
+    "tpu_bf16": 1048576,
+    "t4_fp16": 1048576
+  },
+  "one_pass_input_budget": 435417088,
+  "one_pass_coverage_percent": 0.4816420985296746,
+  "remaining_one_pass_input_positions": 433319936,
+  "initial_validation": {
+    "nll": 10.452616453170776,
+    "perplexity": 34634.876793620984,
+    "objective_loss": 13.999607682228088,
+    "targets": 32640,
+    "blocks": 128,
+    "full_split": false
+  },
+  "validation_curve": [
+    {
+      "step": 64,
+      "device": "xla",
+      "input_positions": 262144,
+      "validation": {
+        "nll": 8.8114675283432,
+        "perplexity": 6710.7602751810045,
+        "objective_loss": 10.928930282592773,
+        "targets": 32640,
+        "blocks": 128,
+        "full_split": false
+      },
+      "active_wall_seconds": 198.72282722799997
+    },
+    {
+      "step": 128,
+      "device": "xla",
+      "input_positions": 524288,
+      "validation": {
+        "nll": 6.3699010014534,
+        "perplexity": 584.0000108771009,
+        "objective_loss": 8.174985885620117,
+        "targets": 32640,
+        "blocks": 128,
+        "full_split": false
+      },
+      "active_wall_seconds": 225.56536128999994
+    },
+    {
+      "step": 192,
+      "device": "xla",
+      "input_positions": 786432,
+      "validation": {
+        "nll": 5.4916441440582275,
+        "perplexity": 242.65584022071064,
+        "objective_loss": 7.493014872074127,
+        "targets": 32640,
+        "blocks": 128,
+        "full_split": false
+      },
+      "active_wall_seconds": 253.0236511920001
+    },
+    {
+      "step": 256,
+      "device": "xla",
+      "input_positions": 1048576,
+      "validation": {
+        "nll": 4.544028341770172,
+        "perplexity": 94.06897989034952,
+        "objective_loss": 6.4618465304374695,
+        "targets": 32640,
+        "blocks": 128,
+        "full_split": false
+      },
+      "active_wall_seconds": 279.5539886870001
+    },
+    {
+      "step": 320,
+      "device": "cuda",
+      "input_positions": 1310720,
+      "validation": {
+        "nll": 4.120145916938782,
+        "perplexity": 61.568225455997435,
+        "objective_loss": 5.9737319350242615,
+        "targets": 32640,
+        "blocks": 128,
+        "full_split": false
+      },
+      "active_wall_seconds": 291.72764821400006
+    },
+    {
+      "step": 384,
+      "device": "cuda",
+      "input_positions": 1572864,
+      "validation": {
+        "nll": 3.9176108837127686,
+        "perplexity": 50.28017597984146,
+        "objective_loss": 5.774171948432922,
+        "targets": 32640,
+        "blocks": 128,
+        "full_split": false
+      },
+      "active_wall_seconds": 302.92023362500004
+    },
+    {
+      "step": 448,
+      "device": "cuda",
+      "input_positions": 1835008,
+      "validation": {
+        "nll": 3.763244777917862,
+        "perplexity": 43.08801042077455,
+        "objective_loss": 5.594230830669403,
+        "targets": 32640,
+        "blocks": 128,
+        "full_split": false
+      },
+      "active_wall_seconds": 314.08109915
+    },
+    {
+      "step": 512,
+      "device": "cuda",
+      "input_positions": 2097152,
+      "validation": {
+        "nll": 3.6113409996032715,
+        "perplexity": 37.01565752949945,
+        "objective_loss": 5.427974879741669,
+        "targets": 32640,
+        "blocks": 128,
+        "full_split": false
+      },
+      "active_wall_seconds": 325.3712700100001
+    }
+  ],
+  "final_validation_perplexity": 37.01565752949945,
+  "frozen_validation": "colab-stories-frozen-validation-20261002.json",
+  "rtd_majority_baseline_accuracy": 0.8752231455832564,
+  "generation_diagnostics": "colab-stories-generation-20261002.json",
+  "selected_checkpoint": {
+    "step": 512,
+    "same_weights_as_final": true
+  },
+  "checkpoint_archives": [
+    "colab-stories-xla-000064-export-20261002.json",
+    "colab-stories-xla-000128-export-20261002.json",
+    "colab-stories-xla-000192-export-20261002.json",
+    "colab-stories-xla-000256-export-20261002.json",
+    "colab-stories-cuda-000320-export-20261002.json",
+    "colab-stories-cuda-000384-export-20261002.json",
+    "colab-stories-cuda-000448-export-20261002.json",
+    "colab-stories-cuda-000512-export-20261002.json"
+  ],
+  "final_checkpoint": "runs\\colab-stories-cuda-000512-20261002\\stories-training\\latest.pt",
+  "final_checkpoint_sha256": "463fbcc9abeb36d01937a417b046596300cb3b71a4651ae6d8bb4dab38dc9f39",
+  "active_training_wall_seconds": {
+    "tpu": 279.5539886870001,
+    "t4_increment": 45.817281322999975,
+    "total": 325.3712700100001
+  },
+  "active_time_scope": "In-loop training/validation/saves; excludes allocation, installation, initial validation, transfers and teardown. Not a matched sustainable-throughput benchmark.",
+  "shuffle_audits": [
+    "colab-stories-tpu-shuffle-20261002.json",
+    "colab-stories-t4-shuffle-20261002.json"
+  ],
+  "transfer_verification": "colab-stories-transfer-verification-20261002.json",
+  "cleanup": "colab-stories-cleanup-20261002.json",
+  "tests": {
+    "ruff_format": "passed",
+    "ruff_lint": "passed",
+    "pytest_passed": 208,
+    "dependency_check": "passed"
+  },
+  "limitations": [
+    "Only 128 fixed validation blocks; no independent test or complete validation split.",
+    "Greedy samples repeat text and may change story entities.",
+    "RTD recall is 1.97% at logit >= 0; majority-class accuracy is misleading and ranking/calibration remain unmeasured.",
+    "No matched CLM control or proof of causal RTD's quality/sample-efficiency benefit.",
+    "One pass is a working resumable schedule, not a sufficient-optimization or release-quality claim.",
+    "Base and IT training are not performed in this run."
+  ],
+  "full_corpus_trained": false,
+  "quality_gate_passed": false,
+  "runpod_used": false,
+  "paid_fallback_used": false,
+  "published": false,
+  "reproduction_protocol_sha256": {
+    "prepare_colab_training_window.py": "63ff8d2a16843dc055bdba8d616f6c4a1190e824515a282ac1595d39a60eac61",
+    "colab_train_stories_window.py": "ff6791c983bd4826ed0ae336e1e02c30b2dae4023ef20b9bdf2926a0aa94bfee",
+    "colab_export_stories_phase.py": "54915ab7fc98ea7b0dff21386e87e49738818f6b04d0f312efa9bb9c1380eb62",
+    "colab_audit_stories_shuffle.py": "bdbd29b0b650fa51b0ac10c4da2420e74bfaf4fad5125c43d3ecdcc671ad75de",
+    "prepare_stories_generation_prompts.py": "d9bf389770ac8b6a82d1e28c37390105ba55ab3507acafe946bd86288ab80dd7",
+    "colab_generate_stories_partial.py": "dccb88937f6d146777ef998f4a47c5ae1adaa3f01ab7c521c105bb3ffe03c5b0",
+    "evaluate_stories_partial.py": "2e6677faa9a2320c5c606dcace082c3b3cd3a072131119f555d0ac84c5ed53ac"
+  }
+}

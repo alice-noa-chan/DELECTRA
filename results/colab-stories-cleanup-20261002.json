@@ -1,0 +1,15 @@
+{
+  "measured_at_utc": "2026-10-02T06:12:32.048449+00:00",
+  "assignment_inventory_count": 0,
+  "consumption_info_assignment_count": 0,
+  "compute_unit_balance": 0.0,
+  "reported_compute_units_per_hour": 0.0,
+  "created_runtimes": [
+    "delectra-stories-tpu",
+    "delectra-stories-t4"
+  ],
+  "all_created_runtimes_explicitly_stopped": true,
+  "checkpoints_exported_before_stop": true,
+  "runpod_used": false,
+  "paid_fallback_used": false
+}

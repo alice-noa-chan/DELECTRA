@@ -1,0 +1,82 @@
+{
+  "archive": "stories-xla-000192.tar",
+  "archive_bytes": 217589760,
+  "archive_sha256": "7a7ef91c2f5624fa9507d4f7da7198a4d233583f601071177859f8733cf1a283",
+  "checkpoint_sha256": "bc46a4b94bb7cccda6b76990c10e3cc0ab00366a9ca001d4694e5de6c52c9b61",
+  "state": {
+    "step": 192,
+    "input_positions": 786432,
+    "prediction_targets": 783360,
+    "assistant_targets": 0,
+    "active_wall_seconds": 253.0236511920001,
+    "best_validation_nll": 5.4916441440582275,
+    "best_validation_step": 192,
+    "optimizer_updates": 192,
+    "skipped_updates": 0
+  },
+  "sampler": {
+    "epoch": 0,
+    "offset": 3072
+  },
+  "spec": {
+    "model": {
+      "vocab_size": 32000,
+      "embedding_size": 288,
+      "hidden_size": 288,
+      "num_layers": 6,
+      "num_heads": 6,
+      "intermediate_size": 1024,
+      "max_positions": 256,
+      "dropout": 0.1,
+      "pad_token_id": 0,
+      "bos_token_id": 1,
+      "attention_backend": "eager"
+    },
+    "objective": {
+      "mode": "joint",
+      "generator_mode": "self",
+      "lm_loss_backend": "torch",
+      "replacement_probability": 0.15,
+      "temperature": 1.0,
+      "generator_weight": 1.0,
+      "rtd_weight": 5.0,
+      "lm_weight": 1.0
+    },
+    "plan": {
+      "max_input_positions": 435417088,
+      "batch_size": 16,
+      "learning_rate": 0.0003,
+      "warmup_positions": 1048576,
+      "min_lr_ratio": 0.1,
+      "weight_decay": 0.01,
+      "max_grad_norm": 1.0,
+      "seed": 7,
+      "device": "xla",
+      "precision": "bf16",
+      "cpu_threads": 2,
+      "checkpoint_every": 64,
+      "evaluate_every": 64,
+      "validation_blocks": 128,
+      "max_wall_seconds": 3600,
+      "sequential_backward": true,
+      "fused_optimizer": false,
+      "share_embeddings": true
+    },
+    "corpus_manifest_sha256": "d1a76e9642c789933e50509adc02ed83604d98f63e38902efb5cdd8a1472a7dd",
+    "initialize_from_sha256": null
+  },
+  "environment": {
+    "python": "3.13.15",
+    "torch": "2.9.0+cpu",
+    "transformers": "4.57.6",
+    "device": "xla"
+  },
+  "code_commit": "c51a60a",
+  "wheel_sha256": "e82834f3840a48debf7beba1fe47f6f92de6d437ba02026eac080fa12e7c8ac5",
+  "test_split_used": false,
+  "full_corpus_trained": false,
+  "published": false,
+  "local_archive": "runs/stories-xla-000192-20261002.tar",
+  "local_checkpoint": "runs/colab-stories-xla-000192-20261002/stories-training/latest.pt",
+  "locally_verified": true
+}
