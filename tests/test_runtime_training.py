@@ -76,3 +76,7 @@ def test_xla_rng_snapshot_does_not_advance_the_step(monkeypatch):
     assert runtime.rng_state() == runtime.rng_state() == 7
     runtime.restore_rng(42)
     assert runtime.rng_state() == runtime.rng_state() == 42
+    runtime.synchronize(preserve_rng=True)
+    assert runtime.rng_state() == 42
+    runtime.synchronize()
+    assert runtime.rng_state() == 43

@@ -61,9 +61,14 @@ class TrainingRuntime:
         self.synchronize()
         return self.scaler.get_scale() >= old_scale
 
-    def synchronize(self):
+    def synchronize(self, *, preserve_rng=False):
         if self.xla is not None:
+            state = self.rng_state() if preserve_rng else None
             self.xla.sync(wait=True)
+            if preserve_rng:
+                import torch_xla.core.xla_model as xm
+
+                xm.set_rng_state(state, self.device)
 
     def rng_state(self):
         if self.xla is None:

@@ -460,7 +460,9 @@ class ProductionTrainer:
         }
 
     def save(self, *, filename: str = "latest.pt"):
-        self.runtime.synchronize()
+        # Checkpoint frequency must not change the next dropout seed. Training
+        # steps already synchronize after AdamW; this only drains serialization.
+        self.runtime.synchronize(preserve_rng=True)
         array_state = np.random.get_state()
         saved = {
             "spec": self.spec,

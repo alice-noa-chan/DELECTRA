@@ -56,6 +56,8 @@ model/optimizer tensors on CPU and preserve XLA device RNG state separately.
 XLA synchronization advances its device seed even without random work. Snapshot
 reads therefore do not synchronize; checkpoint saving synchronizes first, and
 resume drains loading before restoring the saved next-step seed.
+Checkpoint synchronization preserves the existing next-step seed so extra saves
+and a requested pause cannot change future dropout merely by advancing XLA steps.
 Device conversion explicitly restores the vocabulary head/input-embedding
 alias before constructing AdamW. XLA otherwise replaces the two references with
 independent parameters. Divergent legacy input/output checkpoint weights are
