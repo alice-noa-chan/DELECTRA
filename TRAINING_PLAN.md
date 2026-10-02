@@ -222,6 +222,22 @@ validation and checkpoint work, but process exit alone does not stop provider
 GPU/storage billing. Independent final-test scoring remains separate from
 checkpoint selection, and a completed token budget never authorizes publication.
 
+Frozen scoring uses the explicit `deletcra.evaluation` entry point. It neither
+updates weights nor selects a checkpoint. Omit `--max-blocks` for full partition
+coverage; a bounded prefix is labelled diagnostic. NLL is weighted by actual
+supervised targets, including a smaller final batch. Reference scoring uses the
+same pinned tokenizer and prepared BOS/block protocol; its pretraining overlap
+with the dataset remains unknown.
+
+```powershell
+.venv/Scripts/python -m deletcra.evaluation --data data/tinystories-full-256 --split test --reference --output results/reference-full-test-cpu.json
+.venv/Scripts/python -m deletcra.evaluation --data data/tinystories-full-256 --split test --checkpoint runs/cpu-production-check/latest.pt --max-blocks 4 --output results/cpu-diagnostic-test.json
+```
+
+The small CPU checkpoint example is diagnostic only. A full reference result
+establishes a comparator, not candidate quality. Candidate release testing must
+use the selected completed-training checkpoint and the full untouched partition.
+
 ## Conditional compute estimate
 
 The repeated fixed-batch comparison measured joint throughput at context 256 and
